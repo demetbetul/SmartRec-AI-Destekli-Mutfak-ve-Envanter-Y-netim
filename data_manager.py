@@ -2,16 +2,40 @@ import json
 import os
 from datetime import datetime
 
+
+# Dosyanın bulunduğu klasörü ana dizin olarak belirle
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Data klasörüne giden yolu dinamik yap
+DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
+
+def dosya_yolu_getir(dosya_adi):
+    return os.path.join(DATA_DIR, dosya_adi)
+
 def veriyi_yukle():
-    # Dosya yolunu belirliyoruz
-    dosya_yolu = os.path.join('data', 'recipes.json')
+    # Artık dosya yolunu elle yazmıyoruz, dinamik fonksiyonumuzu çağırıyoruz
+    path = dosya_yolu_getir('recipes.json') 
     
     try:
-        with open(dosya_yolu, 'r', encoding='utf-8') as f:
-            veri = json.load(f)
-            return veri["tarifler"]
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        # --- VERİ İŞLEME VE KONTROL UZMANI DOKUNUŞU ---
+        # Veriyi kullanmadan önce 'şemaya uygun mu' diye denetliyoruz
+        durum, mesaj = veri_dogrula(data, "tarif")
+        
+        if not durum:
+            print(f"⚠️ VERİ KONTROL HATASI: {mesaj}")
+            # Veri bozuksa sistemi durdurup boş liste döndürüyoruz ki hata zinciri oluşmasın
+            return []
+            
+        return data["tarifler"]
+        
     except FileNotFoundError:
-        return "Hata: JSON dosyası bulunamadı! Lütfen 'data' klasörünü kontrol edin."
+        print(f"❌ Hata: {path} dosyası bulunamadı! Lütfen veri yollarını kontrol et.")
+        return []
+    except json.JSONDecodeError:
+        print(f"❌ Hata: JSON dosyasının formatı bozuk (virgül veya parantez hatası olabilir).")
+        return []
 
 # Basit bir test yapalım:
 tarifler = veriyi_yukle()
@@ -177,6 +201,23 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori):
         print(f"✅ {yemek_adi} günlüğe kaydedildi! Grafik için veri hazır.")
     except Exception as e:
         print(f"❌ Günlük kaydı hatası: {e}")
+        
+def veri_dogrula(veri, tip):
+    """
+    Veri İşleme Uzmanı Kontrolü: 
+    Yüklenen verinin şemaya uygun olup olmadığını denetler.
+    """
+    if tip == "envanter":
+        for item in veri.get("envanter", []):
+            if not all(k in item for k in ("ad", "miktar", "skt")):
+                return False, f"Eksik alan bulundu: {item.get('ad', 'Bilinmeyen')}"
+    
+    if tip == "tarif":
+        for tarif in veri.get("tarifler", []):
+            if "malzemeler" not in tarif or not isinstance(tarif["malzemeler"], list):
+                return False, f"Hatalı tarif yapısı: {tarif.get('ad', 'Bilinmeyen')}"
+                
+    return True, "Veri temiz!"
     
 
 if __name__ == "__main__":
