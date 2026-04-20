@@ -46,29 +46,32 @@ def veri_temizle(metin):
     return metin
 
 def veriyi_yukle():
-    # Artık dosya yolunu elle yazmıyoruz, dinamik fonksiyonumuzu çağırıyoruz
-    path = dosya_yolu_getir('recipes.json') 
-    
+    path = dosya_yolu_getir('recipes.json')
     try:
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
-        # --- VERİ İŞLEME VE KONTROL UZMANI DOKUNUŞU ---
-        # Veriyi kullanmadan önce 'şemaya uygun mu' diye denetliyoruz
-        durum, mesaj = veri_dogrula(data, "tarif")
         
-        if not durum:
-            print(f"⚠️ VERİ KONTROL HATASI: {mesaj}")
-            # Veri bozuksa sistemi durdurup boş liste döndürüyoruz ki hata zinciri oluşmasın
-            return []
+            # --- VERİ TEMİZLEME DOKUNUŞU ---
+            # Her tarifin adını ve malzemelerini daha yüklerken temizleyelim
+            for tarif in data.get("tarifler", []):
+                tarif["ad"] = veri_temizle(tarif["ad"])
+                tarif["malzemeler"] = [veri_temizle(m) for m in tarif["malzemeler"]]
+            
+            durum, mesaj = veri_dogrula(data, "tarif")
+            if not durum:
+                logging.error(f"Doğrulama hatası: {mesaj}")
+                return []
             
         return data["tarifler"]
+    except Exception as e:
+        logging.error(f"Yükleme hatası: {e}")
+        return []
         
     except FileNotFoundError:
-        print(f"❌ Hata: {path} dosyası bulunamadı! Lütfen veri yollarını kontrol et.")
+        logging.error(f"❌ Hata: {path} dosyası bulunamadı! Lütfen veri yollarını kontrol et.")
         return []
     except json.JSONDecodeError:
-        print(f"❌ Hata: JSON dosyasının formatı bozuk (virgül veya parantez hatası olabilir).")
+        logging.error(f"❌ Hata: JSON dosyasının formatı bozuk (virgül veya parantez hatası olabilir).")
         return []
 
 # Basit bir test yapalım:
