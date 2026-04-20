@@ -2,11 +2,17 @@ import json
 import logging
 import os
 from datetime import datetime
+import shutil
 
 # Dosyanın bulunduğu klasörü ana dizin olarak belirle
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Data klasörüne giden yolu dinamik yap
 DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
+BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
+
+# Eğer backups klasörü yoksa otomatik oluştur
+if not os.path.exists(BACKUP_DIR):
+    os.makedirs(BACKUP_DIR)
 
 # Profesyonel Loglama Ayarı
 logging.basicConfig(
@@ -191,21 +197,19 @@ def eksik_malzemeleri_bul(tarif_id):
         return f"Hata: {e}"
     
 def ai_icin_malzeme_listesi_hazirla():
-    """
-    inventory.json dosyasındaki malzemeleri AI'nın anlayabileceği 
-    tek bir metin (string) haline getirir.
-    """
     try:
-        with open('data/inventory.json', 'r', encoding='utf-8') as f:
-            envanter = json.load(f)["envanter"]
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            envanter_data = json.load(f)
         
-        # Sadece malzeme isimlerini al ve virgülle birleştir
-        malzeme_isimleri = malzeme_isimleri = [veri_temizle(item["ad"]) for item in envanter]
-        malzeme_metni = ", ".join(malzeme_isimleri)
+        # Buraya dikkat: Listenin içindeki her bir item'ın 'ad' alanını çekiyoruz
+        # Eğer sadece 'envanter_data'yı metne çevirirsen harf harf ayırır.
+        malzemeler = [veri_temizle(item["ad"]) for item in envanter_data.get("envanter", [])]
         
-        return malzeme_metni
+        return malzemeler # Burası bir LİSTE döndürmeli, metin değil!
     except Exception as e:
-        return f"Malzeme listesi hazırlanamadı: {e}"
+        logging.error(f"AI malzeme listesi hatası: {e}")
+        return []
     
 def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori):
     """
@@ -274,35 +278,132 @@ def envanter_guncelle(yemek_adi):
     except Exception as e:
         print(f"❌ Veri güncelleme hatası: {e}")
         
+def veri_yedekle():
+    """
+    Veri İşleme Uzmanı Güvenlik Önlemi: 
+    Kritik veri dosyalarını tarih damgasıyla yedekler.
+    """
+    dosyalar = ['recipes.json', 'inventory.json', 'nutrition.json']
+    zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    try:
+        for dosya in dosyalar:
+            kaynak = dosya_yolu_getir(dosya)
+            if os.path.exists(kaynak):
+                yedek_adi = f"{dosya.split('.')[0]}_{zaman_damgasi}.json"
+                hedef = os.path.join(BACKUP_DIR, yedek_adi)
+                shutil.copy2(kaynak, hedef)
+        
+        print(f"🛡️ GÜVENLİK: Veri yedekleri '{zaman_damgasi}' etiketiyle alındı.")
+    except Exception as e:
+        logging.error(f"Yedekleme hatası: {e}")
+        print("⚠️ Yedekleme sırasında bir hata oluştu, loglara bakınız.")
+        
+def envanter_istatistikleri():
+    """
+    Veri Analizi Uzmanı Notu: 
+    Envanterdeki ürünlerin genel durumunu analiz eder.
+    """
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        envanter = data.get("envanter", [])
+        total_item = len(envanter)
+        kritik_urunler = [item["ad"] for item in envanter if item["miktar"] <= 2]
+        
+        print("\n" + "📊 VERİ ANALİZ RAPORU")
+        print(f"🔹 Toplam Çeşit Ürün: {total_item}")
+        print(f"⚠️ Kritik Stok (2 altı): {', '.join(kritik_urunler) if kritik_urunler else 'Yok'}")
+        print("-" * 20)
+        
+    except Exception as e:
+        logging.error(f"İstatistik hatası: {e}")
+        
+        
+def envanter_malzeme_ekle(ad, miktar, birim="Adet"):
+    """
+    Veri Yönetim Uzmanı Dokunuşu: 
+    Yeni bir malzemeyi temizleyerek ve doğrulayarak envantere ekler.
+    """
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # 1. Veriyi Temizle (Standardizasyon)
+        temiz_ad = veri_temizle(ad)
+        
+        # 2. Ürün zaten var mı kontrol et (Varsa miktarını artır)
+        mevcut = next((item for item in data["envanter"] if veri_temizle(item["ad"]) == temiz_ad), None)
+        
+        if mevcut:
+            mevcut["miktar"] += miktar
+            print(f"🔄 GÜNCELLEME: {temiz_ad} miktarı {mevcut['miktar']} oldu.")
+        else:
+            # 3. Yeni Ürün Ekle
+            yeni_urun = {"ad": temiz_ad, "miktar": miktar, "birim": birim}
+            data["envanter"].append(yeni_urun)
+            print(f"✨ YENİ ÜRÜN: {temiz_ad} envantere eklendi.")
+        
+        # 4. Kaydet (Persistence)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            
+    except Exception as e:
+        logging.error(f"Veri ekleme hatası: {e}")
+        
     
 
 if __name__ == "__main__":
-    try:
-        print("\n" + "="*30)
-        print("🚀 SMARTREC SİSTEM KONTROLÜ")
-        print("="*30)
-        
-        # Veri Yükleme Testi
-        tarifler = veriyi_yukle()
+    print("\n" + "="*30)
+    print("🚀 SMARTREC SİSTEM KONTROLÜ")
+    print("="*30 + "\n")
+
+    # 1. ADIM: Verileri Güvene Al (Yedekleme)
+    # Bu satır sayesinde 'backups' klasörün dolacak
+    veri_yedekle()
+
+    # 2. ADIM: Verileri Yükle ve Kontrol Et
+    tarifler = veriyi_yukle()
+
+    if tarifler:
         print(f"✅ Veritabanı: {len(tarifler)} tarif başarıyla yüklendi.")
         
-        # Filtreleme Testi
-        v_tarifler = akilli_tarif_filtrele(etiket="vejetaryen")
-        print(f"🌱 Filtreleme: {len(v_tarifler)} adet vejetaryen tarif bulundu.")
+        # Vejetaryen filtreleme testimiz
+        veg_tarifler = [t for t in tarifler if "vejetaryen" in [v.lower() for v in t.get("kategoriler", [])]]
+        print(f"🌱 Filtreleme: {len(veg_tarifler)} adet vejetaryen tarif bulundu.")
         
-        
-        
-        print("="*30)
+        print("\n" + "="*30)
         print("✨ SİSTEM ŞU AN KUSURSUZ ÇALIŞIYOR!")
-    except Exception as e:
-        print(f"❌ KONTROL SIRASINDA HATA: {e}")
+        print("="*30 + "\n")
         
-        # Envanter Güncelleme Testi
-    #envanter_guncelle("Menemen")
-        
+        envanter_listesi = ai_icin_malzeme_listesi_hazirla()
+        if envanter_listesi:
+            # Hem temiz görünsün hem de kaç tane olduğunu söylesin
+            print(f"🤖 AI HAZIRLIK: Toplam {len(envanter_listesi)} malzeme başarıyla paketlendi.")
+            # İstersen ilk 5 tanesini örnek olarak gösterebilirsin:
+            print(f"📋 Örnek Malzemeler: {', '.join(envanter_listesi[:5])}...")
+            
+            
+envanter_istatistikleri()
+
+# 5. ADIM: Dinamik Veri Ekleme Testi
+# Olmayan bir şey ekleyelim
+#envanter_malzeme_ekle("Ejder Meyvesi", 5, "Adet")
+# Olan bir şeyin miktarını artıralım
+#envanter_malzeme_ekle("Domates", 3, "Adet")
+    
+# Güncel durumu görmek için istatistikleri tekrar çağıralım
+#envanter_istatistikleri()
+
+# 4. ADIM: Opsiyonel Testler (İhtiyaç duyduğunda '#' kaldırabilirsin)
+# envanter_guncelle("Menemen")
+    
 # AI Malzeme Listesi Testi
-ai_listesi = ai_icin_malzeme_listesi_hazirla()
-print(f"\n🤖 AI'ya Gidecek Malzemeler: {ai_listesi}")
+#ai_listesi = ai_icin_malzeme_listesi_hazirla()
+#print(f"\n🤖 AI'ya Gidecek Malzemeler: {ai_listesi}")
     
 # Günlük Kayıt Testi
 #yemeği_gunluge_kaydet("Kuru Fasulye", 600)

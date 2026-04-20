@@ -1,0 +1,532 @@
+{"tarifler": [
+  {
+    "id": 1,
+    "ad": "menemen",
+    "kategori": "kahvaltı",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "15 dk",
+    "kalori": 240,
+    "etiketler": ["kahvaltı", "pratik", "vejetaryen"],
+    "aciklama": "Domates, biber ve yumurta ile hazırlanan klasik Türk kahvaltılığı.",
+    "malzemeler": ["yumurta", "domates", "yeşil biber", "zeytinyağı", "tuz"],
+    "hazirlanis": [
+      "Biberleri doğra ve yağda kavur.",
+      "Domatesleri ekleyip pişir.",
+      "Yumurtaları kır ve karıştır.",
+      "Tuz ekleyip servis et."
+    ]
+  },
+  {
+    "id": 2,
+    "ad": "mercimek çorbası",
+    "kategori": "çorba",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "30 dk",
+    "kalori": 300,
+    "etiketler": ["çorba", "vejetaryen", "sağlıklı"],
+    "aciklama": "Besleyici ve doyurucu klasik Türk çorbası.",
+    "malzemeler": ["kırmızı mercimek", "soğan", "havuç", "yağ", "tuz"],
+    "hazirlanis": [
+      "Mercimeği yıka.",
+      "Soğan ve havucu kavur.",
+      "Mercimeği ekle ve su ilave et.",
+      "Yumuşayana kadar pişir ve blenderdan geçir."
+    ]
+  },
+  {
+    "id": 3,
+    "ad": "kuru fasulye",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "60 dk",
+    "kalori": 600,
+    "etiketler": ["baklagil", "protein", "geleneksel"],
+    "aciklama": "Türk mutfağının en sevilen baklagil yemeklerinden biridir.",
+    "malzemeler": ["kuru fasulye", "soğan", "salça", "yağ", "tuz"],
+    "hazirlanis": [
+      "Fasulyeyi önceden ıslat.",
+      "Soğanı kavur ve salça ekle.",
+      "Fasulyeyi ekleyip su koy.",
+      "Yumuşayana kadar pişir."
+    ]
+  },
+  {
+    "id": 4,
+    "ad": "pilav",
+    "kategori": "yan yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "kalori": 520,
+    "etiketler": ["pirinç", "tamamlayıcı"],
+    "aciklama": "Tane tane pirinç pilavı.",
+    "malzemeler": ["pirinç", "su", "tereyağı", "tuz"],
+    "hazirlanis": [
+      "Pirinci yıka.",
+      "Yağda kavur.",
+      "Su ekle.",
+      "Kısık ateşte pişir."
+    ]
+  },
+  {
+    "id": 5,
+    "ad": "tavuk sote",
+    "kategori": "ana yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "25 dk",
+    "kalori": 450,
+    "etiketler": ["protein", "pratik"],
+    "aciklama": "Sebzelerle sotelenmiş tavuk yemeği.",
+    "malzemeler": ["tavuk", "biber", "soğan", "domates", "yağ"],
+    "hazirlanis": [
+      "Tavuğu doğra ve kavur.",
+      "Sebzeleri ekle.",
+      "Baharatlarla pişir.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 6,
+    "ad": "karnıyarık",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "50 dk",
+    "kalori": 700,
+    "etiketler": ["etli", "geleneksel"],
+    "aciklama": "Kıymalı harçla doldurulmuş patlıcan yemeği.",
+    "malzemeler": ["patlıcan", "kıyma", "soğan", "domates", "yağ"],
+    "hazirlanis": [
+      "Patlıcanları kızart.",
+      "Kıymalı harcı hazırla.",
+      "Patlıcanları doldur.",
+      "Fırında pişir."
+    ]
+  },
+  {
+    "id": 7,
+    "ad": "lahmacun",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "40 dk",
+    "kalori": 500,
+    "etiketler": ["hamur işi", "geleneksel"],
+    "aciklama": "İnce hamur üzerine kıymalı harçla yapılan lezzetli yemek.",
+    "malzemeler": ["hamur", "kıyma", "soğan", "domates", "baharat"],
+    "hazirlanis": [
+      "Hamuru aç.",
+      "Harcı üzerine sür.",
+      "Fırında pişir.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 8,
+    "ad": "mantı",
+    "kategori": "ana yemek",
+    "zorluk": "zor",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "90 dk",
+    "kalori": 800,
+    "etiketler": ["hamur işi", "yoğurtlu"],
+    "aciklama": "Küçük hamur parçalarının içine kıyma konularak yapılan yemek.",
+    "malzemeler": ["un", "kıyma", "yoğurt", "sarımsak", "yağ"],
+    "hazirlanis": [
+      "Hamuru hazırla.",
+      "Küçük parçalar kes.",
+      "İç harç koy ve kapat.",
+      "Haşla ve sosla servis et."
+    ]
+  },
+  {
+    "id": 9,
+    "ad": "çoban salata",
+    "kategori": "salata",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "10 dk",
+    "kalori": 120,
+    "etiketler": ["vejetaryen", "hafif"],
+    "aciklama": "Taze sebzelerle hazırlanan hafif salata.",
+    "malzemeler": ["domates", "salatalık", "soğan", "zeytinyağı", "limon"],
+    "hazirlanis": [
+      "Sebzeleri doğra.",
+      "Karıştır.",
+      "Sos ekle.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 10,
+    "ad": "baklava",
+    "kategori": "tatlı",
+    "zorluk": "zor",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "90 dk",
+    "kalori": 1200,
+    "etiketler": ["şerbetli", "geleneksel"],
+    "aciklama": "İnce yufka ve şerbetle yapılan ünlü Türk tatlısı.",
+    "malzemeler": ["yufka", "ceviz", "şeker", "tereyağı", "su"],
+    "hazirlanis": [
+      "Yufkaları diz.",
+      "Aralara ceviz koy.",
+      "Pişir.",
+      "Şerbet dök."
+    ]
+  },
+  {
+    "id": 11,
+    "ad": "sütlaç",
+    "kategori": "tatlı",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "35 dk",
+    "kalori": 400,
+    "etiketler": ["sütlü", "hafif"],
+    "aciklama": "Süt ve pirinçle yapılan geleneksel tatlı.",
+    "malzemeler": ["süt", "pirinç", "şeker"],
+    "hazirlanis": [
+      "Pirinci haşla.",
+      "Süt ekle.",
+      "Şeker kat.",
+      "Kıvam alana kadar pişir."
+    ]
+  },
+  {
+    "id": 12,
+    "ad": "imam bayıldı",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "60 dk",
+    "kalori": 500,
+    "etiketler": ["zeytinyağlı", "vejetaryen"],
+    "aciklama": "Zeytinyağlı patlıcan yemeği.",
+    "malzemeler": ["patlıcan", "soğan", "domates", "zeytinyağı"],
+    "hazirlanis": [
+      "Patlıcanları hazırla.",
+      "İç harcı yap.",
+      "Doldur.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 13,
+    "ad": "ezogelin çorbası",
+    "kategori": "çorba",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "30 dk",
+    "kalori": 320,
+    "etiketler": ["çorba", "baharatlı"],
+    "aciklama": "Mercimek ve baharatlarla hazırlanan çorba.",
+    "malzemeler": ["mercimek", "bulgur", "salça", "soğan"],
+    "hazirlanis": [
+      "Malzemeleri kavur.",
+      "Su ekle.",
+      "Kaynat.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 14,
+    "ad": "dolma",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 5,
+    "hazirlanma_suresi": "70 dk",
+    "kalori": 650,
+    "etiketler": ["geleneksel", "dolma"],
+    "aciklama": "Sebzelerin içinin doldurulmasıyla yapılan yemek.",
+    "malzemeler": ["biber", "pirinç", "soğan", "baharat"],
+    "hazirlanis": [
+      "İç harcı hazırla.",
+      "Sebzelere doldur.",
+      "Tencereye diz.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 15,
+    "ad": "gözleme",
+    "kategori": "kahvaltı",
+    "zorluk": "orta",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "30 dk",
+    "kalori": 500,
+    "etiketler": ["hamur işi", "kahvaltı"],
+    "aciklama": "Sacda pişirilen iç harçlı hamur işi.",
+    "malzemeler": ["un", "su", "peynir", "ıspanak"],
+    "hazirlanis": [
+      "Hamur aç.",
+      "İç malzeme koy.",
+      "Katla.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 16,
+    "ad": "kısır",
+    "kategori": "salata",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "kalori": 350,
+    "etiketler": ["vejetaryen", "hafif"],
+    "aciklama": "Bulgurla yapılan lezzetli salata.",
+    "malzemeler": ["bulgur", "domates", "maydanoz", "zeytinyağı"],
+    "hazirlanis": [
+      "Bulguru ıslat.",
+      "Malzemeleri ekle.",
+      "Karıştır.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 17,
+    "ad": "şakşuka",
+    "kategori": "meze",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "35 dk",
+    "kalori": 400,
+    "etiketler": ["meze", "sebze"],
+    "aciklama": "Kızartılmış sebzelerle yapılan meze.",
+    "malzemeler": ["patlıcan", "domates", "biber", "yağ"],
+    "hazirlanis": [
+      "Sebzeleri kızart.",
+      "Sos hazırla.",
+      "Karıştır.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 18,
+    "ad": "tavuk pilav",
+    "kategori": "ana yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "35 dk",
+    "kalori": 700,
+    "etiketler": ["protein", "pratik"],
+    "aciklama": "Tavuk ve pilavın birlikte servis edildiği yemek.",
+    "malzemeler": ["tavuk", "pirinç", "yağ"],
+    "hazirlanis": [
+      "Tavuğu haşla.",
+      "Pilavı hazırla.",
+      "Birlikte servis et."
+    ]
+  },
+  {
+    "id": 19,
+    "ad": "fırın makarna",
+    "kategori": "ana yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "40 dk",
+    "kalori": 750,
+    "etiketler": ["hamur işi", "fırın"],
+    "aciklama": "Beşamel soslu fırın makarna.",
+    "malzemeler": ["makarna", "süt", "un", "peynir"],
+    "hazirlanis": [
+      "Makarnayı haşla.",
+      "Sos hazırla.",
+      "Fırına ver.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 20,
+    "ad": "revani",
+    "kategori": "tatlı",
+    "zorluk": "orta",
+    "kac_kisilik": 5,
+    "hazirlanma_suresi": "50 dk",
+    "kalori": 900,
+    "etiketler": ["şerbetli"],
+    "aciklama": "İrmikle yapılan şerbetli tatlı.",
+    "malzemeler": ["irmik", "yumurta", "şeker"],
+    "hazirlanis": [
+      "Karışımı hazırla.",
+      "Pişir.",
+      "Şerbet dök.",
+      "Dinlendir."
+    ]
+  },
+  {
+    "id": 21,
+    "ad": "poğaça",
+    "kategori": "kahvaltı",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "45 dk",
+    "kalori": 800,
+    "etiketler": ["hamur işi"],
+    "aciklama": "Yumuşak hamurlu kahvaltılık.",
+    "malzemeler": ["un", "maya", "süt", "peynir"],
+    "hazirlanis": [
+      "Hamur hazırla.",
+      "Şekil ver.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 22,
+    "ad": "börek",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 5,
+    "hazirlanma_suresi": "50 dk",
+    "kalori": 850,
+    "etiketler": ["hamur işi"],
+    "aciklama": "İç harçlı yufka yemeği.",
+    "malzemeler": ["yufka", "peynir", "yumurta"],
+    "hazirlanis": [
+      "Yufkaları hazırla.",
+      "İç malzeme koy.",
+      "Pişir."
+    ]
+  },
+  {
+    "id": 23,
+    "ad": "tarhana çorbası",
+    "kategori": "çorba",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "25 dk",
+    "kalori": 300,
+    "etiketler": ["çorba"],
+    "aciklama": "Geleneksel tarhana çorbası.",
+    "malzemeler": ["tarhana", "su", "yağ"],
+    "hazirlanis": [
+      "Tarhanayı çöz.",
+      "Kaynat.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 24,
+    "ad": "hamsi tava",
+    "kategori": "ana yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "25 dk",
+    "kalori": 600,
+    "etiketler": ["balık"],
+    "aciklama": "Kızartılmış hamsi balığı.",
+    "malzemeler": ["hamsi", "un", "yağ"],
+    "hazirlanis": [
+      "Balığı temizle.",
+      "Una bulayıp kızart.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 25,
+    "ad": "izmir köfte",
+    "kategori": "ana yemek",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "45 dk",
+    "kalori": 700,
+    "etiketler": ["etli"],
+    "aciklama": "Fırında köfte ve patates yemeği.",
+    "malzemeler": ["kıyma", "patates", "domates"],
+    "hazirlanis": [
+      "Köfte hazırla.",
+      "Sebzeleri doğra.",
+      "Fırında pişir."
+    ]
+  },
+  {
+    "id": 26,
+    "ad": "çiğ köfte",
+    "kategori": "meze",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "30 dk",
+    "kalori": 500,
+    "etiketler": ["vegan"],
+    "aciklama": "Baharatlı bulgur yemeği.",
+    "malzemeler": ["bulgur", "salça", "baharat"],
+    "hazirlanis": [
+      "Malzemeleri yoğur.",
+      "Şekil ver.",
+      "Servis et."
+    ]
+  },
+  {
+    "id": 27,
+    "ad": "ayran",
+    "kategori": "içecek",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "5 dk",
+    "kalori": 80,
+    "etiketler": ["içecek"],
+    "aciklama": "Yoğurt bazlı serinletici içecek.",
+    "malzemeler": ["yoğurt", "su", "tuz"],
+    "hazirlanis": [
+      "Malzemeleri karıştır.",
+      "Soğuk servis et."
+    ]
+  },
+  {
+    "id": 28,
+    "ad": "kazandibi",
+    "kategori": "tatlı",
+    "zorluk": "zor",
+    "kac_kisilik": 5,
+    "hazirlanma_suresi": "60 dk",
+    "kalori": 850,
+    "etiketler": ["sütlü"],
+    "aciklama": "Altı karamelize edilmiş sütlü tatlı.",
+    "malzemeler": ["süt", "şeker", "nişasta"],
+    "hazirlanis": [
+      "Karışımı hazırla.",
+      "Tavada karamelize et.",
+      "Soğut."
+    ]
+  },
+  {
+    "id": 29,
+    "ad": "lokma",
+    "kategori": "tatlı",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "40 dk",
+    "kalori": 900,
+    "etiketler": ["şerbetli"],
+    "aciklama": "Kızartılmış hamur tatlısı.",
+    "malzemeler": ["un", "maya", "şeker"],
+    "hazirlanis": [
+      "Hamur hazırla.",
+      "Kızart.",
+      "Şerbete at."
+    ]
+  },
+  {
+    "id": 30,
+    "ad": "fırın tavuk",
+    "kategori": "ana yemek",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "60 dk",
+    "kalori": 650,
+    "etiketler": ["protein"],
+    "aciklama": "Baharatlı fırınlanmış tavuk yemeği.",
+    "malzemeler": ["tavuk", "baharat", "yağ"],
+    "hazirlanis": [
+      "Tavuğu marine et.",
+      "Fırına koy.",
+      "Pişir.",
+      "Servis et."
+    ]
+}
+]
+}

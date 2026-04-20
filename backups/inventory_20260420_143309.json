@@ -2,7 +2,7 @@
   "envanter": [
     {
       "ad": "domates",
-      "miktar": 502,
+      "miktar": 499,
       "birim": "gr",
       "skt": "2026-04-22"
     },
@@ -359,11 +359,6 @@
       "miktar": 100,
       "birim": "gr",
       "skt": "2027-10-20"
-    },
-    {
-      "ad": "ejder meyvesi",
-      "miktar": 5,
-      "birim": "Adet"
     }
   ]
 }
