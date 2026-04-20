@@ -1,15 +1,49 @@
 import json
+import logging
 import os
 from datetime import datetime
-
 
 # Dosyanın bulunduğu klasörü ana dizin olarak belirle
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Data klasörüne giden yolu dinamik yap
 DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 
+# Profesyonel Loglama Ayarı
+logging.basicConfig(
+    filename=os.path.join(BASE_DIR, '..', 'app.log'), # Hataları app.log dosyasına yazar
+    level=logging.ERROR,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    encoding='utf-8'
+)
+
 def dosya_yolu_getir(dosya_adi):
     return os.path.join(DATA_DIR, dosya_adi)
+
+def veri_dogrula(veri, tip):
+    """
+    Veri İşleme Uzmanı Kontrolü: 
+    Yüklenen verinin şemaya uygun olup olmadığını denetler.
+    """
+    if tip == "envanter":
+        for item in veri.get("envanter", []):
+            if not all(k in item for k in ("ad", "miktar", "skt")):
+                return False, f"Eksik alan bulundu: {item.get('ad', 'Bilinmeyen')}"
+    
+    if tip == "tarif":
+        for tarif in veri.get("tarifler", []):
+            if "malzemeler" not in tarif or not isinstance(tarif["malzemeler"], list):
+                return False, f"Hatalı tarif yapısı: {tarif.get('ad', 'Bilinmeyen')}"
+                
+    return True, "Veri temiz!"
+
+def veri_temizle(metin):
+    """
+    Veri İşleme Uzmanı Dokunuşu: 
+    Metindeki gereksiz boşlukları siler ve tamamen küçük harfe çevirir.
+    """
+    if isinstance(metin, str):
+        return metin.strip().lower()
+    return metin
 
 def veriyi_yukle():
     # Artık dosya yolunu elle yazmıyoruz, dinamik fonksiyonumuzu çağırıyoruz
@@ -163,7 +197,7 @@ def ai_icin_malzeme_listesi_hazirla():
             envanter = json.load(f)["envanter"]
         
         # Sadece malzeme isimlerini al ve virgülle birleştir
-        malzeme_isimleri = [item["ad"].lower() for item in envanter]
+        malzeme_isimleri = malzeme_isimleri = [veri_temizle(item["ad"]) for item in envanter]
         malzeme_metni = ", ".join(malzeme_isimleri)
         
         return malzeme_metni
@@ -201,23 +235,42 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori):
         print(f"✅ {yemek_adi} günlüğe kaydedildi! Grafik için veri hazır.")
     except Exception as e:
         print(f"❌ Günlük kaydı hatası: {e}")
-        
-def veri_dogrula(veri, tip):
+
+def envanter_guncelle(yemek_adi):
     """
     Veri İşleme Uzmanı Kontrolü: 
-    Yüklenen verinin şemaya uygun olup olmadığını denetler.
+    Yemek yapıldığında malzemeleri stoktan düşer.
     """
-    if tip == "envanter":
-        for item in veri.get("envanter", []):
-            if not all(k in item for k in ("ad", "miktar", "skt")):
-                return False, f"Eksik alan bulundu: {item.get('ad', 'Bilinmeyen')}"
-    
-    if tip == "tarif":
-        for tarif in veri.get("tarifler", []):
-            if "malzemeler" not in tarif or not isinstance(tarif["malzemeler"], list):
-                return False, f"Hatalı tarif yapısı: {tarif.get('ad', 'Bilinmeyen')}"
-                
-    return True, "Veri temiz!"
+    try:
+        # 1. Verileri dinamik yollarla çekelim
+        tarifler = veriyi_yukle()
+        envanter_path = dosya_yolu_getir('inventory.json')
+        
+        with open(envanter_path, 'r', encoding='utf-8') as f:
+            envanter_data = json.load(f)
+
+        # 2. Seçilen yemeği veritabanında bulalım
+        secilen_tarif = next((t for t in tarifler if t["ad"].lower() == yemek_adi.lower()), None)
+        
+        if secilen_tarif:
+            # Tarifteki her bir malzeme için dolaba bakalım
+            for malzeme in secilen_tarif["malzemeler"]:
+                for stok in envanter_data["envanter"]:
+                    if veri_temizle(stok["ad"]) == veri_temizle(malzeme):
+                        # Stok miktarını 1 azalt (0'ın altına düşmesin diye max kullandık)
+                        stok["miktar"] = max(0, stok["miktar"] - 1)
+            
+            # 3. Güncellenmiş yeni envanteri dosyaya geri yazalım
+            with open(envanter_path, 'w', encoding='utf-8') as f:
+                json.dump(envanter_data, f, ensure_ascii=False, indent=2)
+            
+            print(f"✅ VERİ GÜNCELLEME: {yemek_adi} yapıldı, stoklar düşüldü.")
+        else:
+            print(f"⚠️ Hata: {yemek_adi} isimli bir tarif bulunamadı.")
+            
+    except Exception as e:
+        print(f"❌ Veri güncelleme hatası: {e}")
+        
     
 
 if __name__ == "__main__":
@@ -234,10 +287,15 @@ if __name__ == "__main__":
         v_tarifler = akilli_tarif_filtrele(etiket="vejetaryen")
         print(f"🌱 Filtreleme: {len(v_tarifler)} adet vejetaryen tarif bulundu.")
         
+        
+        
         print("="*30)
         print("✨ SİSTEM ŞU AN KUSURSUZ ÇALIŞIYOR!")
     except Exception as e:
         print(f"❌ KONTROL SIRASINDA HATA: {e}")
+        
+        # Envanter Güncelleme Testi
+    #envanter_guncelle("Menemen")
         
 # AI Malzeme Listesi Testi
 ai_listesi = ai_icin_malzeme_listesi_hazirla()
