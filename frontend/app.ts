@@ -28,3 +28,12 @@ function envanterKontrolEt(liste: Malzeme[]) {
         }
     });
 }
+function bozukUrunKontrolu(envanter: Malzeme[]) {
+    const bugun = new Date().toISOString().split('T')[0];
+    
+    envanter.forEach(urun => {
+        if (urun.skt < bugun) {
+            console.log(`DİKKAT: ${urun.isim} bozulmuş olabilir!`); // 
+        }
+    });
+}
