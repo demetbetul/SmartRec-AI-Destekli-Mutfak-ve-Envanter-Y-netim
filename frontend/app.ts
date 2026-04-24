@@ -1,12 +1,7 @@
-// 1. Veri Yapısı (Tip Tanımlama)
-interface Malzeme {
-    ad: string;
-    miktar: number;
-    skt: string; // Son Kullanma Tarihi
-}
+import { getIngredients, saveIngredient } from './storage';
 
-// 2. Hata Korumalı (Fail-Safe) Mantık Başlangıcı
-const envanterKontrol = (liste: Malzeme[]) => {
-    console.log("SmartRec Envanter Kontrolü Başlatıldı...");
-    // Burada ileride SKT kontrolü yapacağız
-};
+console.log("SmartRec Sistemi Hazır!");
+
+// Test etmek istersen:
+const liste = getIngredients();
+console.log("Mevcut Malzemeler:", liste);
