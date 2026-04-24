@@ -1,4 +1,5 @@
-// 1. Veri Yapısı (Tip Tanımlama)
+
+
 interface Malzeme {
     ad: string;
     miktar: number;
