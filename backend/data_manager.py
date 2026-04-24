@@ -3,6 +3,22 @@ import logging
 import os
 from datetime import datetime
 import shutil
+import os
+import json
+import requests
+from dotenv import load_dotenv
+import google.generativeai as genai
+from deep_translator import GoogleTranslator
+
+# .env dosyasındaki şifreleri yükle
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
+NUTRITION_API_KEY = os.getenv("NUTRITION_API_KEY")
+
+# Gemini ayarını bir kere yapıyoruz
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 # Dosyanın bulunduğu klasörü ana dizin olarak belirle
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -122,27 +138,6 @@ def eksik_malzemeleri_bul(tarif_malzemeleri):
             eksikler.append(malzeme)
     
     return eksikler
-
-
-
-def kalori_hesapla(tarif_malzemeleri):
-    """
-    tarif_malzemeleri: {'yumurta': 2, 'domates': 100} gibi miktar içeren bir sözlük
-    """
-    try:
-        with open('data/nutrition.json', 'r', encoding='utf-8') as f:
-            nut_data = json.load(f)['besin_degerleri']
-    except FileNotFoundError:
-        return "Besin verisi bulunamadı!"
-
-    toplam_kalori = 0
-    for malzeme, miktar in tarif_malzemeleri.items():
-        if malzeme.lower() in nut_data:
-            # Basit bir hesap: (miktar * 100gr kalorisi) / 100 
-            # (Eğer adetse direkt miktar ile çarpabiliriz, şimdilik düz mantık gidelim)
-            toplam_kalori += (miktar * nut_data[malzeme.lower()]) / 100
-    
-    return round(toplam_kalori, 2)
 
 
 
@@ -407,3 +402,127 @@ envanter_istatistikleri()
     
 # Günlük Kayıt Testi
 #yemeği_gunluge_kaydet("Kuru Fasulye", 600)
+
+def get_recipes_from_gemini(malzemeler_metni):
+    """Asıl servis: Gemini AI'dan dinamik malzemelerle menü ister."""
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana başlangıç, 
+    ana yemek ve tatlıdan oluşan 3 aşamalı bir menü öner: {malzemeler_metni}.
+    
+    Ayrıca bu yemekleri yapmak için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt.
+    
+    Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin yazma:
+    {{
+        "kaynak": "gemini",
+        "baslangic": "başlangıç yemeği",
+        "ana_yemek": "ana yemek",
+        "tatli": "tatlı",
+        "eksik_malzemeler": ["malzeme1", "malzeme2"]
+    }}
+    """
+    
+    response = model.generate_content(
+        prompt,
+        generation_config=genai.GenerationConfig(response_mime_type="application/json")
+    )
+    return json.loads(response.text)
+
+def get_recipes_from_spoonacular(malzemeler_metni):
+    """Yedek servis: Gemini çökerse Spoonacular'dan veri çeker (Otomatik Çeviri İçerir)."""
+    
+    # 1. YENİ EKLENEN KISIM: Türkçe metni İngilizceye çeviriyoruz
+    print("🌍 Sistem Uyarısı: Türkçe malzemeler Spoonacular için İngilizceye çevriliyor...")
+    try:
+        ingilizce_malzemeler = GoogleTranslator(source='tr', target='en').translate(malzemeler_metni)
+        print(f"🔄 Çevrilen Malzemeler: {ingilizce_malzemeler}")
+    except Exception as e:
+        print(f"❌ Çeviri Hatası: {e}")
+        ingilizce_malzemeler = malzemeler_metni # Çeviri çökerse orijinalini bırak
+        
+    # 2. ESKİ KISIM: API'ye artık İngilizce kelimeleri gönderiyoruz
+    url = "https://api.spoonacular.com/recipes/findByIngredients"
+    params = {
+        "ingredients": ingilizce_malzemeler, # Artık buraya İngilizce metin gidiyor!
+        "number": 3,
+        "apiKey": SPOONACULAR_API_KEY
+    }
+    
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    # Spoonacular 3 aşamalı menü mantığını bilmez, o yüzden dönen 3 tarifi bölüştürüyoruz
+    return {
+        "kaynak": "spoonacular",
+        "baslangic": data[0]["title"] if len(data) > 0 else "Tarif bulunamadı",
+        "ana_yemek": data[1]["title"] if len(data) > 1 else "Tarif bulunamadı",
+        "tatli": data[2]["title"] if len(data) > 2 else "Tarif bulunamadı",
+        "eksik_malzemeler": ["Bilinmiyor (Spoonacular verisi)"]
+    }
+
+def kalori_hesapla(yemek_adi):
+    """Sisteme zaten bağlı olan Spoonacular API ile kalori hesaplar."""
+    print(f"📊 {yemek_adi} için kalori hesaplanıyor (Spoonacular)...")
+    
+    # 1. Yemek adını İngilizceye çevir
+    try:
+        ingilizce_yemek = GoogleTranslator(source='tr', target='en').translate(yemek_adi)
+    except:
+        ingilizce_yemek = yemek_adi 
+        
+    # 2. Spoonacular'ın Gizli Kalori Uç Noktasına (Endpoint) İstek At
+    url = "https://api.spoonacular.com/recipes/guessNutrition"
+    params = {
+        "title": ingilizce_yemek,
+        "apiKey": SPOONACULAR_API_KEY # En başta aldığımız şifreyi kullanıyoruz!
+    }
+    
+    try:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Spoonacular veriyi {"calories": {"value": 315}} şeklinde döner
+            # Biz de o "value" kısmını güvenli bir şekilde çekiyoruz
+            kalori_degeri = data.get('calories', {}).get('value', 0)
+            
+            if kalori_degeri > 0:
+                return f"{int(kalori_degeri)} kcal"
+                
+        return "Bilinmiyor"
+    except Exception as e:
+        print(f"⚠️ Kalori hesaplama hatası: {e}")
+        return "Hesaplanamadı"
+
+def akilli_menu_olustur(malzemeler_listesi):
+    """Sistemin ana köprüsü. Tarifleri ve kalorileri tek bir JSON'da birleştirir."""
+    malzemeler_metni = ", ".join(malzemeler_listesi)
+    
+    try:
+        sonuc = get_recipes_from_gemini(malzemeler_metni)
+    except Exception as e:
+        print(f"Sistem Uyarısı: Gemini çöktü, yedeğe geçiliyor. ({e})")
+        sonuc = get_recipes_from_spoonacular(malzemeler_metni)
+        
+    # --- YENİ EKLENEN KISIM: Kalorileri Veriye Dahil Et ---
+    print("\n🔍 Besin Değerleri Analiz Ediliyor...")
+    sonuc["kaloriler"] = {
+        "baslangic_kalori": kalori_hesapla(sonuc["baslangic"]),
+        "ana_yemek_kalori": kalori_hesapla(sonuc["ana_yemek"]),
+        "tatli_kalori": kalori_hesapla(sonuc["tatli"])
+    }
+    # ------------------------------------------------------
+    
+    return sonuc
+    
+if __name__ == "__main__":
+    # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
+    kullanici_dolabi = ["kıyma", "soğan", "sarımsak", "domates salçası", "makarna"]
+    
+    print("Mutfak Envanteri Analiz Ediliyor...")
+    final_menu = akilli_menu_olustur(kullanici_dolabi)
+    
+    print("\n🍽️ OLUŞTURULAN MENÜ VERİSİ (JSON):")
+    print(json.dumps(final_menu, indent=4, ensure_ascii=False))
+
