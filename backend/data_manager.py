@@ -295,59 +295,62 @@ def veri_yedekle():
         print("⚠️ Yedekleme sırasında bir hata oluştu, loglara bakınız.")
         
 def envanter_istatistikleri():
-    """
-    Veri Analizi Uzmanı Notu: 
-    Envanterdeki ürünlerin genel durumunu analiz eder.
-    """
     try:
         path = dosya_yolu_getir('inventory.json')
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         envanter = data.get("envanter", [])
-        total_item = len(envanter)
-        kritik_urunler = [item["ad"] for item in envanter if item["miktar"] <= 2]
+        bugun = datetime.now()
         
-        print("\n" + "📊 VERİ ANALİZ RAPORU")
-        print(f"🔹 Toplam Çeşit Ürün: {total_item}")
-        print(f"⚠️ Kritik Stok (2 altı): {', '.join(kritik_urunler) if kritik_urunler else 'Yok'}")
-        print("-" * 20)
+        kritik_stok = [i["ad"] for i in envanter if i["miktar"] <= 2]
+        # SKT'si bugün veya geçmiş olanları bul
+        bozulmus_urunler = []
+        for i in envanter:
+            skt_tarihi = datetime.strptime(i["skt"], "%Y-%m-%d")
+            if skt_tarihi <= bugun:
+                bozulmus_urunler.append(i["ad"])
+
+        print("\n" + "📊 VERİ ANALİZ RAPORU (Zaman Duyarlı)")
+        print(f"🔹 Toplam Çeşit: {len(envanter)}")
+        print(f"⚠️ Kritik Stok: {', '.join(kritik_stok) if kritik_stok else 'Yok'}")
+        print(f"❌ TARİHİ GEÇMİŞ: {', '.join(bozulmus_urunler) if bozulmus_urunler else 'Hepsi Taze ✨'}")
+        print("-" * 30)
         
     except Exception as e:
-        logging.error(f"İstatistik hatası: {e}")
+        logging.error(f"SKT Analiz hatası: {e}")
         
         
-def envanter_malzeme_ekle(ad, miktar, birim="Adet"):
+def envanter_malzeme_ekle(ad, miktar, birim="Adet", raf_omru_gun=7):
     """
     Veri Yönetim Uzmanı Dokunuşu: 
-    Yeni bir malzemeyi temizleyerek ve doğrulayarak envantere ekler.
+    Malzemeyi eklerken bugünün tarihine raf ömrünü ekleyerek SKT oluşturur.
     """
     try:
         path = dosya_yolu_getir('inventory.json')
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # 1. Veriyi Temizle (Standardizasyon)
         temiz_ad = veri_temizle(ad)
+        # SKT Hesaplama: Bugün + Raf Ömrü
+        skt = (datetime.now() + timedelta(days=raf_omru_gun)).strftime("%Y-%m-%d")
         
-        # 2. Ürün zaten var mı kontrol et (Varsa miktarını artır)
         mevcut = next((item for item in data["envanter"] if veri_temizle(item["ad"]) == temiz_ad), None)
         
         if mevcut:
             mevcut["miktar"] += miktar
-            print(f"🔄 GÜNCELLEME: {temiz_ad} miktarı {mevcut['miktar']} oldu.")
+            mevcut["skt"] = skt # Tarihi de güncellemiş olalım
+            print(f"🔄 GÜNCELLEME: {temiz_ad} güncellendi. Yeni SKT: {skt}")
         else:
-            # 3. Yeni Ürün Ekle
-            yeni_urun = {"ad": temiz_ad, "miktar": miktar, "birim": birim}
+            yeni_urun = {"ad": temiz_ad, "miktar": miktar, "birim": birim, "skt": skt}
             data["envanter"].append(yeni_urun)
-            print(f"✨ YENİ ÜRÜN: {temiz_ad} envantere eklendi.")
+            print(f"✨ YENİ ÜRÜN: {temiz_ad} (SKT: {skt}) eklendi.")
         
-        # 4. Kaydet (Persistence)
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
             
     except Exception as e:
-        logging.error(f"Veri ekleme hatası: {e}")
+        logging.error(f"SKT'li veri ekleme hatası: {e}")
         
     
 
@@ -380,6 +383,21 @@ if __name__ == "__main__":
             print(f"🤖 AI HAZIRLIK: Toplam {len(envanter_listesi)} malzeme başarıyla paketlendi.")
             # İstersen ilk 5 tanesini örnek olarak gösterebilirsin:
             print(f"📋 Örnek Malzemeler: {', '.join(envanter_listesi[:5])}...")
+            
+        # 1. Önce Yedek Alalım (Güvenlik şart!)
+    veri_yedekle()
+
+    # 2. Yeni ve Taze Ürünler Ekleyelim
+    # Raf ömrü 7 gün olan bir yoğurt ekleyelim
+    #envanter_malzeme_ekle("Yoğurt", 2, "Kilo", raf_omru_gun=7)
+    
+    # 3. Bilerek Tarihi Geçmiş Bir Ürün Ekleyelim (Sistemi test etmek için)
+    # Raf ömrüne -1 verirsek, SKT dünün tarihi olur ve sistem "bozuk" yakalar!
+    #envanter_malzeme_ekle("Tavuk", 1, "Paket", raf_omru_gun=-1)
+
+    # 4. Şov Zamanı: Analiz Raporunu Çalıştıralım
+    # Bakalım sistem tavuğu yakalayabilecek mi?
+    #envanter_istatistikleri()
             
             
             
