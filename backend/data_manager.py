@@ -387,6 +387,7 @@ if __name__ == "__main__":
             print(f"📋 Örnek Malzemeler: {', '.join(envanter_listesi[:5])}...")
             
             
+            
 envanter_istatistikleri()
 
 # 5. ADIM: Dinamik Veri Ekleme Testi
