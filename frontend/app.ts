@@ -1,77 +1,62 @@
 import { getIngredients, saveIngredient } from './storage.js';
 import type { Ingredient } from './types.js';
 
-// 1. ADIM: Global Fonksiyon Tanımlamaları
-// dashboard.js içindeki fonksiyonların TypeScript tarafından tanınması için 'declare' ediyoruz
+// Arkadaşının dashboard.js içindeki görselleştirme fonksiyonunu TypeScript'e tanıtıyoruz
+// Bu sayede kaydettiğimiz an liste sayfada yenilenecek.
 declare function renderInventory(items: any[]): void;
-declare function showToast(message: string): void;
 
-// 2. ADIM: Arkadaşının sahte verilerini senin gerçek verilerinle değiştir
-let inventoryData: Ingredient[] = getIngredients();
+window.addEventListener('load', () => {
+    console.log("SmartRec Sistemi Hazır: Butonlar ve Hafıza Bağlanıyor...");
 
-// 3. ADIM: Başlangıç Kurulumu (Sayfa açıldığında çalışır)
-function baslangicVerileriniYukle() {
-    // Arkadaşının yazdığı render fonksiyonu yüklendiyse çalıştır
-    if (typeof renderInventory === 'function') {
-        renderInventory(inventoryData);
-        
-        // Üstteki sayaçları senin gerçek veri sayına göre güncelle
-        const countEl = document.getElementById('inventoryCount');
-        const expiryEl = document.getElementById('expiryCount');
-        
-        if (countEl) countEl.textContent = inventoryData.length.toString();
-        
-        // Yakın tarihli olanları filtreleyip uyarısını verelim
-        const expiredItems = inventoryData.filter(i => {
-            if (!i.expiryDate || i.expiryDate === 'Belirtilmedi') return false;
-            const daysLeft = Math.ceil((new Date(i.expiryDate).getTime() - new Date().getTime()) / 86400000);
-            return daysLeft <= 3;
-        });
-        if (expiryEl) expiryEl.textContent = expiredItems.length.toString();
-    }
-}
-
-// 4. ADIM: Ekleme Butonu Köprüsü
-const saveBtn = document.getElementById('saveInventoryBtn');
-
-saveBtn?.addEventListener('click', () => {
+    // 1. Elementleri arkadaşının HTML'indeki ID'lere göre yakalıyoruz
+    const saveBtn = document.getElementById('saveInventoryBtn');
     const nameInput = document.getElementById('newItemName') as HTMLInputElement;
     const expiryInput = document.getElementById('newItemExpiry') as HTMLInputElement;
     const qtyInput = document.getElementById('newItemQty') as HTMLInputElement;
+    const addInventoryForm = document.getElementById('addInventoryForm');
 
-    if (nameInput && nameInput.value.trim() !== "") {
-        // Yeni malzeme objesini senin tipine (Ingredient) göre oluştur
-        const yeniMalzeme: Ingredient = {
-            id: Date.now().toString(),
-            name: nameInput.value.trim(),
-            expiryDate: expiryInput.value || 'Belirtilmedi',
-            quantity: qtyInput.value ? `${qtyInput.value} adet` : '1 adet'
-        };
+    // 2. Kaydet Butonuna basıldığında yapılacaklar
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            console.log("Kaydet butonuna basıldı, veriler işleniyor...");
 
-        // Veriyi KALICI olarak storage'a kaydet
-        saveIngredient(yeniMalzeme);
+            // Boş isim girilmesini engelle
+            if (nameInput && nameInput.value.trim() !== "") {
+                
+                // Yeni malzeme objesini oluşturuyoruz
+                const yeniMalzeme: Ingredient = {
+                    id: Date.now().toString(), // Benzersiz ID için o anki zaman
+                    name: nameInput.value.trim(),
+                    expiryDate: expiryInput.value || 'Belirtilmedi',
+                    quantity: qtyInput.value ? `${qtyInput.value} adet` : '1 adet'
+                };
 
-        // Listeyi ve arayüzü güncelle
-        inventoryData = getIngredients();
-        if (typeof renderInventory === 'function') {
-            renderInventory(inventoryData);
-        }
+                // A. Hafızaya (LocalStorage) Kaydet
+                saveIngredient(yeniMalzeme);
 
-        // Sayaç güncelleme
-        const countEl = document.getElementById('inventoryCount');
-        if (countEl) countEl.textContent = inventoryData.length.toString();
+                // B. Ekrana anında yansıt (Arkadaşının fonksiyonunu kullanarak)
+                if (typeof renderInventory === 'function') {
+                    renderInventory(getIngredients());
+                }
 
-        // Temizlik ve Kapatma
-        nameInput.value = '';
-        expiryInput.value = '';
-        qtyInput.value = '';
-        document.getElementById('addInventoryForm')?.classList.add('hidden');
-        
-        if (typeof showToast === 'function') {
-            showToast(`✅ "${yeniMalzeme.name}" başarıyla kaydedildi!`);
-        }
+                // C. Formu temizle ve gizle (Kullanıcı dostu olsun)
+                nameInput.value = '';
+                expiryInput.value = '';
+                qtyInput.value = '';
+                addInventoryForm?.classList.add('hidden');
+                
+                console.log("Başarılı: " + yeniMalzeme.name + " envantere eklendi!");
+                alert("Malzeme başarıyla eklendi!");
+            } else {
+                alert("Lütfen en azından bir malzeme adı giriniz!");
+            }
+        });
+    } else {
+        console.error("KRİTİK HATA: 'saveInventoryBtn' bulunamadı. HTML dosyanı kontrol et!");
+    }
+
+    // 3. Sayfa ilk açıldığında hafızadaki eski malzemeleri listeye bas
+    if (typeof renderInventory === 'function') {
+        renderInventory(getIngredients());
     }
 });
-
-// Sayfa yüklendiğinde her şeyi başlat
-window.addEventListener('load', baslangicVerileriniYukle);
