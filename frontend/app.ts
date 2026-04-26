@@ -61,6 +61,45 @@ window.addEventListener('load', () => {
             }
         };
     }
+    // ... (Enter geçişleri kodlarının bittiği yer)
+
+   // --- 6. ÖZEL BAŞ HARF FİLTRELEME MİMARİSİ ---
+    if (nameInput) {
+        const datalist = document.getElementById('material-suggestions') as HTMLDataListElement;
+        
+        // options'ı HTMLOptionElement dizisi olarak alıyoruz
+        const allOptions = datalist ? Array.from(datalist.options) : []; 
+
+        nameInput.addEventListener('input', () => {
+            const val = nameInput.value.toLowerCase().trim();
+            
+            if (!datalist) return;
+
+            // 1. Önce listeyi temizle
+            datalist.innerHTML = '';
+
+            // 2. Sadece yazdığın harfle BAŞLAYANLARI geri ekle
+            if (val.length > 0) {
+                const filtered = allOptions.filter(opt => 
+                    opt.value.toLowerCase().startsWith(val)
+                );
+                
+                filtered.forEach(opt => datalist.appendChild(opt));
+
+                // 3. Hata veren yerin çözümü: filtered[0] var mı diye kontrol ekledik
+                if (filtered.length === 1 && filtered[0] && filtered[0].value.toLowerCase() === val) {
+                    setTimeout(() => {
+                        if (expiryInput) expiryInput.focus();
+                    }, 200);
+                }
+            } else {
+                // Eğer kutu boşsa tüm listeyi geri getir
+                allOptions.forEach(opt => datalist.appendChild(opt));
+            }
+        });
+    }
+
+        // ...
 
    // --- 4. KAYDET VE FİLTRELEME (1 YAZMAYI ENGELLER) ---
     if (saveBtn) {
