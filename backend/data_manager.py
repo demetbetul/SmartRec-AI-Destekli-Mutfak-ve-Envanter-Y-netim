@@ -9,6 +9,7 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
+from datetime import timedelta
 
 # .env dosyasındaki şifreleri yükle
 load_dotenv()
