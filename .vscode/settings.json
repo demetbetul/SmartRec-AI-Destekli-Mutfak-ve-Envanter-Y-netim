@@ -1,0 +1,16 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.analysis.typeCheckingMode": "off",
+  "python.linting.enabled": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "ms-vscode.vscode-typescript-next",
+    "editor.formatOnSave": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
+}
