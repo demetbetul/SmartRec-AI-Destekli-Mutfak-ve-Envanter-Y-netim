@@ -73,7 +73,20 @@
 
         <!-- Add Inventory Modal (hidden) -->
         <div class="mini-form hidden" id="addInventoryForm">
-          <input type="text" class="input" id="newItemName" placeholder="Malzeme adı (örn: Yumurta)" />
+          <input type="text" class="input" id="newItemName" list="material-suggestions" placeholder="Malzeme adı (örn: Yumurta)" autocomplete="off" />
+
+<datalist id="material-suggestions">
+    <option value="Süt">
+    <option value="Yumurta">
+    <option value="Un">
+    <option value="Domates">
+    <option value="Peynir">
+    <option value="Zeytinyağı">
+    <option value="Tavuk">
+    <option value="Makarna">
+    <option value="Soğan">
+    <option value="Patates">
+</datalist>
           <input type="date" class="input" id="newItemExpiry" />
           <input type="number" class="input" id="newItemQty" placeholder="Miktar" min="1" />
           <button class="btn btn--primary btn--sm" id="saveInventoryBtn">Kaydet</button>
@@ -159,8 +172,10 @@
     </div>
   </div>
 
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="data.js"></script>
+<script src="main.js"></script>
+<script src="dashboard.js"></script>
+
+<script type="module" src="dist/app.js"></script>
 </body>
 </html>
