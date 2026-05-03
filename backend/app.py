@@ -8,6 +8,7 @@ from flask_cors import CORS
 import json
 import os
 from datetime import datetime, timedelta
+from functools import wraps
 from data_manager import (
     veriyi_yukle,
     dosya_yolu_getir,
@@ -27,6 +28,21 @@ from data_manager import (
 app = Flask(__name__)
 CORS(app)
 
+
+# ==================== ERROR HANDLER DECORATOR ====================
+def handle_errors(f):
+    """Tüm API endpoints'inde hata handling için decorator"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+    return decorated_function
+
 # ==================== HEALTH CHECK ====================
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -39,82 +55,74 @@ def health_check():
 
 # ==================== TARİF API'ları ====================
 @app.route('/api/recipes', methods=['GET'])
+@handle_errors
 def get_all_recipes():
     """Tüm tarifleri getir"""
-    try:
-        tarifler = veriyi_yukle()
-        return jsonify({
-            "success": True,
-            "count": len(tarifler),
-            "tarifler": tarifler
-        }), 200
-    except Exception as e:
+    tarifler = veriyi_yukle()
+    if not tarifler:
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": "Tarifler yüklenemedi"
         }), 500
+    
+    return jsonify({
+        "success": True,
+        "count": len(tarifler),
+        "tarifler": tarifler
+    }), 200
 
 @app.route('/api/recipes/<int:recipe_id>', methods=['GET'])
+@handle_errors
 def get_recipe(recipe_id):
     """Belirli bir tarifi ID'si ile getir"""
-    try:
-        tarifler = veriyi_yukle()
-        tarif = next((t for t in tarifler if t.get("id") == recipe_id), None)
-        
-        if not tarif:
-            return jsonify({
-                "success": False,
-                "error": "Tarif bulunamadı"
-            }), 404
-        
-        return jsonify({
-            "success": True,
-            "tarif": tarif
-        }), 200
-    except Exception as e:
+    tarifler = veriyi_yukle()
+    tarif = next((t for t in tarifler if t.get("id") == recipe_id), None)
+    
+    if not tarif:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "error": "Tarif bulunamadı"
+        }), 404
+    
+    return jsonify({
+        "success": True,
+        "tarif": tarif
+    }), 200
 
 @app.route('/api/recipes/filter', methods=['POST'])
+@handle_errors
 def filter_recipes():
     """Tarifleri filtrele (etiket, zorluk vb.)"""
-    try:
-        data = request.get_json()
-        etiket = data.get('etiket')
-        zorluk = data.get('zorluk')
-        
-        sonuclar = akilli_tarif_filtrele(etiket=etiket, zorluk_seviyesi=zorluk)
-        
-        return jsonify({
-            "success": True,
-            "count": len(sonuclar),
-            "tarifler": sonuclar
-        }), 200
-    except Exception as e:
+    data = request.get_json()
+    if not data:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "error": "JSON verisi gerekli"
+        }), 400
+    
+    etiket = data.get('etiket')
+    zorluk = data.get('zorluk')
+    
+    sonuclar = akilli_tarif_filtrele(etiket=etiket, zorluk_seviyesi=zorluk)
+    
+    return jsonify({
+        "success": True,
+        "count": len(sonuclar),
+        "tarifler": sonuclar
+    }), 200
 
 @app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
+@handle_errors
 def get_missing_ingredients(recipe_id):
     """Tarifte eksik olan malzemeleri getir"""
-    try:
-        eksikler = eksik_malzemeleri_bul(recipe_id)
-        
-        return jsonify({
-            "success": True,
-            "recipe_id": recipe_id,
-            "eksik_malzemeler": eksikler,
-            "count": len(eksikler)
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    eksikler = eksik_malzemeleri_bul(recipe_id)
+    
+    return jsonify({
+        "success": True,
+        "recipe_id": recipe_id,
+        "eksik_malzemeler": eksikler,
+        "count": len(eksikler)
+    }), 200
 
 # ==================== ENVANTER API'ları ====================
 @app.route('/api/inventory', methods=['GET'])

@@ -1,21 +1,24 @@
 import json
 import logging
 import os
-from datetime import datetime
 import shutil
-import os
-import json
 import requests
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
-from datetime import timedelta
 
 # .env dosyasındaki şifreleri yükle
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
 NUTRITION_API_KEY = os.getenv("NUTRITION_API_KEY")
+
+# API Keys Validasyon
+if not GEMINI_API_KEY:
+    logging.warning("⚠️ GEMINI_API_KEY not found in .env file")
+if not SPOONACULAR_API_KEY:
+    logging.warning("⚠️ SPOONACULAR_API_KEY not found in .env file")
 
 # Gemini ayarını bir kere yapıyoruz
 if GEMINI_API_KEY:
@@ -86,27 +89,40 @@ def veriyi_yukle():
                 return []
             
         return data["tarifler"]
-    except Exception as e:
-        logging.error(f"Yükleme hatası: {e}")
-        return []
-        
     except FileNotFoundError:
         logging.error(f"❌ Hata: {path} dosyası bulunamadı! Lütfen veri yollarını kontrol et.")
         return []
     except json.JSONDecodeError:
         logging.error(f"❌ Hata: JSON dosyasının formatı bozuk (virgül veya parantez hatası olabilir).")
         return []
+    except Exception as e:
+        logging.error(f"Yükleme hatası: {e}")
+        return []
 
-# Basit bir test yapalım:
-tarifler = veriyi_yukle()
-if isinstance(tarifler, list):
-    print(f"Sistem hazır! Toplam {len(tarifler)} adet yedek tarif yüklendi.")
-    for tarif in tarifler:
-        print(f"- {tarif['ad']} ({tarif['kalori']} kcal)")
-else:
-    print(tarifler)
-    
-from datetime import datetime
+
+def akilli_tarif_filtrele(etiket=None, zorluk_seviyesi=None):
+    """
+    Kullanıcın isteğine göre tarifleri filtreler.
+    Örn: etiket='vejetaryen' veya zorluk_seviyesi='Kolay'
+    """
+    try:
+        tarifler = veriyi_yukle()
+        
+        sonuclar = []
+        for tarif in tarifler:
+            # Etiket kontrolü
+            etiket_uygun_mu = (etiket is None) or (etiket.lower() in [veri_temizle(t) for t in tarif.get('etiketler', [])])
+            # Zorluk kontrolü
+            zorluk_uygun_mu = (zorluk_seviyesi is None) or (veri_temizle(tarif.get('zorluk', '')) == veri_temizle(zorluk_seviyesi))
+            
+            if etiket_uygun_mu and zorluk_uygun_mu:
+                sonuclar.append(tarif)
+        
+        return sonuclar
+    except Exception as e:
+        logging.error(f"Filtreleme hatası: {e}")
+        return []
+
 
 def skt_kontrol(urun_tarihi):
     bugun = datetime.now()
@@ -119,78 +135,37 @@ def skt_kontrol(urun_tarihi):
 
 
 
-def eksik_malzemeleri_bul(tarif_malzemeleri):
-    """
-    tarif_malzemeleri: AI'dan gelen malzele listesi ['Domates', 'Yumurta', 'Peynir']
-    """
-    # 1. Önce envanterimizi yükleyelim
-    try:
-        with open('data/inventory.json', 'r', encoding='utf-8') as f:
-            envanter_verisi = json.load(f)
-            # Sadece malzeme isimlerinden oluşan bir liste yapalım
-            evdeki_malzemeler = [item['ad'].lower() for item in envanter_verisi['envanter']]
-    except FileNotFoundError:
-        return "Hata: Envanter dosyası bulunamadı!"
-
-    # 2. Karşılaştırma yapalım
-    eksikler = []
-    for malzeme in tarif_malzemeleri:
-        if malzeme.lower() not in evdeki_malzemeler:
-            eksikler.append(malzeme)
-    
-    return eksikler
-
-
-
-def akilli_tarif_filtrele(etiket=None, zorluk_seviyesi=None):
-    """
-    Kullanıcın isteğine göre tarifleri filtreler.
-    Örn: etiket='vejetaryen' veya zorluk_seviyesi='Kolay'
-    """
-    try:
-        with open('data/recipes.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            tarifler = data['yedek_tarifler']
-            
-            sonuclar = []
-            for tarif in tarifler:
-                # Etiket kontrolü
-                etiket_uygun_mu = (etiket is None) or (etiket.lower() in [t.lower() for t in tarif.get('etiketler', [])])
-                # Zorluk kontrolü
-                zorluk_uygun_mu = (zorluk_seviyesi is None) or (tarif.get('zorluk', '').lower() == zorluk_seviyesi.lower())
-                
-                if etiket_uygun_mu and zorluk_uygun_mu:
-                    sonuclar.append(tarif)
-            
-            return sonuclar
-    except Exception as e:
-        return f"Filtreleme hatası: {e}"
-    
 def eksik_malzemeleri_bul(tarif_id):
+    """
+    Belirtilen tarif ID'si için envanterden eksik olan malzemeleri bulur.
+    """
     try:
         # 1. Tarifleri ve Envanteri yükle
-        with open('data/recipes.json', 'r', encoding='utf-8') as f:
-            tarifler = json.load(f)["tarifler"]
-        with open('data/inventory.json', 'r', encoding='utf-8') as f:
+        tarifler = veriyi_yukle()
+        
+        # 2. Envanteri yükle
+        envanter_path = dosya_yolu_getir('inventory.json')
+        with open(envanter_path, 'r', encoding='utf-8') as f:
             envanter_verisi = json.load(f)["envanter"]
 
-        # 2. İlgili tarifi ID ile bul
-        secilen_tarif = next((t for t in tarifler if t["id"] == tarif_id), None)
+        # 3. İlgili tarifi ID ile bul
+        secilen_tarif = next((t for t in tarifler if t.get("id") == tarif_id), None)
         if not secilen_tarif:
-            return "Tarif bulunamadı!"
+            return []
 
-        # 3. Evdeki malzemelerin listesini al (Küçük harf standardıyla!)
-        evdeki_malzemeler = [item["ad"].lower() for item in envanter_verisi]
+        # 4. Evdeki malzemelerin listesini al (Küçük harf standardıyla!)
+        evdeki_malzemeler = [veri_temizle(item["ad"]) for item in envanter_verisi]
         
-        # 4. Karşılaştır
+        # 5. Karşılaştır
         eksikler = []
-        for malzeme in secilen_tarif["malzemeler"]:
-            if malzeme.lower() not in evdeki_malzemeler:
+        for malzeme in secilen_tarif.get("malzemeler", []):
+            if veri_temizle(malzeme) not in evdeki_malzemeler:
                 eksikler.append(malzeme)
         
         return eksikler
     except Exception as e:
-        return f"Hata: {e}"
+        logging.error(f"Eksik malzeme bulma hatası: {e}")
+        return []
     
 def ai_icin_malzeme_listesi_hazirla():
     try:
@@ -212,10 +187,8 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori):
     Kullanıcının yediği yemeği ve tarihini daily_log.json dosyasına ekler.
     Tasarımcı bu veriyi alıp grafik çizecek.
     """
-    import datetime
-    
-    log_dosyasi = 'data/daily_log.json'
-    tarih = datetime.datetime.now().strftime("%Y-%m-%d")
+    log_dosyasi = dosya_yolu_getir('daily_log.json')
+    tarih = datetime.now().strftime("%Y-%m-%d")
     
     try:
         # Mevcut kayıtları oku
@@ -352,76 +325,7 @@ def envanter_malzeme_ekle(ad, miktar, birim="Adet", raf_omru_gun=7):
             
     except Exception as e:
         logging.error(f"SKT'li veri ekleme hatası: {e}")
-        
-    
 
-if __name__ == "__main__":
-    print("\n" + "="*30)
-    print("🚀 SMARTREC SİSTEM KONTROLÜ")
-    print("="*30 + "\n")
-
-    # 1. ADIM: Verileri Güvene Al (Yedekleme)
-    # Bu satır sayesinde 'backups' klasörün dolacak
-    veri_yedekle()
-
-    # 2. ADIM: Verileri Yükle ve Kontrol Et
-    tarifler = veriyi_yukle()
-
-    if tarifler:
-        print(f"✅ Veritabanı: {len(tarifler)} tarif başarıyla yüklendi.")
-        
-        # Vejetaryen filtreleme testimiz
-        veg_tarifler = [t for t in tarifler if "vejetaryen" in [v.lower() for v in t.get("kategoriler", [])]]
-        print(f"🌱 Filtreleme: {len(veg_tarifler)} adet vejetaryen tarif bulundu.")
-        
-        print("\n" + "="*30)
-        print("✨ SİSTEM ŞU AN KUSURSUZ ÇALIŞIYOR!")
-        print("="*30 + "\n")
-        
-        envanter_listesi = ai_icin_malzeme_listesi_hazirla()
-        if envanter_listesi:
-            # Hem temiz görünsün hem de kaç tane olduğunu söylesin
-            print(f"🤖 AI HAZIRLIK: Toplam {len(envanter_listesi)} malzeme başarıyla paketlendi.")
-            # İstersen ilk 5 tanesini örnek olarak gösterebilirsin:
-            print(f"📋 Örnek Malzemeler: {', '.join(envanter_listesi[:5])}...")
-            
-        # 1. Önce Yedek Alalım (Güvenlik şart!)
-    veri_yedekle()
-
-    # 2. Yeni ve Taze Ürünler Ekleyelim
-    # Raf ömrü 7 gün olan bir yoğurt ekleyelim
-    #envanter_malzeme_ekle("Yoğurt", 2, "Kilo", raf_omru_gun=7)
-    
-    # 3. Bilerek Tarihi Geçmiş Bir Ürün Ekleyelim (Sistemi test etmek için)
-    # Raf ömrüne -1 verirsek, SKT dünün tarihi olur ve sistem "bozuk" yakalar!
-    #envanter_malzeme_ekle("Tavuk", 1, "Paket", raf_omru_gun=-1)
-
-    # 4. Şov Zamanı: Analiz Raporunu Çalıştıralım
-    # Bakalım sistem tavuğu yakalayabilecek mi?
-    #envanter_istatistikleri()
-            
-            
-            
-envanter_istatistikleri()
-
-# 5. ADIM: Dinamik Veri Ekleme Testi
-# Olmayan bir şey ekleyelim
-#envanter_malzeme_ekle("Ejder Meyvesi", 5, "Adet")
-# Olan bir şeyin miktarını artıralım
-#envanter_malzeme_ekle("Domates", 3, "Adet")
-    
-# Güncel durumu görmek için istatistikleri tekrar çağıralım
-#envanter_istatistikleri()
-
-# 4. ADIM: Opsiyonel Testler (İhtiyaç duyduğunda '#' kaldırabilirsin)
-# envanter_guncelle("Menemen")
-    
-# AI Malzeme Listesi Testi
-#ai_listesi = ai_icin_malzeme_listesi_hazirla()
-#print(f"\n🤖 AI'ya Gidecek Malzemeler: {ai_listesi}")
-    
-# Günlük Kayıt Testi
-#yemeği_gunluge_kaydet("Kuru Fasulye", 600)
 
 def get_recipes_from_gemini(malzemeler_metni):
     """Asıl servis: Gemini AI'dan dinamik malzemelerle menü ister."""
