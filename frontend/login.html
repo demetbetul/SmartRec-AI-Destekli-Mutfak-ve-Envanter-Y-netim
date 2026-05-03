@@ -16,18 +16,20 @@
         <h1 class="login-title">Tekrar Hoş Geldiniz</h1>
         <p class="login-desc">Mutfak deneyiminize devam etmek için giriş yapın.</p>
 
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <input type="email" class="input" placeholder="E-posta adresiniz" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="input" placeholder="Şifreniz" required>
-            </div>
-            <button type="submit" class="btn btn--primary" style="width: 100%;">Giriş Yap</button>
-        </form>
-
+       <form id="loginForm" class="login-form">
+    <div class="form-group">
+        <!-- id="email" eklendi -->
+        <input type="email" id="email" class="input" placeholder="E-posta adresiniz" required>
+    </div>
+    <div class="form-group">
+        <!-- id="password" eklendi -->
+        <input type="password" id="password" class="input" placeholder="Şifreniz" required>
+    </div>
+    <!-- id="loginBtn" eklendi (app.ts'de hangi ID varsa o olmalı) -->
+    <button type="submit" id="loginBtn" class="btn btn--primary" style="width: 100%;">Giriş Yap</button>
+</form>
         <p class="login-footer">Hesabınız yok mu? <a href="register.html" class="text--accent">Kayıt Olun</a></p>
     </div>
-
+<script type="module" src="dist/app.js"></script>
 </body>
 </html>

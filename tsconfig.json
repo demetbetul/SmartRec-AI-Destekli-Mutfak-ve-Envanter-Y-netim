@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "Bundler", 
     "rootDir": "./frontend",
-    "outDir": "./dist",
+    "outDir": "./frontend/dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["frontend/app.ts"]
 }

@@ -15,24 +15,24 @@
         <h1 class="login-title">Aramıza Katıl</h1>
         <p class="login-desc">Lezzetli tariflere ve akıllı mutfağa ilk adımını at.</p>
 
-        <form id="registerForm" class="login-form">
-            <div class="form-group">
-                <input type="text" class="input" placeholder="Adınız Soyadınız" required>
-            </div>
-            <div class="form-group">
-                <input type="email" class="input" placeholder="E-posta adresiniz" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="input" placeholder="Şifre" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="input" placeholder="Şifreyi doğrula" required>
-            </div>
-            <button type="submit" class="btn btn--primary" style="width: 100%;">Kayıt Ol</button>
-        </form>
+      <form id="registerForm" class="login-form">
+    <div class="form-group">
+        <input type="text" id="regName" class="input" placeholder="Adınız Soyadınız" required>
+    </div>
+    <div class="form-group">
+        <input type="email" id="regEmail" class="input" placeholder="E-posta adresiniz" required>
+    </div>
+    <div class="form-group">
+        <input type="password" id="regPassword" class="input" placeholder="Şifre" required>
+    </div>
+    <div class="form-group">
+        <input type="password" id="regPasswordConfirm" class="input" placeholder="Şifreyi doğrula" required>
+    </div>
+    <button type="submit" id="registerBtn" class="btn btn--primary" style="width: 100%;">Kayıt Ol</button>
+</form>
 
         <p class="login-footer">Zaten hesabınız var mı? <a href="login.html" class="text--accent">Giriş Yapın</a></p>
     </div>
-
+<script type="module" src="dist/app.js"></script>
 </body>
 </html>

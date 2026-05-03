@@ -25,7 +25,7 @@ from data_manager import (
 )
 
 app = Flask(__name__)
-CORS(app)  # Frontend isteplerine izin ver
+CORS(app)
 
 # ==================== HEALTH CHECK ====================
 @app.route('/api/health', methods=['GET'])
@@ -292,54 +292,131 @@ def create_custom_menu():
             "error": str(e)
         }), 500
 
-# ==================== GÜNLÜK KAYıT API'ları ====================
-@app.route('/api/daily-log/add', methods=['POST'])
-def add_daily_log():
-    """Günlüğe yemek kaydı ekle"""
-    try:
-        data = request.get_json()
-        yemek_adi = data.get('yemek_adi')
-        kalori = data.get('kalori', 0)
-        
-        if not yemek_adi:
-            return jsonify({
-                "success": False,
-                "error": "Yemek adı gerekli"
-            }), 400
-        
-        yemeği_gunluge_kaydet(yemek_adi, kalori)
-        
-        return jsonify({
-            "success": True,
-            "message": f"{yemek_adi} günlüğe kaydedildi"
-        }), 201
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
 
+# ==================== GÜNLÜK KAYıT API'ları ====================
 @app.route('/api/daily-log', methods=['GET'])
 def get_daily_logs():
     """Günlük kayıtları getir"""
+    # Buradaki fonksiyon ismi benzersiz olmalı
+    return jsonify({"success": True, "kayitlar": []}), 200
+
+# ==================== KALORİ TAKİBİ API ====================
+@app.route('/api/calories', methods=['GET'])
+def get_calories():
+    """Dashboard için kalori verilerini getir"""
+    # DİKKAT: Bu fonksiyonun adı 'get_calories' olmalı, 'get_daily_logs' değil!
+    return jsonify({
+        "bugun": 1420,
+        "hedef": 2000,
+        "haftalik": [1800, 2200, 1950, 1420, 0, 0, 0]
+    })
+# ==================== KULLANICI YÖNETİMİ (Kayıt & Giriş) ====================
+
+def kullanicilari_yukle():
+    path = dosya_yolu_getir('users.json')
+    if not os.path.exists(path):
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump([], f)
+        return []
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    """Yeni kullanıcı kaydeder"""
     try:
-        path = dosya_yolu_getir('daily_log.json')
+        data = request.get_json()
+        email = data.get('email').strip() if data.get('email') else None
+        password = data.get('password').strip() if data.get('password') else None
+        ad = data.get('ad', 'Yeni Kullanıcı').strip()
+
+        if not email or not password:
+            return jsonify({"success": False, "message": "E-posta ve şifre zorunludur!"}), 400
+
+        users = kullanicilari_yukle()
+
+        if any(u['email'] == email for u in users):
+            return jsonify({"success": False, "message": "Bu e-posta zaten kayıtlı!"}), 400
+
+        yeni_kullanici = {"ad": ad, "email": email, "password": password}
+        users.append(yeni_kullanici)
+
+        # Dosya yolunu al ve yazmayı dene
+        path = dosya_yolu_getir('users.json')
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(users, f, ensure_ascii=False, indent=2)
+            f.flush() # Verinin hemen yazıldığından emin ol
+        
+        print(f"✅ Kullanıcı kaydedildi: {email}") # Terminale onay yazısı basar
+        return jsonify({"success": True, "message": "Kayıt başarılı!"}), 201
+        
+    except Exception as e:
+        print(f"❌ Kayıt Hatası: {str(e)}") # Hata varsa terminale yazar
+        return jsonify({"success": False, "message": f"Sunucu hatası: {str(e)}"}), 500
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Kullanıcı girişi doğrular"""
+    data = request.get_json()
+    # .strip() ile görünmez boşlukları temizliyoruz
+    email = data.get('email').strip() if data.get('email') else ""
+    password = data.get('password').strip() if data.get('password') else ""
+
+    users = kullanicilari_yukle()
+    # Karşılaştırma yaparken de strip kullanmak eşleşme şansını artırır
+    user = next((u for u in users if u['email'].strip() == email and u['password'].strip() == password), None)
+
+    if user:
+        return jsonify({
+            "success": True, 
+            "message": "Giriş başarılı!",
+            "user": {"ad": user['ad'], "email": user['email']}
+        }), 200
+    
+    return jsonify({"success": False, "message": "E-posta veya şifre hatalı!"}), 401
+# ==================== BİLDİRİM API ====================
+@app.route('/api/notifications', methods=['GET'])
+def get_notifications():
+    """SKT ve stok durumuna göre akıllı bildirimler üretir"""
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        if not os.path.exists(path):
+             return jsonify({"success": True, "bildirimler": []}), 200
+
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        kayitlar = data.get('gunluk_kayitlar', [])
-        
-        return jsonify({
-            "success": True,
-            "count": len(kayitlar),
-            "kayitlar": kayitlar
-        }), 200
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        # Envanterin bir liste olduğundan emin olalım
+        envanter = data if isinstance(data, list) else data.get("envanter", [])
+        bildirimler = []
+        bugun = datetime.now()
 
+        for urun in envanter:
+            # Eksik veri kontrolü
+            if not urun.get("ad") or not urun.get("skt"):
+                continue
+
+            try:
+                # Tarih formatını kontrol ederek çevirelim
+                skt_tarihi = datetime.strptime(str(urun["skt"]), "%Y-%m-%d")
+                fark = (skt_tarihi - bugun).days
+
+                if fark < 0:
+                    bildirimler.append({"tip": "danger", "mesaj": f"⚠️ {urun['ad']} son kullanma tarihi {abs(fark)} gün geçti!"})
+                elif fark <= 3:
+                    bildirimler.append({"tip": "warning", "mesaj": f"⏳ {urun['ad']} {fark + 1} gün içinde bozulacak."})
+                
+                # Miktar kontrolü (sayıya çevirerek)
+                miktar = int(urun.get("miktar", 0))
+                if miktar <= 2:
+                    bildirimler.append({"tip": "info", "mesaj": f"🛒 {urun['ad']} stokta azalıyor ({miktar} adet kaldı)."})
+            except (ValueError, TypeError) as e:
+                print(f"Veri işleme hatası ({urun.get('ad')}): {e}")
+                continue
+
+        return jsonify({"success": True, "bildirimler": bildirimler}), 200
+    except Exception as e:
+        print(f"Genel Bildirim Hatası: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 # ==================== YEDEKLEME API'ları ====================
 @app.route('/api/backup', methods=['POST'])
 def create_backup():
