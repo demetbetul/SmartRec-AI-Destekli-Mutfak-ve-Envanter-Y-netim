@@ -230,9 +230,9 @@
     },
     {
       "ad": "yumurta",
-      "miktar": 9,
+      "miktar": 18,
       "birim": "adet",
-      "skt": "2026-04-22"
+      "skt": "2026-05-11"
     },
     {
       "ad": "balık levrek",
@@ -365,6 +365,5 @@
       "miktar": 5,
       "birim": "Adet"
     }
-
   ]
 }
