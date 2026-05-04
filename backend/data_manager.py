@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
+import random
 
 # .env dosyasındaki şifreleri yükle
 load_dotenv()
@@ -328,22 +329,41 @@ def envanter_malzeme_ekle(ad, miktar, birim="Adet", raf_omru_gun=7):
 
 
 def get_recipes_from_gemini(malzemeler_metni):
-    """Asıl servis: Gemini AI'dan dinamik malzemelerle menü ister."""
+    """Asıl servis: Gemini AI'dan dinamik malzemelerle 3 FARKLI menü alternatifi ister."""
     model = genai.GenerativeModel('gemini-2.5-flash')
     
     prompt = f"""
-    Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana başlangıç, 
-    ana yemek ve tatlıdan oluşan 3 aşamalı bir menü öner: {malzemeler_metni}.
+    Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
     
-    Ayrıca bu yemekleri yapmak için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt.
+    Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır. 
+    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt.
     
-    Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin yazma:
+    Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya açıklama yazma:
     {{
         "kaynak": "gemini",
-        "baslangic": "başlangıç yemeği",
-        "ana_yemek": "ana yemek",
-        "tatli": "tatlı",
-        "eksik_malzemeler": ["malzeme1", "malzeme2"]
+        "menuler": [
+            {{
+                "id": 1,
+                "baslangic": "1. Menü Başlangıç Yemeği",
+                "ana_yemek": "1. Menü Ana Yemek",
+                "tatli": "1. Menü Tatlı",
+                "eksik_malzemeler": ["malzeme1", "malzeme2"]
+            }},
+            {{
+                "id": 2,
+                "baslangic": "2. Menü Başlangıç Yemeği",
+                "ana_yemek": "2. Menü Ana Yemek",
+                "tatli": "2. Menü Tatlı",
+                "eksik_malzemeler": ["malzeme3", "malzeme4"]
+            }},
+            {{
+                "id": 3,
+                "baslangic": "3. Menü Başlangıç Yemeği",
+                "ana_yemek": "3. Menü Ana Yemek",
+                "tatli": "3. Menü Tatlı",
+                "eksik_malzemeler": ["malzeme5", "malzeme6"]
+            }}
+        ]
     }}
     """
     
@@ -354,35 +374,76 @@ def get_recipes_from_gemini(malzemeler_metni):
     return json.loads(response.text)
 
 def get_recipes_from_spoonacular(malzemeler_metni):
-    """Yedek servis: Gemini çökerse Spoonacular'dan veri çeker (Otomatik Çeviri İçerir)."""
-    
-    # 1. YENİ EKLENEN KISIM: Türkçe metni İngilizceye çeviriyoruz
+    """Yedek servis: Gemini çökerse Spoonacular'dan 9 tarif çekip 3 menü oluşturur."""
     print("🌍 Sistem Uyarısı: Türkçe malzemeler Spoonacular için İngilizceye çevriliyor...")
     try:
         ingilizce_malzemeler = GoogleTranslator(source='tr', target='en').translate(malzemeler_metni)
-        print(f"🔄 Çevrilen Malzemeler: {ingilizce_malzemeler}")
     except Exception as e:
         print(f"❌ Çeviri Hatası: {e}")
-        ingilizce_malzemeler = malzemeler_metni # Çeviri çökerse orijinalini bırak
+        ingilizce_malzemeler = malzemeler_metni 
         
-    # 2. ESKİ KISIM: API'ye artık İngilizce kelimeleri gönderiyoruz
     url = "https://api.spoonacular.com/recipes/findByIngredients"
     params = {
-        "ingredients": ingilizce_malzemeler, # Artık buraya İngilizce metin gidiyor!
-        "number": 3,
+        "ingredients": ingilizce_malzemeler, 
+        "number": 9, # 3 menü * 3 yemek = 9 tarif çekiyoruz
         "apiKey": SPOONACULAR_API_KEY
     }
     
     response = requests.get(url, params=params)
     data = response.json()
     
-    # Spoonacular 3 aşamalı menü mantığını bilmez, o yüzden dönen 3 tarifi bölüştürüyoruz
+    # 9 tarifi 3'erli gruplar halinde 3 menüye bölüştürüyoruz
+    menuler = []
+    for i in range(3):
+        menuler.append({
+            "id": i + 1,
+            "baslangic": data[i*3]["title"] if len(data) > i*3 else "Tarif bulunamadı",
+            "ana_yemek": data[i*3+1]["title"] if len(data) > i*3+1 else "Tarif bulunamadı",
+            "tatli": data[i*3+2]["title"] if len(data) > i*3+2 else "Tarif bulunamadı",
+            "eksik_malzemeler": ["Bilinmiyor (Spoonacular verisi)"]
+        })
+        
     return {
         "kaynak": "spoonacular",
-        "baslangic": data[0]["title"] if len(data) > 0 else "Tarif bulunamadı",
-        "ana_yemek": data[1]["title"] if len(data) > 1 else "Tarif bulunamadı",
-        "tatli": data[2]["title"] if len(data) > 2 else "Tarif bulunamadı",
-        "eksik_malzemeler": ["Bilinmiyor (Spoonacular verisi)"]
+        "menuler": menuler
+    }
+
+
+def get_recipes_from_local(malzemeler_listesi):
+    """3. Savunma Hattı: Hem Gemini hem Spoonacular çökerse kendi recipes.json dosyamızdan 3 menü çeker."""
+    print("📂 Sistem Uyarısı: API'ler çöktü, yerel tarif veritabanına (recipes.json) başvuruluyor...")
+    
+    # Kendi yazdığınız tarifleri çekiyoruz
+    tum_tarifler = veriyi_yukle() 
+    
+    # Eğer dosya boşsa acil durum menüsü döndür
+    if not tum_tarifler:
+        return {
+            "kaynak": "yerel_veritabani_hata",
+            "menuler": [{
+                "id": 1, "baslangic": "Hazır Çorba", "ana_yemek": "Makarna", "tatli": "Meyve", "eksik_malzemeler": []
+            }]
+        }
+    
+    # 9 tane tarif seç (Eğer 9 tarif yoksa olanların hepsini al)
+    cekilecek_sayi = min(9, len(tum_tarifler))
+    secilenler = random.sample(tum_tarifler, cekilecek_sayi)
+    
+    menuler = []
+    for i in range(3):
+        bas_idx = i * 3
+        menuler.append({
+            "id": i + 1,
+            # Tarifin "ad" kısmını güvenli bir şekilde alıyoruz
+            "baslangic": secilenler[bas_idx].get("ad", "Çorba") if len(secilenler) > bas_idx else "Günün Çorbası",
+            "ana_yemek": secilenler[bas_idx+1].get("ad", "Ana Yemek") if len(secilenler) > bas_idx+1 else "Günün Yemeği",
+            "tatli": secilenler[bas_idx+2].get("ad", "Tatlı") if len(secilenler) > bas_idx+2 else "Günün Tatlısı",
+            "eksik_malzemeler": ["Bilinmiyor (Yerel Veri)"]
+        })
+        
+    return {
+        "kaynak": "yerel_veritabani",
+        "menuler": menuler
     }
 
 def kalori_hesapla(yemek_adi):
@@ -420,25 +481,121 @@ def kalori_hesapla(yemek_adi):
         return "Hesaplanamadı"
 
 def akilli_menu_olustur(malzemeler_listesi):
-    """Sistemin ana köprüsü. Tarifleri ve kalorileri tek bir JSON'da birleştirir."""
+    """Sistemin ana köprüsü. 3 farklı menüyü ve kalorileri tek bir JSON'da birleştirir."""
     malzemeler_metni = ", ".join(malzemeler_listesi)
     
+    # 1. PLAN: GEMINI AI
     try:
         sonuc = get_recipes_from_gemini(malzemeler_metni)
     except Exception as e:
-        print(f"Sistem Uyarısı: Gemini çöktü, yedeğe geçiliyor. ({e})")
-        sonuc = get_recipes_from_spoonacular(malzemeler_metni)
+        print(f"⚠️ Sistem Uyarısı: Gemini çöktü, 1. yedeğe geçiliyor. ({e})")
         
-    # --- YENİ EKLENEN KISIM: Kalorileri Veriye Dahil Et ---
-    print("\n🔍 Besin Değerleri Analiz Ediliyor...")
-    sonuc["kaloriler"] = {
-        "baslangic_kalori": kalori_hesapla(sonuc["baslangic"]),
-        "ana_yemek_kalori": kalori_hesapla(sonuc["ana_yemek"]),
-        "tatli_kalori": kalori_hesapla(sonuc["tatli"])
-    }
-    # ------------------------------------------------------
+        # 2. PLAN: SPOONACULAR API
+        try:
+            sonuc = get_recipes_from_spoonacular(malzemeler_metni)
+        except Exception as e2:
+            print(f"❌ Sistem Uyarısı: Spoonacular da çöktü, 2. yedeğe (Yerel JSON) geçiliyor. ({e2})")
+            
+            # 3. PLAN: YEREL JSON (recipes.json)
+            sonuc = get_recipes_from_local(malzemeler_listesi)
+            
+    print("\n🔍 3 Menü İçin Besin Değerleri Analiz Ediliyor (Bu biraz sürebilir)...")
+    
+    # 3 menünün de içine girip her bir yemek için kalori hesaplıyoruz
+    for menu in sonuc.get("menuler", []):
+        menu["kaloriler"] = {
+            "baslangic_kalori": kalori_hesapla(menu["baslangic"]),
+            "ana_yemek_kalori": kalori_hesapla(menu["ana_yemek"]),
+            "tatli_kalori": kalori_hesapla(menu["tatli"])
+        }
     
     return sonuc
+
+def rastgele_chatbot_tarifi(envanter_listesi):
+    """
+    Kullanıcının envanterine göre samimi bir dille tek bir sürpriz tarif önerir.
+    """
+    print("🤖 Chatbot Aşçı devreye giriyor...")
+    
+    # Envanteri virgüllü bir metne çeviriyoruz
+    malzemeler_metni = ", ".join(envanter_listesi) if envanter_listesi else "temel ev malzemeleri (tuz, yağ, un vb.)"
+    
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen enerjik, esprili ve samimi bir yapay zeka mutfak şefisin.
+    Kullanıcının dolabındaki malzemeler şunlar: {malzemeler_metni}
+    
+    Kullanıcı sana "Bugün ne pişirsem?" diye sordu. Dışarıdan yemek sipariş etmeyi unutturacak, 
+    elindeki malzemelerle yapılabilecek (tuz, yağ, su gibi temel ev malzemelerini varsayabilirsin) 
+    sürpriz ve tek tabaklık harika bir tarif öner.
+    
+    Cevabını KESİNLİKLE sadece aşağıdaki JSON formatında ver, dışına hiçbir metin veya markdown yazma:
+    {{
+        "chatbot_giris_mesaji": "Selam! Bugün dolabındaki malzemelerle harika bir şey yapacağız...",
+        "tarif_adi": "Yaratıcı Yemeğin Adı",
+        "hazirlik_suresi": "25 dakika",
+        "malzemeler": ["malzeme 1", "malzeme 2"],
+        "adimlar": ["1. Önce yağı kızdırın.", "2. Soğanları ekleyin."]
+    }}
+    """
+    
+    try:
+        # JSON formatına zorluyoruz
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        logging.error(f"Chatbot tarif hatası: {e}")
+        return {
+            "chatbot_giris_mesaji": "Mutfakta ufak bir kaza oldu, tarif defterimi bulamıyorum!",
+            "tarif_adi": "Sistem Hatası",
+            "hazirlik_suresi": "?",
+            "malzemeler": [],
+            "adimlar": []
+        }
+    
+def ai_tarif_detayi_getir(yemek_adi, envanter_listesi):
+    """Sadece istenen yemeğin adım adım tarifini JSON olarak üretir."""
+    print(f"👨‍🍳 AI Şef {yemek_adi} için mutfağa girdi...")
+    
+    malzemeler_metni = ", ".join(envanter_listesi) if envanter_listesi else "temel ev malzemeleri"
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen profesyonel bir şefsin. Kullanıcı "{yemek_adi}" yemeğini yapmak istiyor.
+    Kullanıcının dolabındaki malzemeler: {malzemeler_metni}.
+    
+    Lütfen bu yemeğin adım adım yapılış tarifini, KESİNLİKLE kullanıcının dolabındaki malzemelere öncelik vererek (ve eksik varsa temel malzemeleri varsayarak) oluştur.
+    
+    Yanıtı SADECE aşağıdaki JSON formatında ver, dışına markdown veya açıklama yazma:
+    {{
+        "yemek_adi": "{yemek_adi}",
+        "hazirlik_suresi": "35 Dakika",
+        "porsiyon": "2 Kişilik",
+        "kullanilan_malzemeler": ["malzeme 1", "malzeme 2"],
+        "adimlar": ["1. Adım açıklaması...", "2. Adım açıklaması..."]
+    }}
+    """
+    
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"❌ Tarif detay hatası: {e}")
+        return {
+            "yemek_adi": yemek_adi,
+            "hazirlik_suresi": "?",
+            "porsiyon": "?",
+            "kullanilan_malzemeler": [],
+            "adimlar": ["Tarif yüklenirken bir hata oluştu, lütfen tekrar tıklayın."]
+        }
+    
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:

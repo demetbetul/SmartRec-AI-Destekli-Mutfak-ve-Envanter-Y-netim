@@ -22,7 +22,9 @@ from data_manager import (
     veri_yedekle,
     eksik_malzemeleri_bul,
     akilli_tarif_filtrele,
-    kalori_hesapla
+    kalori_hesapla,
+    rastgele_chatbot_tarifi,
+    ai_tarif_detayi_getir
 )
 
 app = Flask(__name__)
@@ -293,6 +295,49 @@ def create_custom_menu():
         return jsonify({
             "success": True,
             "menu": menu
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    
+@app.route('/api/chatbot/recipe', methods=['GET'])
+def get_chatbot_recipe():
+    """Chatbot mantığıyla rastgele tek bir tarif önerir"""
+    try:
+        # Envanterden malzemeleri otomatik alıyoruz (data_manager'daki mevcut fonksiyonla)
+        malzemeler = ai_icin_malzeme_listesi_hazirla()
+        
+        tarif = rastgele_chatbot_tarifi(malzemeler)
+        
+        return jsonify({
+            "success": True,
+            "data": tarif
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    
+@app.route('/api/recipe/details', methods=['POST'])
+def get_recipe_details():
+    """Tıklanan yemeğin detaylı tarifini getirir"""
+    try:
+        data = request.get_json()
+        yemek_adi = data.get('yemek_adi')
+        
+        if not yemek_adi:
+             return jsonify({"success": False, "error": "Yemek adı belirtilmedi!"}), 400
+             
+        # Dolaptaki malzemeleri çekip Gemini'ye yemeğin adıyla birlikte yolluyoruz
+        malzemeler = ai_icin_malzeme_listesi_hazirla()
+        tarif_detayi = ai_tarif_detayi_getir(yemek_adi, malzemeler)
+        
+        return jsonify({
+            "success": True,
+            "data": tarif_detayi
         }), 200
     except Exception as e:
         return jsonify({
