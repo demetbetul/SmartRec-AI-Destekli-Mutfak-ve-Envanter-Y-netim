@@ -24,7 +24,10 @@ from data_manager import (
     akilli_tarif_filtrele,
     kalori_hesapla,
     rastgele_chatbot_tarifi,
-    ai_tarif_detayi_getir
+    ai_tarif_detayi_getir,
+    akilli_envanter_analizi,
+    secili_malzemelerle_tek_tarif,
+    alisveris_linkleri_olustur
 )
 
 app = Flask(__name__)
@@ -115,15 +118,37 @@ def filter_recipes():
 
 @app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
 @handle_errors
+@app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
+@handle_errors
 def get_missing_ingredients(recipe_id):
-    """Tarifte eksik olan malzemeleri getir"""
+    """Tarifte eksik olan malzemeleri hem tekli hem toplu arama linkleriyle getirir"""
+    
+    # 1. Eksik malzemelerin adlarını buluyoruz
     eksikler = eksik_malzemeleri_bul(recipe_id)
+    
+    if not eksikler:
+        return jsonify({
+            "success": True,
+            "message": "Hiç eksik malzeme yok, hemen pişirmeye başla!",
+            "eksik_malzemeler_detay": [],
+            "toplu_arama_linki": ""
+        }), 200
+        
+    # 2. Tek tek butonlar için: Her malzemeye özel link listesi
+    linkli_eksikler = alisveris_linkleri_olustur(eksikler)
+    
+    # 3. YENİ - Toplu Buton İçin: Tüm malzemeleri boşlukla birleştirip tek bir link yapıyoruz
+    # Örn: "süt un yumurta" şeklinde aratacak
+    toplu_metin = " ".join(eksikler)
+    import urllib.parse
+    toplu_link = f"https://www.migros.com.tr/arama?q={urllib.parse.quote(toplu_metin)}"
     
     return jsonify({
         "success": True,
         "recipe_id": recipe_id,
-        "eksik_malzemeler": eksikler,
-        "count": len(eksikler)
+        "count": len(eksikler),
+        "eksik_malzemeler_detay": linkli_eksikler, # Tek tek eklemek isteyenler için
+        "toplu_arama_linki": toplu_link            # Tek tuşla hepsini aramak isteyenler için
     }), 200
 
 # ==================== ENVANTER API'ları ====================
@@ -344,6 +369,33 @@ def get_recipe_details():
             "success": False,
             "error": str(e)
         }), 500
+    
+@app.route('/api/recipe/custom-ingredients', methods=['POST'])
+def get_custom_ingredients_recipe():
+    """Kullanıcının seçtiği özel malzemelerle tek bir tarif üretir"""
+    try:
+        data = request.get_json()
+        # Frontend'den {"malzemeler": ["Tavuk", "Krema"]} şeklinde bir liste gelecek
+        secilenler = data.get('malzemeler', [])
+        
+        # Eğer kullanıcı hiçbir şey seçmeden butona basarsa uyaralım
+        if not secilenler or len(secilenler) == 0:
+             return jsonify({
+                 "success": False, 
+                 "error": "Lütfen şefe en az bir malzeme verin!"
+             }), 400
+             
+        ozel_tarif = secili_malzemelerle_tek_tarif(secilenler)
+        
+        return jsonify({
+            "success": True,
+            "data": ozel_tarif
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 
 # ==================== GÜNLÜK KAYıT API'ları ====================
@@ -470,6 +522,22 @@ def get_notifications():
     except Exception as e:
         print(f"Genel Bildirim Hatası: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+    
+@app.route('/api/notifications/ai-insight', methods=['GET'])
+def get_ai_insight():
+    """AI kullanarak envanterdeki bozulacak ürünler için akıllı tavsiyeler üretir."""
+    try:
+        analiz_sonucu = akilli_envanter_analizi()
+        return jsonify({
+            "success": True,
+            "data": analiz_sonucu
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    
 # ==================== YEDEKLEME API'ları ====================
 @app.route('/api/backup', methods=['POST'])
 def create_backup():

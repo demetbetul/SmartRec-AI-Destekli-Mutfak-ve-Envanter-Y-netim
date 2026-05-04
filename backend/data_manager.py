@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
 import random
+import urllib.parse
 
 # .env dosyasındaki şifreleri yükle
 load_dotenv()
@@ -503,10 +504,18 @@ def akilli_menu_olustur(malzemeler_listesi):
     
     # 3 menünün de içine girip her bir yemek için kalori hesaplıyoruz
     for menu in sonuc.get("menuler", []):
+        # 1. Kalorileri ekle
         menu["kaloriler"] = {
             "baslangic_kalori": kalori_hesapla(menu["baslangic"]),
             "ana_yemek_kalori": kalori_hesapla(menu["ana_yemek"]),
             "tatli_kalori": kalori_hesapla(menu["tatli"])
+        }
+        
+        # 2. YENİ: Fotoğrafları ekle
+        menu["gorseller"] = {
+            "baslangic_foto": yemek_fotografi_bul(menu["baslangic"]),
+            "ana_yemek_foto": yemek_fotografi_bul(menu["ana_yemek"]),
+            "tatli_foto": yemek_fotografi_bul(menu["tatli"])
         }
     
     return sonuc
@@ -596,6 +605,175 @@ def ai_tarif_detayi_getir(yemek_adi, envanter_listesi):
             "adimlar": ["Tarif yüklenirken bir hata oluştu, lütfen tekrar tıklayın."]
         }
     
+def akilli_envanter_analizi():
+    """Dolaptaki ürünlerin tarihlerine bakıp AI destekli samimi uyarılar üretir."""
+    print("🔮 AI Kahin envanteri inceliyor...")
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        envanter = data.get("envanter", [])
+        if not envanter:
+            return {
+                "durum": "iyi", 
+                "ai_mesaji": "Dolabın tertemiz (çünkü bomboş)! Alışveriş zamanı gelmiş.",
+                "kurtarilacak_urunler": []
+            }
+        
+        # Promptu çok şişirmemek için sadece ad ve SKT bilgilerini alıyoruz
+        ozet_envanter = [{"ad": u.get("ad"), "skt": u.get("skt")} for u in envanter if u.get("ad") and u.get("skt")]
+        
+        # Bugünün tarihini çekiyoruz ki AI ne kadar zaman kaldığını bilsin
+        bugun = datetime.now().strftime("%Y-%m-%d")
+        
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        prompt = f"""
+        Sen sevimli ve dikkatli bir mutfak asistanısın. Bugünün tarihi: {bugun}.
+        Kullanıcının dolabındaki ürünler ve son kullanma tarihleri (skt) şunlar:
+        {ozet_envanter}
+        
+        Lütfen tarihleri bugünün tarihiyle karşılaştır.
+        - Tarihi geçmiş veya geçmek üzere olan (1-3 gün kalmış) ürünleri tespit et.
+        - Kullanıcıya chatbot tarzında, tek veya iki cümlelik samimi bir bildirim yaz. 
+          Örnek: "Sütün son kullanma tarihi yarın doluyor, ondan hemen güzel bir sütlaç yapmaya ne dersin?"
+        - Eğer her şey tazeyse: "Tüm ürünlerin taptaze, mutfakta işler harika gidiyor!" gibi motive edici bir şey de.
+        
+        Cevabını SADECE aşağıdaki JSON formatında ver, dışına markdown veya açıklama yazma:
+        {{
+            "durum": "kritik",  // veya her şey tazeyse "iyi"
+            "ai_mesaji": "Buraya yazdığın samimi mesaj gelecek",
+            "kurtarilacak_urunler": ["bozulmak_uzere_olan_urun1", "urun2"]
+        }}
+        """
+        
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"❌ AI Analiz Hatası: {e}")
+        return {
+            "durum": "bilinmiyor",
+            "ai_mesaji": "Sistemde ufak bir yavaşlık var, dolabın içini tam göremedim. Tarihleri kendin kontrol etsen iyi olur!",
+            "kurtarilacak_urunler": []
+        }
+
+def secili_malzemelerle_tek_tarif(secilen_malzemeler):
+    """Kullanıcının arayüzden özel olarak seçtiği malzemelerle tek bir yıldız tarif üretir."""
+    print(f"🎯 Özel Şef devrede! Sadece şu malzemelere odaklanılıyor: {secilen_malzemeler}")
+    
+    malzemeler_metni = ", ".join(secilen_malzemeler)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen usta ve yaratıcı bir şefsin. Kullanıcı sana şu malzemeleri verdi: {malzemeler_metni}.
+    
+    Senden İSTENEN: Bu malzemeleri KESİNLİKLE BAŞROLDE kullanarak (tuz, karabiber, yağ, su gibi temel ev malzemelerini ekleyebilirsin) 
+    harika ve iştah açıcı tek bir yemek tarifi oluşturman.
+    
+    Cevabını SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya markdown yazma:
+    {{
+        "yemek_adi": "Özel Yaratıcı Yemeğin Adı",
+        "hazirlik_suresi": "30 Dakika",
+        "porsiyon": "2 Kişilik",
+        "kullanilan_ana_malzemeler": ["{malzemeler_metni}"],
+        "eklenen_temel_malzemeler": ["Zeytinyağı", "Tuz"],
+        "adimlar": ["1. Adım...", "2. Adım..."],
+        "puf_noktasi": "Bu yemeğin lezzet sırrı..."
+    }}
+    """
+    
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"❌ Özel tarif hatası: {e}")
+        return {
+            "yemek_adi": "Yaratıcı Tarif Bulunamadı",
+            "hazirlik_suresi": "?",
+            "adimlar": ["Şu an mutfakta bir yoğunluk var, lütfen tekrar deneyin."],
+            "puf_noktasi": ""
+        }
+    
+def alisveris_linkleri_olustur(eksik_malzemeler):
+    """Eksik malzemeleri alır ve online market (Sanalmarket) arama linklerine dönüştürür."""
+    print("🛒 Alışveriş robotu eksikler için sepet linklerini hazırlıyor...")
+    linkli_liste = []
+    
+    for malzeme in eksik_malzemeler:
+        # Türkçe karakterleri (ş, ç, ö vb.) URL formatına (%C5%9F gibi) çeviririz
+        url_uyumlu_isim = urllib.parse.quote(malzeme)
+        
+        # Migros Sanal Market altyapısını kullanıyoruz
+        arama_linki = f"https://www.migros.com.tr/arama?q={url_uyumlu_isim}"
+        
+        linkli_liste.append({
+            "malzeme": malzeme,
+            "satin_al_linki": arama_linki
+        })
+        
+    return linkli_liste
+
+def yemek_fotografi_bul(yemek_adi):
+    """Spoonacular -> Google Custom Search -> Varsayılan Görsel hiyerarşisiyle çalışır."""
+    print(f"📸 '{yemek_adi}' için görsel aranıyor...")
+    varsayilan_foto = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    
+    # === 1. AŞAMA: SPOONACULAR (Ana Kaynak) ===
+    try:
+        ingilizce_ad = GoogleTranslator(source='tr', target='en').translate(yemek_adi)
+        url = "https://api.spoonacular.com/recipes/complexSearch"
+        params = {"query": ingilizce_ad, "number": 1, "apiKey": SPOONACULAR_API_KEY}
+        
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("results") and len(data["results"]) > 0:
+                print(f"✅ {yemek_adi} görseli Spoonacular'dan bulundu.")
+                return data["results"][0]["image"]
+    except Exception as e:
+        print(f"⚠️ Spoonacular Hatası: {e}")
+
+    # === 2. AŞAMA: GOOGLE GÖRSELLER (1. Yedek) ===
+    print(f"🔍 Spoonacular bulamadı, '{yemek_adi}' Google Görseller'de aranıyor...")
+    try:
+        # Bunları .env dosyasından okuyacak (Eğer yoksa Null döner, sistem çökmez)
+        GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") 
+        GOOGLE_CX = os.getenv("GOOGLE_CX") # Özel Arama Motoru ID'si
+        
+        if GOOGLE_API_KEY and GOOGLE_CX:
+            google_url = "https://www.googleapis.com/customsearch/v1"
+            g_params = {
+                "q": yemek_adi + "tarifi", # Daha doğru sonuç için "yemeği" kelimesi eklendi
+                "cx": GOOGLE_CX,
+                "key": GOOGLE_API_KEY,
+                "searchType": "image",
+                "num": 1 # Sadece 1 fotoğraf getir
+            }
+            g_res = requests.get(google_url, params=g_params)
+            
+            if g_res.status_code == 200:
+                g_data = g_res.json()
+                if "items" in g_data and len(g_data["items"]) > 0:
+                    print(f"✅ {yemek_adi} görseli Google'dan bulundu.")
+                    return g_data["items"][0]["link"]
+            else:
+                 print(f"⚠️ Google API Yanıt Vermedi (Kota bitmiş veya yetkisiz).")
+        else:
+            print("⚠️ Google API şifreleri .env dosyasında bulunamadı (Atlanıyor).")
+            
+    except Exception as e:
+        print(f"⚠️ Google Arama Hatası: {e}")
+
+    # === 3. AŞAMA: VARSAYILAN FOTOĞRAF (Son Çare) ===
+    print(f"🖼️ İki API de '{yemek_adi}' için görsel bulamadı, varsayılan tabak kullanılıyor.")
+    return varsayilan_foto
+     
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
