@@ -116,11 +116,10 @@ def filter_recipes():
         "tarifler": sonuclar
     }), 200
 
+
 @app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
 @handle_errors
-@app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
-@handle_errors
-def get_missing_ingredients(recipe_id):
+def eksik_malzemeleri_getir_api(recipe_id):
     """Tarifte eksik olan malzemeleri hem tekli hem toplu arama linkleriyle getirir"""
     
     # 1. Eksik malzemelerin adlarını buluyoruz
@@ -584,7 +583,48 @@ def internal_error(error):
         "success": False,
         "error": "Sunucu hatası"
     }), 500
-
+# ==================== PITI AI SOHBET API'si ====================
+@app.route('/api/chat', methods=['POST'])
+def chat_with_piti():
+    try:
+        data = request.get_json()
+        kullanici_mesaji = data.get('mesaj', '')
+        
+        print(f"Piti'ye gelen mesaj: {kullanici_mesaji}")
+        
+        # Arkadaşın buraya kendi AI kodlarını yazacak, şimdilik test cevabı dönüyoruz:
+        sahte_cevap = f"Şu an test modundayım. Bana '{kullanici_mesaji}' dedin. Arkadaşın beynimi yüklediğinde sana gerçek tarifler vereceğim! 🍳"
+        
+        return jsonify({
+            "success": True,
+            "cevap": sahte_cevap
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    # ==================== AI ALIŞVERİŞ LİSTESİ API'si ====================
+@app.route('/api/shopping-list/ai', methods=['POST'])
+def generate_ai_shopping_list():
+    try:
+        # Arkadaşın buraya "Envantere bak, eksikleri bul, ChatGPT'ye sor" kodlarını yazacak.
+        # Şimdilik senin butonun çalıştığını kanıtlamak için sahte bir liste yolluyoruz:
+        sahte_liste = [
+            "🍅 1 kg Domates (Menemen için kritik!)",
+            "🥚 1 Koli Yumurta",
+            "🧀 500g Kaşar Peyniri",
+            "🥖 2 Adet Taze Ekmek"
+        ]
+        
+        return jsonify({
+            "success": True,
+            "liste": sahte_liste
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 if __name__ == '__main__':
     print("🚀 SmartRec Backend API Başlatılıyor...")
     print("📍 http://localhost:5000")
