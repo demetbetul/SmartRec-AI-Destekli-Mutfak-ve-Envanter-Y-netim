@@ -7,31 +7,11 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="dashboard-body">
 
-  <header class="header" id="header">
-    <div class="header__inner">
-      <a href="index.html" class="logo">
-        <span class="logo__icon">🍽</span>
-        <span class="logo__text">SmartRec</span>
-      </a>
-      <nav class="nav">
-        <a href="index.html" class="nav__link">Anasayfa</a>
-        <a href="menu.html" class="nav__link">Menüler</a>
-        <a href="#" class="nav__link" id="openPiti">AI Asistanı</a>
-        <a href="#" class="nav__link">İletişim</a>
-      </nav>
-      <div class="header__actions">
-        <span class="user-badge">👤 Hoş geldin, Ali</span>
-        <button class="hamburger" id="hamburger" aria-label="Menüyü Aç">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <div id="app-header"></div>
 
   <main class="dashboard">
 
@@ -39,139 +19,400 @@
     <div class="dashboard__header">
       <div>
         <h1 class="dashboard__title">Kontrol <span class="text--accent">Paneliniz</span></h1>
-        <p class="dashboard__subtitle">Mutfak envanterinizi ve beslenme takibinizi yönetin</p>
+        <p class="dashboard__subtitle" id="userNameDisplay">Mutfak envanterinizi ve beslenme takibinizi yönetin</p>
       </div>
-      <!-- TODO: Fetch user summary from GET /api/user/summary -->
       <div class="dashboard__stats">
-        <div class="stat-pill">🥘 <strong id="inventoryCount">12</strong> Malzeme</div>
-        <div class="stat-pill stat-pill--warn">⚠️ <strong id="expiryCount">3</strong> SKT Uyarısı</div>
-        <div class="stat-pill stat-pill--ok">🛒 <strong id="shoppingCount">5</strong> Alışveriş</div>
+        <div class="stat-pill">🥘 <strong id="inventoryCount">—</strong> Malzeme</div>
+        <div class="stat-pill stat-pill--warn">⚠️ <strong id="expiryCount">—</strong> SKT Uyarısı</div>
+        <div class="stat-pill stat-pill--ok">🛒 <strong id="shoppingCount">—</strong> Alışveriş</div>
       </div>
     </div>
 
     <div class="dashboard__grid">
 
-      <!-- ===== INVENTORY PANEL ===== -->
+      <!-- ===== ENVANTER ===== -->
       <section class="dash-card dash-card--inventory">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🧊 Envanter</h2>
-          <!-- TODO: POST /api/inventory/add -->
           <button class="btn btn--primary btn--sm" id="addInventoryBtn">+ Malzeme Ekle</button>
         </div>
-
-        <!-- SKT Warning System -->
         <div class="skt-legend">
           <span class="skt-dot skt-dot--green"></span> Taze
           <span class="skt-dot skt-dot--orange"></span> Yakında Bozulacak
           <span class="skt-dot skt-dot--red"></span> Bugün/Geçmiş
         </div>
-
-        <!-- TODO: Fetch from GET /api/inventory?userId={id} -->
-        <div class="inventory-list" id="inventoryList">
-          <!-- Rendered by dashboard.js -->
-        </div>
-
-        <!-- Add Inventory Modal (hidden) -->
+        <div class="inventory-list" id="inventoryList"></div>
         <div class="mini-form hidden" id="addInventoryForm">
           <input type="text" class="input" id="newItemName" list="material-suggestions" placeholder="Malzeme adı (örn: Yumurta)" autocomplete="off" />
-
-<datalist id="material-suggestions">
-    <option value="Süt">
-    <option value="Yumurta">
-    <option value="Un">
-    <option value="Domates">
-    <option value="Peynir">
-    <option value="Zeytinyağı">
-    <option value="Tavuk">
-    <option value="Makarna">
-    <option value="Soğan">
-    <option value="Patates">
-</datalist>
+          <datalist id="material-suggestions">
+            <option value="Süt"><option value="Yumurta"><option value="Un">
+            <option value="Domates"><option value="Peynir"><option value="Zeytinyağı">
+            <option value="Tavuk"><option value="Makarna"><option value="Soğan"><option value="Patates">
+          </datalist>
           <input type="date" class="input" id="newItemExpiry" />
-          <input type="number" class="input" id="newItemQty" placeholder="Miktar" min="1" />
-          <button class="btn btn--primary btn--sm" id="saveInventoryBtn">Kaydet</button>
-          <button class="btn btn--ghost btn--sm" id="cancelInventoryBtn">İptal</button>
+          <input type="number" class="input" id="newItemQty" placeholder="Miktar" min="1" value="1" />
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn btn--primary btn--sm" id="saveInventoryBtn">Kaydet</button>
+            <button class="btn btn--ghost btn--sm" id="cancelInventoryBtn">İptal</button>
+          </div>
         </div>
       </section>
 
-      <!-- ===== CALORIE TRACKING ===== -->
+      <!-- ===== KALORİ TAKİBİ ===== -->
       <section class="dash-card dash-card--calories">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🔥 Kalori Takibi</h2>
-          <span class="badge badge--accent" id="todayCalLabel">Bugün: 1420 kcal</span>
+          <span class="badge badge--accent" id="todayCalLabel">Bugün: — kcal</span>
         </div>
         <div class="chart-wrap">
-          <!-- TODO: Fetch from GET /api/nutrition/weekly?userId={id} -->
           <canvas id="calorieChart"></canvas>
         </div>
         <div class="calorie-goal">
           <div class="calorie-goal__bar">
-            <div class="calorie-goal__fill" id="calorieBar" style="width: 71%"></div>
+            <div class="calorie-goal__fill" id="calorieBar" style="width:0%"></div>
           </div>
-          <p class="calorie-goal__label">Günlük hedef: <strong>2000 kcal</strong> — <span id="calorieRemaining">580 kcal kaldı</span></p>
+          <p class="calorie-goal__label">Günlük hedef: <strong>2000 kcal</strong> — <span id="calorieRemaining">—</span></p>
         </div>
       </section>
 
-      <!-- ===== SHOPPING LIST ===== -->
+      <!-- ===== ALIŞVERİŞ LİSTESİ ===== -->
       <section class="dash-card dash-card--shopping">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🛒 Alışveriş Listesi</h2>
-          <!-- TODO: POST /api/shopping-list/generate -->
           <button class="btn btn--ghost btn--sm" id="autoGenBtn">✦ AI ile Oluştur</button>
         </div>
-        <!-- TODO: Fetch from GET /api/shopping-list?userId={id} -->
-        <ul class="shopping-list" id="shoppingList">
-          <!-- Rendered by dashboard.js -->
-        </ul>
+        <ul class="shopping-list" id="shoppingList"></ul>
         <button class="btn btn--outline btn--sm" style="margin-top:1rem;" id="addShoppingItemBtn">+ Manuel Ekle</button>
       </section>
 
-      <!-- ===== SUGGESTED RECIPES ===== -->
+      <!-- ===== ÖNERİLEN TARİFLER ===== -->
       <section class="dash-card dash-card--suggestions">
         <div class="dash-card__header">
           <h2 class="dash-card__title">💡 Elinizdekilerle Yapabilecekleriniz</h2>
         </div>
-        <!-- TODO: POST /api/recipes/suggest with { inventory: [...] } -->
-        <div class="suggestion-list" id="suggestionList">
-          <!-- Rendered by dashboard.js -->
-        </div>
+        <div class="suggestion-list" id="suggestionList"></div>
       </section>
 
-      <!-- ===== AI NOTIFICATIONS ===== -->
+      <!-- ===== BİLDİRİMLER ===== -->
       <section class="dash-card dash-card--notifications">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🔔 Akıllı Bildirimler</h2>
         </div>
-        <!-- TODO: Fetch from GET /api/notifications?userId={id} -->
-        <div class="notifications-list" id="notificationsList">
-          <!-- Rendered by dashboard.js -->
-        </div>
+        <div class="notifications-list" id="notificationsList"></div>
       </section>
 
-    </div><!-- /dashboard__grid -->
+    </div>
   </main>
 
-  <!-- Piti Chatbot -->
-  <div class="chatbot-fab" id="chatbotFab" title="Piti AI Asistanı">
-    <span class="chatbot-fab__icon">🤖</span>
-    <span class="chatbot-fab__dot"></span>
-  </div>
-  <div class="chatbot-modal" id="chatbotModal" aria-hidden="true">
-    <div class="chatbot-modal__header">
-      <div class="chatbot-modal__title"><span>✦</span> Piti — AI Asistanı</div>
-      <button class="chatbot-modal__close" id="chatbotClose">✕</button>
-    </div>
-    <div class="chatbot-modal__body" id="chatbotBody">
-      <div class="chat-msg chat-msg--bot">
-        <p>Merhaba Ali! 👋 Envanterinize baktım — bugün <strong>domates ve yumurta</strong> ile menemen yapabilirsiniz 🍳</p>
-      </div>
-    </div>
-    <div class="chatbot-modal__footer">
-      <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Bir şeyler yazın..." />
-      <button class="btn btn--primary chatbot-send" id="chatbotSend">→</button>
-    </div>
-  </div>
+  <div id="chatbot-root"></div>
 
- <script type="module" src="dist/app.js"></script>
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { Auth, initPage } from './js/auth.js';
+    import { initPiti } from './js/piti.js';
+
+    // ─── AUTH GUARD ───────────────────────────────────
+    // Header'ı inject et, sonra auth kontrolü yap
+    document.getElementById('app-header').innerHTML = renderHeader('dashboard');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+
+    if (!Auth.requireAuth()) {
+      // requireAuth() zaten banner gösterip yönlendiriyor
+      // Script duraksatılır, dashboard içeriği yüklenmez
+      throw new Error('AUTH_REQUIRED');
+    }
+    // ─── KULLANICI BİLGİSİ ────────────────────────────
+    const user = Auth.getUser();
+    const displayName = (user?.ad || user?.name || 'Kullanıcı')
+      .trim().split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+
+    const subtitleEl = document.getElementById('userNameDisplay');
+    if (subtitleEl) subtitleEl.textContent = `Hoş geldin, ${displayName}! Mutfak envanterini yönet.`;
+
+    // Piti
+    initPiti();
+    // Piti karşılama mesajını güncelle
+    const pitiBody = document.getElementById('chatbotBody');
+    if (pitiBody) {
+      const firstMsg = pitiBody.querySelector('.chat-msg--bot p');
+      if (firstMsg) firstMsg.innerHTML = `Merhaba <strong>${displayName}</strong>! 👋 Envanterine baktım — bugün sana özel tarif önereyim mi?`;
+    }
+
+    // ─── ENVANTERİ ÇEKME ──────────────────────────────
+    async function verileriGetir() {
+      try {
+        const res = await fetch('http://localhost:5000/api/inventory');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const liste = Array.isArray(data) ? data : data.envanter || [];
+        envanteriCiz(liste);
+        const badge = document.getElementById('inventoryCount');
+        if (badge) badge.textContent = liste.length;
+      } catch {
+        // Backend yoksa mock veri göster
+        envanteriCiz(MOCK_ENVANTER);
+        const badge = document.getElementById('inventoryCount');
+        if (badge) badge.textContent = MOCK_ENVANTER.length;
+      }
+    }
+
+    const MOCK_ENVANTER = [
+      { ad: 'Yumurta',    skt: dayOffset(5),  miktar: 12 },
+      { ad: 'Süt',        skt: dayOffset(2),  miktar: 1  },
+      { ad: 'Domates',    skt: dayOffset(-1), miktar: 6  },
+      { ad: 'Tavuk',      skt: dayOffset(3),  miktar: 2  },
+      { ad: 'Zeytinyağı', skt: dayOffset(90), miktar: 1  },
+    ];
+
+    function dayOffset(n) {
+      const d = new Date();
+      d.setDate(d.getDate() + n);
+      return d.toISOString().split('T')[0];
+    }
+
+    function envanteriCiz(liste) {
+      const container = document.getElementById('inventoryList');
+      if (!container) return;
+      const today = new Date();
+      let warnCount = 0;
+      container.innerHTML = liste.map(item => {
+        const sktDate = new Date(item.skt);
+        const diff = Math.ceil((sktDate - today) / 86400000);
+        const color = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
+        const cls   = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : 'inventory-item--green';
+        if (diff < 0 || diff <= 3) warnCount++;
+        return `
+          <div class="inventory-item ${cls}">
+            <span class="inventory-item__dot" style="background:${color}"></span>
+            <span class="inventory-item__name">${item.ad}</span>
+            <span class="inventory-item__expiry">${item.skt}</span>
+            <span class="inventory-item__qty">${item.miktar} adet</span>
+          </div>`;
+      }).join('');
+      const expiryBadge = document.getElementById('expiryCount');
+      if (expiryBadge) expiryBadge.textContent = warnCount;
+    }
+
+    // ─── KALORİ ───────────────────────────────────────
+    async function kaloriGuncelle() {
+      try {
+        const res = await fetch('http://localhost:5000/api/calories');
+        const d = await res.json();
+        renderKalori(d.bugun, d.hedef, d.haftalik);
+      } catch {
+        renderKalori(1420, 2000, [1800, 1600, 2100, 1750, 1900, 1420, 0]);
+      }
+    }
+
+    function renderKalori(bugun, hedef, haftalik) {
+      const kalan = hedef - bugun;
+      const yuzde = Math.min((bugun / hedef) * 100, 100);
+      const todayEl    = document.getElementById('todayCalLabel');
+      const remainEl   = document.getElementById('calorieRemaining');
+      const barEl      = document.getElementById('calorieBar');
+      const chartCanvas = document.getElementById('calorieChart');
+
+      if (todayEl)  todayEl.textContent = `Bugün: ${bugun} kcal`;
+      if (remainEl) remainEl.textContent = kalan > 0 ? `${kalan} kcal kaldı` : '🎯 Hedefe ulaşıldı!';
+      if (barEl) {
+        barEl.style.width = `${yuzde}%`;
+        barEl.style.background = bugun > hedef
+          ? 'linear-gradient(90deg, #e74c3c, #c0392b)'
+          : 'linear-gradient(90deg, #2D7A4F, #4AAF7A)';
+      }
+      if (chartCanvas && typeof Chart !== 'undefined') {
+        new Chart(chartCanvas, {
+          type: 'line',
+          data: {
+            labels: ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'],
+            datasets: [{
+              label: 'Kalori',
+              data: haftalik,
+              borderColor: '#C44B1C',
+              backgroundColor: 'rgba(196,75,28,0.08)',
+              fill: true, tension: 0.4, pointRadius: 3,
+              pointBackgroundColor: '#C44B1C',
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, display: false }, x: { grid: { display: false } } }
+          }
+        });
+      }
+    }
+
+    // ─── BİLDİRİMLER ──────────────────────────────────
+    async function bildirimleriYukle() {
+      const container = document.getElementById('notificationsList');
+      if (!container) return;
+      const MOCK_NOTIF = [
+        { tip: 'warn',  icon: '⚠️', baslik: 'Son Kullanma Tarihi Yaklaşıyor', mesaj: 'Süt yarın son kullanma tarihine ulaşıyor.' },
+        { tip: 'info',  icon: '💡', baslik: 'Tarif Önerisi',                 mesaj: 'Elinizdeki domates ve yumurta ile menemen yapabilirsiniz!' },
+        { tip: 'tip',   icon: '🛒', baslik: 'Alışveriş Zamanı',              mesaj: '3 malzeme stoğunuz azalmak üzere.' },
+      ];
+      container.innerHTML = MOCK_NOTIF.map(n => `
+        <div class="notif-item notif-item--${n.tip}">
+          <span class="notif-icon">${n.icon}</span>
+          <div class="notif-text">
+            <strong>${n.baslik}</strong>
+            <span>${n.mesaj}</span>
+          </div>
+        </div>`).join('');
+    }
+
+    // ─── ÖNERİLER ─────────────────────────────────────
+    function oneriYukle() {
+      const container = document.getElementById('suggestionList');
+      if (!container) return;
+      const ONERILER = [
+        { emoji: '🍳', name: 'Menemen',       meta: '15 dk · 220 kcal · Kolay' },
+        { emoji: '🍲', name: 'Mercimek Çorbası', meta: '25 dk · 180 kcal · Kolay' },
+        { emoji: '🥗', name: 'Kısır',          meta: '20 dk · 195 kcal · Kolay' },
+      ];
+      container.innerHTML = ONERILER.map(o => `
+        <div class="suggestion-item">
+          <span class="suggestion-item__emoji">${o.emoji}</span>
+          <div class="suggestion-item__info">
+            <p class="suggestion-item__name">${o.name}</p>
+            <p class="suggestion-item__meta">${o.meta}</p>
+          </div>
+          <button class="cooked-btn" onclick="this.classList.toggle('cooked'); this.textContent = this.classList.contains('cooked') ? '✓ Yapıldı' : 'Yaptım'">Yaptım</button>
+        </div>`).join('');
+    }
+
+    // ─── ENVANTER FORMU ───────────────────────────────
+    const addBtn    = document.getElementById('addInventoryBtn');
+    const formDiv   = document.getElementById('addInventoryForm');
+    const saveBtn   = document.getElementById('saveInventoryBtn');
+    const cancelBtn = document.getElementById('cancelInventoryBtn');
+    const inputAd   = document.getElementById('newItemName');
+    const inputSKT  = document.getElementById('newItemExpiry');
+    const inputMiktar = document.getElementById('newItemQty');
+
+    addBtn?.addEventListener('click', () => formDiv?.classList.toggle('hidden'));
+    cancelBtn?.addEventListener('click', () => {
+      formDiv?.classList.add('hidden');
+      if (inputAd)     inputAd.value = '';
+      if (inputSKT)    inputSKT.value = '';
+      if (inputMiktar) inputMiktar.value = '1';
+    });
+
+    saveBtn?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const isim   = inputAd?.value.trim();
+      const skt    = inputSKT?.value;
+      const miktar = Number(inputMiktar?.value) || 1;
+      if (!isim) { inputAd?.focus(); return; }
+      if (/^\d+$/.test(isim)) { alert('⚠️ Malzeme adı sadece sayı olamaz!'); return; }
+      try {
+        const res = await fetch('http://localhost:5000/api/inventory/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ad: isim, skt, miktar })
+        });
+        if (res.ok) { verileriGetir(); cancelBtn?.click(); }
+      } catch {
+        // Offline: UI'a mock olarak ekle
+        cancelBtn?.click();
+        verileriGetir();
+      }
+    });
+
+    // Enter ile inputlar arası geçiş
+    [inputAd, inputSKT, inputMiktar].forEach((input, i, arr) => {
+      input?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          i < arr.length - 1 ? arr[i + 1]?.focus() : saveBtn?.click();
+        }
+      });
+    });
+
+    // ─── ALIŞVERİŞ LİSTESİ ────────────────────────────
+    const shoppingList = document.getElementById('shoppingList');
+    const shoppingCount = document.getElementById('shoppingCount');
+
+    function listeyeEkle(metin) {
+      if (!shoppingList || !metin.trim()) return;
+      const li = document.createElement('li');
+      li.className = 'shopping-item';
+      li.innerHTML = `
+        <input type="checkbox" />
+        <span class="shopping-item__name">${metin}</span>
+        <button style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:1rem;" aria-label="Sil">✕</button>
+      `;
+      const cb  = li.querySelector('input');
+      const txt = li.querySelector('.shopping-item__name');
+      const del = li.querySelector('button');
+      cb?.addEventListener('change', () => {
+        txt.style.textDecoration = cb.checked ? 'line-through' : 'none';
+        txt.style.opacity = cb.checked ? '0.5' : '1';
+      });
+      del?.addEventListener('click', () => {
+        li.style.opacity = '0';
+        li.style.transition = 'opacity 0.2s';
+        setTimeout(() => { li.remove(); updateShoppingCount(); }, 200);
+      });
+      shoppingList.prepend(li);
+      updateShoppingCount();
+    }
+
+    function updateShoppingCount() {
+      if (shoppingCount) shoppingCount.textContent = shoppingList?.querySelectorAll('li').length || 0;
+    }
+
+    document.getElementById('addShoppingItemBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (document.getElementById('manualInputContainer')) return;
+      const container = document.createElement('div');
+      container.id = 'manualInputContainer';
+      container.style.cssText = 'display:flex;gap:8px;margin-top:12px;animation:fadeIn 0.3s';
+      container.innerHTML = `
+        <input type="text" id="manualItemInput" class="input" placeholder="Örn: 1 kg Elma..." style="flex:1" />
+        <button class="btn btn--primary btn--sm" id="confirmManualAdd">Ekle</button>
+        <button class="btn btn--ghost btn--sm" id="cancelManualAdd">İptal</button>
+      `;
+      document.getElementById('addShoppingItemBtn').parentElement?.appendChild(container);
+      const inp = document.getElementById('manualItemInput');
+      inp?.focus();
+      const kaydet = () => {
+        if (inp?.value.trim()) { listeyeEkle(inp.value.trim()); inp.value = ''; inp.focus(); }
+      };
+      document.getElementById('confirmManualAdd')?.addEventListener('click', kaydet);
+      inp?.addEventListener('keypress', (e) => { if (e.key === 'Enter') kaydet(); });
+      document.getElementById('cancelManualAdd')?.addEventListener('click', () => container.remove());
+    });
+
+    document.getElementById('autoGenBtn')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const original = btn.innerHTML;
+      btn.innerHTML = '⏳ Hazırlanıyor...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('http://localhost:5000/api/shopping-list/ai', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ kullanici: user?.ad || 'Kullanıcı' })
+        });
+        const data = await res.json();
+        if (data.success && data.liste) data.liste.forEach(listeyeEkle);
+      } catch {
+        ['2 kg Domates','1 L Süt','6 adet Yumurta','500 g Un'].forEach(listeyeEkle);
+      } finally {
+        btn.innerHTML = original;
+        btn.disabled = false;
+      }
+    });
+
+    // ─── BAŞLAT ───────────────────────────────────────
+    verileriGetir();
+    kaloriGuncelle();
+    bildirimleriYukle();
+    oneriYukle();
+  </script>
 </body>
 </html>

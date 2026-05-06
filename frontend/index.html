@@ -1,4 +1,3 @@
-@ -1,165 +1,165 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -11,50 +10,8 @@
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
-  <header class="header" id="header">
-    <div class="header__inner">
-      <a href="index.html" class="logo">
-        <span class="logo__icon">🍽</span>
-        <span class="logo__text">SmartRec</span>
-      </a>
-      <nav class="nav">
-        <a href="index.html" class="nav__link nav__link--active">Anasayfa</a>
-        <a href="menu.html" class="nav__link">Menüler</a>
-        <a href="#" class="nav__link" id="openPiti">AI Asistanı</a>
-        <a href="#" class="nav__link">İletişim</a>
-      </nav>
-      <div class="header__actions">
-        <a href="login.html" class="btn btn--outline">Giriş Yap</a>
-        
-        <div class="user-profile-wrapper">
-          <div class="user-badge-icon" id="userProfileIcon">
-            👤
-            <div class="user-tooltip">Hesabım</div>
-          </div>
-
-          <div class="profile-dropdown" id="profileDropdown">
-            <div class="dropdown-header">
-              <p class="user-name">Misafir Kullanıcı</p>
-              <p class="user-email">Lütfen giriş yapın</p>
-            </div>
-            <hr>
-            <ul class="dropdown-links">
-              <li><a href="dashboard.html">📊 Panelim</a></li>
-              <li><a href="#">⚙️ Ayarlar</a></li>
-              <li><a href="#">⭐ Favori Tarifler</a></li>
-            </ul>
-            <hr>
-            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
-          </div>
-      </div>
-
-        <button class="hamburger" id="hamburger" aria-label="Menüyü Aç">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <!-- HEADER (JS tarafından inject edilir) -->
+  <div id="app-header"></div>
 
   <!-- ===== HERO ===== -->
   <section class="hero">
@@ -71,7 +28,6 @@
           placeholder="Malzeme, tarif veya kategori ara..."
           autocomplete="off"
         />
-        <!-- TODO: Connect to GET /api/recipes/search?q={query} -->
         <button class="btn btn--primary search-bar__btn" id="searchBtn">Ara</button>
       </div>
       <div class="hero__tags">
@@ -83,10 +39,9 @@
     </div>
   </section>
 
-  <!-- ===== CATEGORY SECTIONS ===== -->
+  <!-- ===== MAIN CONTENT ===== -->
   <main class="main-content">
 
-    <!-- Section: Günün Menüsü -->
     <section class="recipe-section" id="gunun-menusu">
       <div class="section-header">
         <div class="section-header__left">
@@ -98,13 +53,9 @@
         </div>
         <a href="menu.html" class="btn btn--ghost">Tümünü Gör ↗</a>
       </div>
-      <!-- TODO: Fetch from GET /api/recipes/daily -->
-      <div class="card-grid" id="dailyCards">
-        <!-- Dynamically rendered by main.js -->
-      </div>
+      <div class="card-grid" id="dailyCards"></div>
     </section>
 
-    <!-- Section: Unutulmuş Lezzetler -->
     <section class="recipe-section" id="unutulmus">
       <div class="section-header">
         <div class="section-header__left">
@@ -116,11 +67,9 @@
         </div>
         <a href="menu.html?cat=geleneksel" class="btn btn--ghost">Tümünü Gör ↗</a>
       </div>
-      <!-- TODO: Fetch from GET /api/recipes?category=traditional -->
       <div class="card-grid" id="traditionalCards"></div>
     </section>
 
-    <!-- Section: Sağlıklı Seçimler -->
     <section class="recipe-section" id="saglikli">
       <div class="section-header">
         <div class="section-header__left">
@@ -132,11 +81,9 @@
         </div>
         <a href="menu.html?cat=saglikli" class="btn btn--ghost">Tümünü Gör ↗</a>
       </div>
-      <!-- TODO: Fetch from GET /api/recipes?category=healthy -->
       <div class="card-grid" id="healthyCards"></div>
     </section>
 
-    <!-- CTA Banner: Meet Piti -->
     <section class="piti-banner">
       <div class="piti-banner__icon">✦</div>
       <h2 class="piti-banner__title">AI Asistanı Piti ile Tanışın</h2>
@@ -157,32 +104,52 @@
     </div>
   </footer>
 
-  <!-- ===== PITI CHATBOT ===== -->
-  <div class="chatbot-fab" id="chatbotFab" title="Piti AI Asistanı">
-    <span class="chatbot-fab__icon">🤖</span>
-    <span class="chatbot-fab__dot"></span>
-  </div>
+  <!-- CHATBOT (JS tarafından inject edilir) -->
+  <div id="chatbot-root"></div>
 
-  <div class="chatbot-modal" id="chatbotModal" aria-hidden="true">
-    <div class="chatbot-modal__header">
-      <div class="chatbot-modal__title">
-        <span>✦</span> Piti — AI Asistanı
-      </div>
-      <button class="chatbot-modal__close" id="chatbotClose">✕</button>
-    </div>
-    <div class="chatbot-modal__body" id="chatbotBody">
-      <div class="chat-msg chat-msg--bot">
-        <p>Merhaba! Ben Piti 👋 Bugün ne pişirmek istersiniz? Elinizdeki malzemeleri yazın, size tarif önereyim!</p>
-      </div>
-    </div>
-    <div class="chatbot-modal__footer">
-      <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Bir şeyler yazın..." />
-      <!-- TODO: POST /api/chat with { message, userId } -->
-      <button class="btn btn--primary chatbot-send" id="chatbotSend">→</button>
-    </div>
-  </div>
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { initPage } from './js/auth.js';
+    import { initPiti } from './js/piti.js';
+    import { MOCK_RECIPES, renderRecipeGrid } from './js/recipes.js';
 
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
+    // Header + Chatbot inject
+    document.getElementById('app-header').innerHTML = renderHeader('home');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+
+    // Auth state
+    initPage();
+    initPiti();
+
+    // Tarif gridleri
+    const daily       = MOCK_RECIPES.slice(0, 3);
+    const traditional = MOCK_RECIPES.filter(r => r.tags.includes('geleneksel'));
+    const healthy     = MOCK_RECIPES.filter(r => r.tags.includes('saglikli'));
+
+    renderRecipeGrid('dailyCards', daily);
+    renderRecipeGrid('traditionalCards', traditional);
+    renderRecipeGrid('healthyCards', healthy);
+
+    // Arama
+    document.getElementById('searchBtn')?.addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value.trim();
+      if (q) window.location.href = `menu.html?q=${encodeURIComponent(q)}`;
+    });
+    document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('searchBtn').click();
+    });
+
+    // Hero tag filtresi
+    document.querySelectorAll('.tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        window.location.href = `menu.html?cat=${tag.dataset.filter}`;
+      });
+    });
+
+    // Banner Piti açma
+    document.getElementById('openPitiBanner')?.addEventListener('click', () => {
+      document.getElementById('chatbotModal')?.classList.add('open');
+    });
+  </script>
 </body>
 </html>

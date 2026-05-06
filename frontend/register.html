@@ -1,38 +1,24 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kayıt Ol | SmartRec</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kayıt Ol | SmartRec</title>
+  <!--
+    register.html artık ayrı bir sayfa değil.
+    Giriş/Kayıt tek bir sayfada tab yapısıyla sunuluyor.
+    Bu dosya geriye dönük uyumluluk için login.html'e yönlendirir.
+  -->
+  <meta http-equiv="refresh" content="0; url=login.html?tab=register" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="login-page"> <div class="login-container">
-        <div class="login-logo">
-            <div class="logo__icon">🍳</div>
-            <span class="logo__text">SmartRec</span>
-        </div>
-        
-        <h1 class="login-title">Aramıza Katıl</h1>
-        <p class="login-desc">Lezzetli tariflere ve akıllı mutfağa ilk adımını at.</p>
-
-      <form id="registerForm" class="login-form">
-    <div class="form-group">
-        <input type="text" id="regName" class="input" placeholder="Adınız Soyadınız" required>
+<body class="login-page">
+  <div class="login-wrapper">
+    <div class="login-container">
+      <p style="text-align:center; color: var(--clr-text-muted);">
+        Yönlendiriliyorsunuz... <a href="login.html?tab=register" style="color: var(--clr-accent);">Tıklayın</a>
+      </p>
     </div>
-    <div class="form-group">
-        <input type="email" id="regEmail" class="input" placeholder="E-posta adresiniz" required>
-    </div>
-    <div class="form-group">
-        <input type="password" id="regPassword" class="input" placeholder="Şifre" required>
-    </div>
-    <div class="form-group">
-        <input type="password" id="regPasswordConfirm" class="input" placeholder="Şifreyi doğrula" required>
-    </div>
-    <button type="submit" id="registerBtn" class="btn btn--primary" style="width: 100%;">Kayıt Ol</button>
-</form>
-
-        <p class="login-footer">Zaten hesabınız var mı? <a href="login.html" class="text--accent">Giriş Yapın</a></p>
-    </div>
-<script type="module" src="dist/app.js"></script>
+  </div>
 </body>
 </html>

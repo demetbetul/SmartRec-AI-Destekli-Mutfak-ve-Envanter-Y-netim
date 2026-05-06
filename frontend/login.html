@@ -1,35 +1,239 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap | SmartRec</title>
-    <link rel="stylesheet" href="css/style.css"> </head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giriş Yap | SmartRec</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
 <body class="login-page">
 
+  <div class="login-wrapper">
     <div class="login-container">
-        <div class="login-logo">
-            <div class="logo__icon">🍳</div>
-            <span class="logo__text">SmartRec</span>
-        </div>
-        
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="logo__icon">🍳</div>
+        <span class="logo__text">SmartRec</span>
+      </div>
+
+      <!-- Tab Geçişi: Giriş / Kayıt -->
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" aria-controls="panelLogin">Giriş Yap</button>
+        <button class="auth-tab" id="tabRegister" role="tab" aria-selected="false" aria-controls="panelRegister">Kayıt Ol</button>
+      </div>
+
+      <!-- ─── GİRİŞ PANELI ─── -->
+      <div id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
         <h1 class="login-title">Tekrar Hoş Geldiniz</h1>
         <p class="login-desc">Mutfak deneyiminize devam etmek için giriş yapın.</p>
 
-       <form id="loginForm" class="login-form">
-    <div class="form-group">
-        <!-- id="email" eklendi -->
-        <input type="email" id="email" class="input" placeholder="E-posta adresiniz" required>
-    </div>
-    <div class="form-group">
-        <!-- id="password" eklendi -->
-        <input type="password" id="password" class="input" placeholder="Şifreniz" required>
-    </div>
-    <!-- id="loginBtn" eklendi (app.ts'de hangi ID varsa o olmalı) -->
-    <button type="submit" id="loginBtn" class="btn btn--primary" style="width: 100%;">Giriş Yap</button>
-</form>
-        <p class="login-footer">Hesabınız yok mu? <a href="register.html" class="text--accent">Kayıt Olun</a></p>
-    </div>
-<script type="module" src="dist/app.js"></script>
+        <form id="loginForm" class="login-form" novalidate>
+          <div class="form-group">
+            <label for="email">E-posta</label>
+            <input type="email" id="email" class="input" placeholder="ornek@mail.com" autocomplete="email" required />
+            <span class="form-error" id="emailError">Geçerli bir e-posta giriniz.</span>
+          </div>
+          <div class="form-group">
+            <label for="password">Şifre</label>
+            <input type="password" id="password" class="input" placeholder="••••••••" autocomplete="current-password" required />
+            <span class="form-error" id="passwordError">Şifrenizi giriniz.</span>
+          </div>
+          <div id="loginApiError" class="form-error"></div>
+          <button type="submit" id="loginBtn" class="btn btn--primary" style="width:100%; margin-top: 0.5rem;">Giriş Yap</button>
+        </form>
+
+        <p class="login-footer">Hesabınız yok mu? <a href="#" id="switchToRegister">Kayıt Olun</a></p>
+      </div>
+
+      <!-- ─── KAYIT PANELI ─── -->
+      <div id="panelRegister" role="tabpanel" aria-labelledby="tabRegister" style="display:none;">
+        <h1 class="login-title">Aramıza Katıl</h1>
+        <p class="login-desc">Lezzetli tariflere ve akıllı mutfağa ilk adımını at.</p>
+
+        <form id="registerForm" class="login-form" novalidate>
+          <div class="form-group">
+            <label for="regName">Ad Soyad</label>
+            <input type="text" id="regName" class="input" placeholder="Adınız Soyadınız" autocomplete="name" required />
+            <span class="form-error" id="regNameError">Adınızı giriniz.</span>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">E-posta</label>
+            <input type="email" id="regEmail" class="input" placeholder="ornek@mail.com" autocomplete="email" required />
+            <span class="form-error" id="regEmailError">Geçerli bir e-posta giriniz.</span>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Şifre</label>
+            <input type="password" id="regPassword" class="input" placeholder="En az 6 karakter" autocomplete="new-password" required />
+            <span class="form-error" id="regPasswordError">En az 6 karakter giriniz.</span>
+          </div>
+          <div class="form-group">
+            <label for="regPasswordConfirm">Şifre Tekrar</label>
+            <input type="password" id="regPasswordConfirm" class="input" placeholder="Şifreyi tekrar girin" autocomplete="new-password" required />
+            <span class="form-error" id="regConfirmError">Şifreler eşleşmiyor.</span>
+          </div>
+          <div id="registerApiError" class="form-error"></div>
+          <button type="submit" id="registerBtn" class="btn btn--primary" style="width:100%; margin-top: 0.5rem;">Kayıt Ol</button>
+        </form>
+
+        <p class="login-footer">Zaten hesabınız var mı? <a href="#" id="switchToLogin">Giriş Yapın</a></p>
+      </div>
+
+    </div><!-- /login-container -->
+  </div><!-- /login-wrapper -->
+
+  <script type="module">
+    import { Auth } from './js/auth.js';
+
+    // ─── Zaten giriş yapılmışsa dashboard'a yönlendir ───
+    if (Auth.isLoggedIn()) {
+      window.location.replace('dashboard.html');
+    }
+
+    // ─── Tab Geçişi ───
+    const tabLogin    = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const panelLogin  = document.getElementById('panelLogin');
+    const panelRegister = document.getElementById('panelRegister');
+
+    function showPanel(panel) {
+      if (panel === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        panelLogin.style.display = 'block';
+        panelRegister.style.display = 'none';
+        tabLogin.setAttribute('aria-selected', 'true');
+        tabRegister.setAttribute('aria-selected', 'false');
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        panelRegister.style.display = 'block';
+        panelLogin.style.display = 'none';
+        tabRegister.setAttribute('aria-selected', 'true');
+        tabLogin.setAttribute('aria-selected', 'false');
+      }
+    }
+
+    tabLogin.addEventListener('click', () => showPanel('login'));
+    tabRegister.addEventListener('click', () => showPanel('register'));
+    document.getElementById('switchToRegister')?.addEventListener('click', (e) => { e.preventDefault(); showPanel('register'); });
+    document.getElementById('switchToLogin')?.addEventListener('click', (e) => { e.preventDefault(); showPanel('login'); });
+
+    // Eğer URL'de ?tab=register varsa direkt kayıt paneline geç
+    if (new URLSearchParams(location.search).get('tab') === 'register') {
+      showPanel('register');
+    }
+
+    // ─── Form Yardımcıları ───
+    function showError(id, show = true) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('show', show);
+    }
+    function markInput(id, error) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('error', error);
+    }
+    function setApiError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.classList.toggle('show', !!msg); }
+    }
+
+    // ─── GİRİŞ ───
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById('email');
+      const passEl  = document.getElementById('password');
+      let valid = true;
+
+      if (!emailEl.value.trim() || !emailEl.checkValidity()) {
+        markInput('email', true); showError('emailError'); valid = false;
+      } else { markInput('email', false); showError('emailError', false); }
+
+      if (!passEl.value.trim()) {
+        markInput('password', true); showError('passwordError'); valid = false;
+      } else { markInput('password', false); showError('passwordError', false); }
+
+      if (!valid) return;
+
+      const btn = document.getElementById('loginBtn');
+      btn.textContent = 'Giriş yapılıyor...';
+      btn.disabled = true;
+      setApiError('loginApiError', '');
+
+      try {
+        const res = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailEl.value.trim(), password: passEl.value.trim() })
+        });
+        const data = await res.json();
+        if (data.success) {
+          Auth.setUser(data.user);
+          const redirect = sessionStorage.getItem('redirect_after_login') || 'dashboard.html';
+          sessionStorage.removeItem('redirect_after_login');
+          window.location.href = redirect;
+        } else {
+          setApiError('loginApiError', data.message || 'E-posta veya şifre hatalı.');
+        }
+      } catch {
+        setApiError('loginApiError', '⚠️ Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
+      } finally {
+        btn.textContent = 'Giriş Yap';
+        btn.disabled = false;
+      }
+    });
+
+    // ─── KAYIT ───
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name    = document.getElementById('regName');
+      const email   = document.getElementById('regEmail');
+      const pass    = document.getElementById('regPassword');
+      const confirm = document.getElementById('regPasswordConfirm');
+      let valid = true;
+
+      if (!name.value.trim()) { markInput('regName', true); showError('regNameError'); valid = false; }
+      else { markInput('regName', false); showError('regNameError', false); }
+
+      if (!email.value.trim() || !email.checkValidity()) { markInput('regEmail', true); showError('regEmailError'); valid = false; }
+      else { markInput('regEmail', false); showError('regEmailError', false); }
+
+      if (pass.value.length < 6) { markInput('regPassword', true); showError('regPasswordError'); valid = false; }
+      else { markInput('regPassword', false); showError('regPasswordError', false); }
+
+      if (pass.value !== confirm.value) { markInput('regPasswordConfirm', true); showError('regConfirmError'); valid = false; }
+      else { markInput('regPasswordConfirm', false); showError('regConfirmError', false); }
+
+      if (!valid) return;
+
+      const btn = document.getElementById('registerBtn');
+      btn.textContent = 'Kayıt yapılıyor...';
+      btn.disabled = true;
+      setApiError('registerApiError', '');
+
+      try {
+        const res = await fetch('http://localhost:5000/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ad: name.value.trim(), email: email.value.trim(), password: pass.value.trim() })
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Kayıt sonrası otomatik giriş yap
+          Auth.setUser({ ad: name.value.trim(), email: email.value.trim() });
+          window.location.href = 'dashboard.html';
+        } else {
+          setApiError('registerApiError', data.message || 'Kayıt sırasında hata oluştu.');
+        }
+      } catch {
+        setApiError('registerApiError', '⚠️ Sunucuya ulaşılamıyor. Lütfen tekrar deneyin.');
+      } finally {
+        btn.textContent = 'Kayıt Ol';
+        btn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

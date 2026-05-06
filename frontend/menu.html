@@ -1,4 +1,3 @@
-@ -1,113 +0,0 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -11,48 +10,10 @@
 </head>
 <body>
 
-  <header class="header" id="header">
-    <div class="header__inner">
-      <a href="index.html" class="logo">
-        <span class="logo__icon">🍽</span>
-        <span class="logo__text">SmartRec</span>
-      </a>
-      <nav class="nav">
-        <a href="index.html" class="nav__link">Anasayfa</a>
-        <a href="menu.html" class="nav__link nav__link--active">Menüler</a>
-        <a href="#" class="nav__link" id="openPiti">AI Asistanı</a>
-        <a href="#" class="nav__link">İletişim</a>
-      </nav>
-      <div class="header__actions">
-        <a href="login.html" class="btn btn--outline">Giriş Yap</a>
-        
-        <div class="user-profile-wrapper">
-          <div class="user-badge-icon" id="userProfileIcon">
-            👤
-            <div class="user-tooltip">Hesabım</div>
-          </div>
-
-          <div class="profile-dropdown" id="profileDropdown">
-            <div class="dropdown-header">
-              <p class="user-name">Misafir Kullanıcı</p>
-              <p class="user-email">Lütfen giriş yapın</p>
-            </div>
-            <hr>
-            <ul class="dropdown-links">
-              <li><a href="dashboard.html">📊 Panelim</a></li>
-              <li><a href="#">⚙️ Ayarlar</a></li>
-              <li><a href="#">⭐ Favori Tarifler</a></li>
-            </ul>
-            <hr>
-            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
-          </div>
-      </div>
-
-  </header>
+  <div id="app-header"></div>
 
   <main class="main-content" style="padding-top: 2rem;">
 
-    <!-- Page Title -->
     <div class="page-header">
       <h1 class="page-title">Tüm <span class="text--accent">Tarifler</span></h1>
       <p class="page-desc">500'den fazla tarif arasından size en uygununu bulun</p>
@@ -69,7 +30,6 @@
         <button class="filter-btn" data-filter="tatli">🍮 Tatlı</button>
       </div>
       <div class="filter-bar__sort">
-        <!-- TODO: Connect to GET /api/recipes?sort={value} -->
         <select class="select" id="sortSelect">
           <option value="popular">En Popüler</option>
           <option value="newest">En Yeni</option>
@@ -79,16 +39,11 @@
       </div>
     </div>
 
-    <!-- Results Count -->
     <p class="results-info" id="resultsInfo">Tüm tarifler gösteriliyor</p>
 
-    <!-- Recipe Grid -->
-    <!-- TODO: Fetch from GET /api/recipes?category={filter}&sort={sort}&page={page} -->
     <div class="card-grid card-grid--menu" id="menuCards"></div>
 
-    <!-- Load More -->
     <div class="load-more-wrap">
-      <!-- TODO: Connect to pagination endpoint GET /api/recipes?page={nextPage} -->
       <button class="btn btn--outline btn--lg" id="loadMoreBtn">Daha Fazla Yükle</button>
     </div>
 
@@ -104,29 +59,92 @@
     </div>
   </footer>
 
-  <!-- Piti Chatbot -->
-  <div class="chatbot-fab" id="chatbotFab" title="Piti AI Asistanı">
-    <span class="chatbot-fab__icon">🤖</span>
-    <span class="chatbot-fab__dot"></span>
-  </div>
-  <div class="chatbot-modal" id="chatbotModal" aria-hidden="true">
-    <div class="chatbot-modal__header">
-      <div class="chatbot-modal__title"><span>✦</span> Piti — AI Asistanı</div>
-      <button class="chatbot-modal__close" id="chatbotClose">✕</button>
-    </div>
-    <div class="chatbot-modal__body" id="chatbotBody">
-      <div class="chat-msg chat-msg--bot">
-        <p>Merhaba! Ben Piti 👋 Bugün ne pişirmek istersiniz?</p>
-      </div>
-    </div>
-    <div class="chatbot-modal__footer">
-      <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Bir şeyler yazın..." />
-      <button class="btn btn--primary chatbot-send" id="chatbotSend">→</button>
-    </div>
-  </div>
+  <div id="chatbot-root"></div>
 
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/menu.js"></script>
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { initPage } from './js/auth.js';
+    import { initPiti } from './js/piti.js';
+    import { MOCK_RECIPES, createRecipeCard } from './js/recipes.js';
+
+    document.getElementById('app-header').innerHTML = renderHeader('menu');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+    initPiti();
+
+    // ─── Durum ───
+    let currentFilter = 'all';
+    const params = new URLSearchParams(location.search);
+    const urlCat = params.get('cat');
+    const urlQ   = params.get('q');
+    if (urlCat) currentFilter = urlCat;
+
+    // ─── Render ───
+    function renderCards(filter = 'all') {
+      const grid = document.getElementById('menuCards');
+      const info = document.getElementById('resultsInfo');
+      if (!grid) return;
+
+      let recipes = [...MOCK_RECIPES];
+
+      if (urlQ) {
+        const q = urlQ.toLowerCase();
+        recipes = recipes.filter(r =>
+          r.title.toLowerCase().includes(q) ||
+          r.desc.toLowerCase().includes(q)
+        );
+      }
+
+      if (filter !== 'all') {
+        recipes = recipes.filter(r => r.tags.includes(filter));
+      }
+
+      // Sıralama
+      const sort = document.getElementById('sortSelect')?.value || 'popular';
+      if (sort === 'calories-asc') recipes.sort((a, b) => a.calories - b.calories);
+      else if (sort === 'time-asc') recipes.sort((a, b) => parseInt(a.time) - parseInt(b.time));
+
+      grid.innerHTML = recipes.map(r => createRecipeCard(r)).join('');
+      if (info) info.textContent = `${recipes.length} tarif gösteriliyor`;
+
+      // Favori butonları
+      grid.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const active = btn.classList.toggle('fav-btn--active');
+          btn.textContent = active ? '♥' : '♡';
+          btn.style.color = active ? '#C44B1C' : '';
+        });
+      });
+    }
+
+    renderCards(currentFilter);
+
+    // URL'den gelen kategoriye göre aktif butonu işaretle
+    if (urlCat) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('filter-btn--active', btn.dataset.filter === urlCat);
+      });
+    }
+
+    // ─── Filter butonları ───
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+        btn.classList.add('filter-btn--active');
+        currentFilter = btn.dataset.filter;
+        renderCards(currentFilter);
+      });
+    });
+
+    // ─── Sıralama ───
+    document.getElementById('sortSelect')?.addEventListener('change', () => renderCards(currentFilter));
+
+    // ─── Daha fazla yükle (mock) ───
+    document.getElementById('loadMoreBtn')?.addEventListener('click', (e) => {
+      e.target.textContent = 'Tümü Yüklendi';
+      e.target.disabled = true;
+    });
+  </script>
 </body>
 </html>
