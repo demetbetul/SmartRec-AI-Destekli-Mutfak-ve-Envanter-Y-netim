@@ -773,7 +773,31 @@ def yemek_fotografi_bul(yemek_adi):
     # === 3. AŞAMA: VARSAYILAN FOTOĞRAF (Son Çare) ===
     print(f"🖼️ İki API de '{yemek_adi}' için görsel bulamadı, varsayılan tabak kullanılıyor.")
     return varsayilan_foto
-     
+def piti_ile_sohbet_et(kullanici_mesaji):
+    """Kullanıcının mesajlarına envanterdeki duruma göre AI ile cevap verir."""
+    print("🤖 Piti mesajı düşünüyor...")
+    
+    # Kullanıcının dolabındaki malzemeleri çekiyoruz ki ona göre cevap versin
+    malzemeler_listesi = ai_icin_malzeme_listesi_hazirla()
+    malzemeler_metni = ", ".join(malzemeler_listesi) if malzemeler_listesi else "temel ev malzemeleri"
+    
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen SmartRec projesinin mutfak asistanı Piti'sin. Çok samimi, yardımsever ve enerjik bir karakterin var.
+    Kullanıcının sana yazdığı mesaj: "{kullanici_mesaji}"
+    Kullanıcının mutfak dolabındaki mevcut malzemeler: {malzemeler_metni}
+    
+    Görev: Kullanıcının mesajına bir mutfak asistanı olarak cevap ver. Eğer yemek veya tarif soruyorsa dolabındaki malzemeleri göz önünde bulundurarak kısa, net ve samimi bir öneri yap. 
+    Cevabını doğrudan ver, JSON formatı veya markdown (kalın/eğik yazı vs.) kullanma, sadece düz metin olsun.
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"❌ Piti Sohbet Hatası: {e}")
+        return "Şu an mutfakta ufak bir yoğunluk var, birazdan tekrar sorar mısın? 😅"     
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:

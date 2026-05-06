@@ -27,7 +27,8 @@ from data_manager import (
     ai_tarif_detayi_getir,
     akilli_envanter_analizi,
     secili_malzemelerle_tek_tarif,
-    alisveris_linkleri_olustur
+    alisveris_linkleri_olustur,
+    piti_ile_sohbet_et
 )
 
 app = Flask(__name__)
@@ -593,11 +594,12 @@ def chat_with_piti():
         print(f"Piti'ye gelen mesaj: {kullanici_mesaji}")
         
         # Arkadaşın buraya kendi AI kodlarını yazacak, şimdilik test cevabı dönüyoruz:
-        sahte_cevap = f"Şu an test modundayım. Bana '{kullanici_mesaji}' dedin. Arkadaşın beynimi yüklediğinde sana gerçek tarifler vereceğim! 🍳"
+        # 1. Adımda yazdığımız gerçek Gemini beyin fonksiyonunu çağırıyoruz
+        gercek_cevap = piti_ile_sohbet_et(kullanici_mesaji)
         
         return jsonify({
             "success": True,
-            "cevap": sahte_cevap
+            "cevap": gercek_cevap
         }), 200
         
     except Exception as e:
@@ -625,6 +627,9 @@ def generate_ai_shopping_list():
         
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    
+
+
 if __name__ == '__main__':
     print("🚀 SmartRec Backend API Başlatılıyor...")
     print("📍 http://localhost:5000")
