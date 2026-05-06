@@ -24,12 +24,30 @@
         <a href="#" class="nav__link">İletişim</a>
       </nav>
       <div class="header__actions">
-        <a href="dashboard.html" class="btn btn--outline">Giriş Yap</a>
-        <button class="hamburger" id="hamburger" aria-label="Menüyü Aç">
-          <span></span><span></span><span></span>
-        </button>
+        <a href="login.html" class="btn btn--outline">Giriş Yap</a>
+        
+        <div class="user-profile-wrapper">
+          <div class="user-badge-icon" id="userProfileIcon">
+            👤
+            <div class="user-tooltip">Hesabım</div>
+          </div>
+
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="dropdown-header">
+              <p class="user-name">Misafir Kullanıcı</p>
+              <p class="user-email">Lütfen giriş yapın</p>
+            </div>
+            <hr>
+            <ul class="dropdown-links">
+              <li><a href="dashboard.html">📊 Panelim</a></li>
+              <li><a href="#">⚙️ Ayarlar</a></li>
+              <li><a href="#">⭐ Favori Tarifler</a></li>
+            </ul>
+            <hr>
+            <button class="logout-btn" id="logoutBtn">Çıkış Yap</button>
+          </div>
       </div>
-    </div>
+
   </header>
 
   <main class="main-content" style="padding-top: 2rem;">
