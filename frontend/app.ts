@@ -269,7 +269,10 @@ async function verileriGetir(): Promise<void> {
     if (!res.ok) throw new Error();
     const data = await res.json();
     const liste: Malzeme[] = Array.isArray(data) ? data : data.envanter ?? [];
+    
+    // Tabloyu çiz
     envanteriCiz(liste);
+    
     const countBadge = getEl('inventoryCount');
     if (countBadge) countBadge.textContent = liste.length.toString();
     malzemeOnerileriniGuncelle(liste);
@@ -279,21 +282,60 @@ async function verileriGetir(): Promise<void> {
 }
 
 function envanteriCiz(liste: Malzeme[]): void {
-  if (!inventoryList) return;
-  const today = new Date();
-  inventoryList.innerHTML = liste.map(item => {
-    const sktDate = new Date(item.skt);
-    const diff    = Math.ceil((sktDate.getTime() - today.getTime()) / 86_400_000);
-    const color   = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
-    const cls     = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : '';
-    return `
-      <div class="inventory-item ${cls}">
-        <span class="inventory-item__dot" style="background:${color}"></span>
-        <span class="inventory-item__name">${item.ad}</span>
-        <span class="inventory-item__expiry">${item.skt}</span>
-        <span class="inventory-item__qty">${item.miktar} adet</span>
-      </div>`;
-  }).join('');
+    if (!inventoryList) return;
+    const today = new Date();
+    
+    inventoryList.innerHTML = liste.map((item) => {
+        const sktDate = new Date(item.skt);
+        const diff = Math.ceil((sktDate.getTime() - today.getTime()) / 86_400_000);
+        
+        // Senin orijinal tasarımındaki arka plan renkleri:
+        const cls = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : 'inventory-item--green';
+        const color = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
+
+        return `
+            <div class="inventory-item ${cls}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; border: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="inventory-item__dot" style="background:${color}; width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+                    <strong class="inventory-item__name" style="color: #333;">${item.ad}</strong>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; color: #666; font-size: 0.85rem;">
+                    <span class="inventory-item__expiry">${item.skt}</span>
+                    <span class="inventory-item__qty" style="font-weight: bold; color: #444;">${item.miktar} adet</span>
+                    
+                    <div style="display: flex; gap: 5px; margin-left: 10px;">
+                        <button class="qty-btn minus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #e74c3c;">-</button>
+                        <button class="qty-btn plus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #27ae60;">+</button>
+                        <button class="delete-item-btn" data-id="${item.ad}" style="background: #ffeaea; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #e74c3c;" title="Sil">🗑️</button>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+
+    // --- BUTON TETİKLEYİCİLERİ ---
+    const islemYap = async (url: string, method: string = 'POST') => {
+        try {
+            const response = await fetch(url, { method });
+            if (response.ok) verileriGetir(); 
+        } catch (err) { console.error("Sunucuya ulaşılamıyor."); }
+    };
+
+    document.querySelectorAll('.minus-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${(e.currentTarget as HTMLElement).getAttribute('data-id')}?degisim=-1`));
+    });
+
+    document.querySelectorAll('.plus-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${(e.currentTarget as HTMLElement).getAttribute('data-id')}?degisim=1`));
+    });
+
+    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = (e.currentTarget as HTMLElement).getAttribute('data-id');
+            if(confirm(`"${id}" çöpe atılacak. Emin misiniz?`)) {
+                islemYap(`http://localhost:5000/api/inventory/remove/${id}`, 'DELETE');
+            }
+        });
+    });
 }
 
 function malzemeOnerileriniGuncelle(envanter: Malzeme[]): void {
@@ -499,3 +541,145 @@ document.addEventListener('DOMContentLoaded', () => {
     bildirimleriGuncelle();
   }
 });
+
+// ==========================================
+// --- ALIŞVERİŞ LİSTESİ MİMARİSİ (AI + MANUEL) ---
+// ==========================================
+setTimeout(() => {
+    const autoGenBtn = document.getElementById('autoGenBtn');
+    const manualAddBtn = document.getElementById('addShoppingItemBtn');
+    const listUI = document.getElementById('shoppingList');
+
+    const listeyeEkle = (metin: string) => {
+        if (!listUI || !metin.trim()) return;
+
+        const li = document.createElement('li');
+        li.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: #fff; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s ease;";
+        
+        li.innerHTML = `
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;">
+                <input type="checkbox" style="accent-color: #e67e22; width: 18px; height: 18px; cursor: pointer;">
+                <span class="item-text" style="color: #444; font-weight: 500;">${metin}</span>
+            </label>
+            <button class="delete-btn" style="background: #ffeaea; color: #e74c3c; border: none; border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; transition: 0.2s;">&times;</button>
+        `;
+
+        const deleteBtn = li.querySelector('.delete-btn') as HTMLButtonElement;
+        deleteBtn.addEventListener('click', () => {
+            li.style.opacity = '0';
+            li.style.transform = 'translateX(-20px)';
+            setTimeout(() => li.remove(), 300);
+        });
+        
+        deleteBtn.onmouseover = () => deleteBtn.style.background = '#ffc0c0';
+        deleteBtn.onmouseout = () => deleteBtn.style.background = '#ffeaea';
+
+        const checkbox = li.querySelector('input');
+        const span = li.querySelector('.item-text') as HTMLElement;
+        checkbox?.addEventListener('change', (e: any) => {
+            span.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+            span.style.color = e.target.checked ? '#aaa' : '#444';
+        });
+
+        listUI.prepend(li);
+    };
+
+    if (manualAddBtn) {
+        manualAddBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (document.getElementById('manualInputContainer')) return;
+
+            const container = document.createElement('div');
+            container.id = 'manualInputContainer';
+            container.style.cssText = "display: flex; gap: 8px; margin-top: 15px; animation: fadeIn 0.3s;";
+            
+            container.innerHTML = `
+                <input type="text" id="manualItemInput" placeholder="Örn: 1 kg Elma..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-family: inherit;">
+                <button id="confirmManualAdd" style="background: #e67e22; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">Ekle</button>
+                <button id="cancelManualAdd" style="background: #f1f2f6; color: #666; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer;">İptal</button>
+            `;
+            
+            manualAddBtn.parentElement?.appendChild(container);
+            
+            const input = document.getElementById('manualItemInput') as HTMLInputElement;
+            const confirmBtn = document.getElementById('confirmManualAdd');
+            const cancelBtn = document.getElementById('cancelManualAdd');
+            
+            input.focus();
+            
+            const kaydet = () => {
+                if (input.value.trim()) {
+                    listeyeEkle(input.value.trim());
+                    input.value = ""; 
+                    input.focus();
+                }
+            };
+            
+            confirmBtn?.addEventListener('click', kaydet);
+            input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') kaydet(); });
+            cancelBtn?.addEventListener('click', () => container.remove());
+        });
+    }
+
+    if (autoGenBtn) {
+        autoGenBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const orjinalMetin = autoGenBtn.innerHTML;
+            autoGenBtn.innerHTML = `⏳ Hazırlanıyor...`;
+            autoGenBtn.style.pointerEvents = 'none';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/shopping-list/ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kullanici: localStorage.getItem('userName') || 'Kullanıcı' })
+                });
+
+                const data = await response.json();
+                if (data.success && data.liste) {
+                    data.liste.forEach((madde: string) => listeyeEkle(madde));
+                }
+            } catch (error) {
+                alert("Backend'e ulaşılamıyor.");
+            } finally {
+                autoGenBtn.innerHTML = orjinalMetin;
+                autoGenBtn.style.pointerEvents = 'auto';
+            }
+        });
+    }
+}, 500);
+
+// ==========================================
+// --- AKILLI TEMİZLİK SİSTEMİ ---
+// ==========================================
+setTimeout(() => {
+    const headerDiv = document.querySelector('.dash-card--inventory .dash-card__header');
+    if (headerDiv && !document.getElementById('smartCleanBtn')) {
+        const cleanBtn = document.createElement('button');
+        cleanBtn.id = 'smartCleanBtn';
+        cleanBtn.className = 'btn btn--ghost btn--sm';
+        cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
+        cleanBtn.style.marginLeft = '10px';
+        headerDiv.appendChild(cleanBtn);
+
+        cleanBtn.addEventListener('click', async () => {
+            cleanBtn.innerHTML = '⏳ Temizleniyor...';
+            try {
+                const res = await fetch('http://localhost:5000/api/inventory/smart-clean', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    if (data.silinenler.length > 0) {
+                        alert(`🧹 Temizlik tamamlandı!\nÇöpe atılan bozuk ürünler: ${data.silinenler.join(', ')}`);
+                    } else {
+                        alert('✨ Harika! Dolapta tarihi geçmiş hiçbir ürün yok.');
+                    }
+                    verileriGetir(); // Tabloyu yeniler
+                }
+            } catch(e) {
+                alert('Backend\'e ulaşılamadı!');
+            } finally {
+                cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
+            }
+        });
+    }
+}, 600);

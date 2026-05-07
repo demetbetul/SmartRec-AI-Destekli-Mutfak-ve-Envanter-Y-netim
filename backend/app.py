@@ -29,7 +29,9 @@ from data_manager import (
     secili_malzemelerle_tek_tarif,
     alisveris_linkleri_olustur,
     piti_ile_sohbet_et,
-    ai_alisveris_listesi_olustur
+    ai_alisveris_listesi_olustur,
+    miktar_guncelle,
+    akilli_temizlik_yap
 )
 
 app = Flask(__name__)
@@ -622,8 +624,18 @@ def generate_ai_shopping_list():
         
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
-    
 
+# ==================== MİKTAR VE AKILLI TEMİZLİK API'leri ====================
+@app.route('/api/inventory/qty/<urun_ad>', methods=['POST'])
+def update_qty(urun_ad):
+    degisim = int(request.args.get('degisim', 0))
+    basari, mesaj = miktar_guncelle(urun_ad, degisim)
+    return jsonify({"success": basari, "message": mesaj})
+
+@app.route('/api/inventory/smart-clean', methods=['POST'])
+def smart_clean():
+    basari, silinenler = akilli_temizlik_yap()
+    return jsonify({"success": basari, "silinenler": silinenler})
 
 if __name__ == '__main__':
     print("🚀 SmartRec Backend API Başlatılıyor...")

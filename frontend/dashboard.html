@@ -178,22 +178,60 @@
       if (!container) return;
       const today = new Date();
       let warnCount = 0;
+      
       container.innerHTML = liste.map(item => {
         const sktDate = new Date(item.skt);
         const diff = Math.ceil((sktDate - today) / 86400000);
         const color = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
         const cls   = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : 'inventory-item--green';
         if (diff < 0 || diff <= 3) warnCount++;
+        
         return `
-          <div class="inventory-item ${cls}">
-            <span class="inventory-item__dot" style="background:${color}"></span>
-            <span class="inventory-item__name">${item.ad}</span>
-            <span class="inventory-item__expiry">${item.skt}</span>
-            <span class="inventory-item__qty">${item.miktar} adet</span>
+          <div class="inventory-item ${cls}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; border: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="inventory-item__dot" style="background:${color}; width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+              <strong class="inventory-item__name" style="color: #333;">${item.ad}</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px; color: #666; font-size: 0.85rem;">
+              <span class="inventory-item__expiry">${item.skt}</span>
+              <span class="inventory-item__qty" style="font-weight: bold; color: #444;">${item.miktar} adet</span>
+              
+              <div style="display: flex; gap: 5px; margin-left: 10px;">
+                <button class="qty-btn minus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #e74c3c;">-</button>
+                <button class="qty-btn plus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #27ae60;">+</button>
+                <button class="delete-item-btn" data-id="${item.ad}" style="background: #ffeaea; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #e74c3c;" title="Sil">🗑️</button>
+              </div>
+            </div>
           </div>`;
       }).join('');
+      
       const expiryBadge = document.getElementById('expiryCount');
       if (expiryBadge) expiryBadge.textContent = warnCount;
+
+      // Buton İşlevleri
+      const islemYap = async (url, method = 'POST') => {
+        try {
+            const response = await fetch(url, { method });
+            if (response.ok) verileriGetir(); 
+        } catch (err) { console.error("Sunucuya ulaşılamıyor."); }
+      };
+
+      container.querySelectorAll('.minus-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${e.currentTarget.getAttribute('data-id')}?degisim=-1`));
+      });
+
+      container.querySelectorAll('.plus-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${e.currentTarget.getAttribute('data-id')}?degisim=1`));
+      });
+
+      container.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            if(confirm(`"${id}" çöpe atılacak. Emin misiniz?`)) {
+                islemYap(`http://localhost:5000/api/inventory/remove/${id}`, 'DELETE');
+            }
+        });
+      });
     }
 
     // ─── KALORİ ───────────────────────────────────────
@@ -407,6 +445,40 @@
         btn.disabled = false;
       }
     });
+    // ─── AKILLI TEMİZLİK BÜYÜSÜ ────────────────────────
+    setTimeout(() => {
+        const headerDiv = document.querySelector('.dash-card--inventory .dash-card__header');
+        const addBtn = document.getElementById('addInventoryBtn');
+        if (headerDiv && addBtn && !document.getElementById('smartCleanBtn')) {
+            const cleanBtn = document.createElement('button');
+            cleanBtn.id = 'smartCleanBtn';
+            cleanBtn.className = 'btn btn--ghost btn--sm';
+            cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
+            cleanBtn.style.marginRight = '10px';
+            
+            headerDiv.insertBefore(cleanBtn, addBtn);
+
+            cleanBtn.addEventListener('click', async () => {
+                cleanBtn.innerHTML = '⏳ Temizleniyor...';
+                try {
+                    const res = await fetch('http://localhost:5000/api/inventory/smart-clean', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        if (data.silinenler.length > 0) {
+                            alert(`🧹 Temizlik tamamlandı!\nÇöpe atılan bozuk ürünler: ${data.silinenler.join(', ')}`);
+                        } else {
+                            alert('✨ Harika! Dolapta tarihi geçmiş hiçbir ürün yok.');
+                        }
+                        verileriGetir();
+                    }
+                } catch(e) {
+                    alert('Backend\'e ulaşılamadı!');
+                } finally {
+                    cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
+                }
+            });
+        }
+    }, 600);
 
     // ─── BAŞLAT ───────────────────────────────────────
     verileriGetir();

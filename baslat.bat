@@ -1,9 +1,9 @@
 @echo off
-echo === SmartRec Sihirli Baslatma Tusu ===
+echo === SmartRec Sihirli Baslatma Tusu (Kesin Cozum) ===
 echo.
 
 echo 1. Kurye (TypeScript) koda cevriliyor...
-call npx tsc frontend/app.ts --outFile frontend/dist/app.js --target es6 --skipLibCheck
+call npx tsc frontend/app.ts --target ES2020 --module ES2020 --outDir frontend/dist
 echo Kurye hazir!
 
 echo.

@@ -830,6 +830,57 @@ def ai_alisveris_listesi_olustur():
     except Exception as e:
         print(f"❌ Alışveriş listesi AI hatası: {e}")
         return ["⚠️ Sistem hatası oluştu.", "Lütfen tekrar deneyin."]     
+
+def miktar_guncelle(urun_ad, degisim):
+    """Ürün miktarını artırır veya azaltır. Sıfır olursa siler."""
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        temiz_ad = veri_temizle(urun_ad)
+        mevcut = next((item for item in data.get("envanter", []) if veri_temizle(item["ad"]) == temiz_ad), None)
+        
+        if mevcut:
+            mevcut["miktar"] += degisim
+            if mevcut["miktar"] <= 0:
+                data["envanter"].remove(mevcut)  # Sıfırlandıysa çöpe at
+            
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return True, "Güncellendi"
+        return False, "Bulunamadı"
+    except Exception as e:
+        return False, str(e)
+
+def akilli_temizlik_yap():
+    """Tarihi geçmiş tüm ürünleri tek seferde dolaptan atar."""
+    try:
+        path = dosya_yolu_getir('inventory.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        bugun = datetime.now()
+        silinenler = []
+        kalanlar = []
+        
+        for item in data.get("envanter", []):
+            try:
+                skt = datetime.strptime(item["skt"], "%Y-%m-%d")
+                if skt < bugun:
+                    silinenler.append(item["ad"]) # Bozuk! Çöpe...
+                else:
+                    kalanlar.append(item) # Sağlam! Dolapta kalsın...
+            except:
+                kalanlar.append(item)
+        
+        data["envanter"] = kalanlar
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            
+        return True, silinenler
+    except Exception as e:
+        return False, []
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
