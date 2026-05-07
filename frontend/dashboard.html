@@ -87,12 +87,13 @@
 
       <!-- ===== ÖNERİLEN TARİFLER ===== -->
       <section class="dash-card dash-card--suggestions">
-        <div class="dash-card__header">
-          <h2 class="dash-card__title">💡 Elinizdekilerle Yapabilecekleriniz</h2>
-        </div>
-        <div class="suggestion-list" id="suggestionList"></div>
-      </section>
-
+    <div class="dash-card__header">
+        <h2 class="dash-card__title">💡 Elinizdekilerle Yapabilecekleriniz</h2>
+        <button class="btn btn--ghost btn--sm" id="refreshRecipesBtn" style="margin-left: auto;">🔄 Yeni Tarif Düşün</button>
+    </div>
+    <div class="suggestion-list" id="suggestionList"></div> 
+</section>
+      
       <!-- ===== BİLDİRİMLER ===== -->
       <section class="dash-card dash-card--notifications">
         <div class="dash-card__header">
@@ -134,11 +135,36 @@
 
     // Piti
     initPiti();
-    // Piti karşılama mesajını güncelle
     const pitiBody = document.getElementById('chatbotBody');
     if (pitiBody) {
       const firstMsg = pitiBody.querySelector('.chat-msg--bot p');
       if (firstMsg) firstMsg.innerHTML = `Merhaba <strong>${displayName}</strong>! 👋 Envanterine baktım — bugün sana özel tarif önereyim mi?`;
+      
+      // --- İŞTE BULUNAMAYAN HIZLI KOMUT ÇİPLERİ BURADAN FIRLATILIYOR ---
+      if (!document.getElementById('pitiQuickActions')) {
+          const quickActionsDiv = document.createElement('div');
+          quickActionsDiv.id = 'pitiQuickActions';
+          quickActionsDiv.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;';
+          quickActionsDiv.innerHTML = `
+            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Bugün ne pişirsem?</button>
+            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Nelerim bozulmak üzere?</button>
+            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Tatlı krizi!</button>
+          `;
+          pitiBody.appendChild(quickActionsDiv);
+
+          // Çiplere tıklama büyüsü
+          quickActionsDiv.querySelectorAll('.quick-prompt-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                  const input = document.getElementById('chatbotInput');
+                  const sendBtn = document.getElementById('chatbotSend');
+                  if(input && sendBtn) {
+                      input.value = e.target.textContent;
+                      sendBtn.click(); // Kullanıcı yazmış gibi Gönder'e basar
+                      quickActionsDiv.style.display = 'none'; // Çipleri ekrandan siler
+                  }
+              });
+          });
+      }
     }
 
     // ─── ENVANTERİ ÇEKME ──────────────────────────────
@@ -284,43 +310,90 @@
       }
     }
 
-    // ─── BİLDİRİMLER ──────────────────────────────────
+    // ─── GERÇEK BİLDİRİMLER ──────────────────────────────────
     async function bildirimleriYukle() {
       const container = document.getElementById('notificationsList');
       if (!container) return;
-      const MOCK_NOTIF = [
-        { tip: 'warn',  icon: '⚠️', baslik: 'Son Kullanma Tarihi Yaklaşıyor', mesaj: 'Süt yarın son kullanma tarihine ulaşıyor.' },
-        { tip: 'info',  icon: '💡', baslik: 'Tarif Önerisi',                 mesaj: 'Elinizdeki domates ve yumurta ile menemen yapabilirsiniz!' },
-        { tip: 'tip',   icon: '🛒', baslik: 'Alışveriş Zamanı',              mesaj: '3 malzeme stoğunuz azalmak üzere.' },
-      ];
-      container.innerHTML = MOCK_NOTIF.map(n => `
-        <div class="notif-item notif-item--${n.tip}">
-          <span class="notif-icon">${n.icon}</span>
-          <div class="notif-text">
-            <strong>${n.baslik}</strong>
-            <span>${n.mesaj}</span>
-          </div>
-        </div>`).join('');
+      
+      try {
+        const res = await fetch('http://localhost:5000/api/notifications');
+        const data = await res.json();
+        
+        if (data.success && data.bildirimler.length > 0) {
+            container.innerHTML = data.bildirimler.map(n => `
+            <div class="notif-item notif-item--${n.tip}">
+              <span class="notif-icon">${n.tip === 'danger' ? '🚨' : n.tip === 'warning' ? '⏳' : '🛒'}</span>
+              <div class="notif-text">
+                <strong>${n.tip === 'danger' ? 'Bozuldu / SKT Geçti!' : n.tip === 'warning' ? 'SKT Yaklaşıyor' : 'Stok Azalıyor'}</strong>
+                <span>${n.mesaj}</span>
+              </div>
+            </div>`).join('');
+        } else {
+            container.innerHTML = `<p style="text-align:center; color:#888; padding: 10px;">Her şey taptaze, bildirim yok! ✨</p>`;
+        }
+      } catch (e) {
+          container.innerHTML = `<p style="color:red; text-align:center;">Bildirimler alınamadı.</p>`;
+      }
     }
-
-    // ─── ÖNERİLER ─────────────────────────────────────
-    function oneriYukle() {
+    // ─── GERÇEK AI ÖNERİLERİ VE KALORİ BAĞLANTISI ─────────────────────
+    async function oneriYukle() {
       const container = document.getElementById('suggestionList');
       if (!container) return;
-      const ONERILER = [
-        { emoji: '🍳', name: 'Menemen',       meta: '15 dk · 220 kcal · Kolay' },
-        { emoji: '🍲', name: 'Mercimek Çorbası', meta: '25 dk · 180 kcal · Kolay' },
-        { emoji: '🥗', name: 'Kısır',          meta: '20 dk · 195 kcal · Kolay' },
-      ];
-      container.innerHTML = ONERILER.map(o => `
-        <div class="suggestion-item">
-          <span class="suggestion-item__emoji">${o.emoji}</span>
-          <div class="suggestion-item__info">
-            <p class="suggestion-item__name">${o.name}</p>
-            <p class="suggestion-item__meta">${o.meta}</p>
-          </div>
-          <button class="cooked-btn" onclick="this.classList.toggle('cooked'); this.textContent = this.classList.contains('cooked') ? '✓ Yapıldı' : 'Yaptım'">Yaptım</button>
-        </div>`).join('');
+      
+      container.innerHTML = '<p style="text-align:center; color:#888; font-style:italic;">AI Şef dolabınıza bakıp tarif düşünüyor... 💭</p>';
+
+      try {
+        // AI kapısından GERÇEK tarifleri istiyoruz
+        const res = await fetch('http://localhost:5000/api/menu/create');
+        const data = await res.json();
+
+        if (data.success && data.menu && data.menu.menuler) {
+          // AI 3 menü dönüyor, her menünün ana yemeğini listeleyelim
+          container.innerHTML = data.menu.menuler.map(m => {
+            // Kaloriyi sayı olarak alalım (örn: "315 kcal" -> 315)
+            const kaloriMiktari = parseInt(m.kaloriler.ana_yemek_kalori) || 300; 
+            
+            return `
+            <div class="suggestion-item">
+              <span class="suggestion-item__emoji">🍲</span>
+              <div class="suggestion-item__info">
+                <p class="suggestion-item__name">${m.ana_yemek}</p>
+                <p class="suggestion-item__meta">${kaloriMiktari} kcal · AI Önerisi</p>
+              </div>
+              <button class="cooked-btn" onclick="yemegiKaydet('${m.ana_yemek}', ${kaloriMiktari}, this)">Yaptım</button>
+            </div>`;
+          }).join('');
+        } else {
+          container.innerHTML = '<p style="text-align:center; color:#888;">Şu an için yeni tarif bulunamadı.</p>';
+        }
+      } catch (e) {
+          container.innerHTML = '<p style="text-align:center; color:#C0392B;">AI Şef şu an meşgul.</p>';
+      }
+    }
+    
+
+    // Yaptım butonuna basılınca Backend'e kaloriyi gönderen sihirli fonksiyon
+    window.yemegiKaydet = async function(yemekAdi, kalori, btnElement) {
+        // Butonu görsel olarak "Yapıldı" durumuna geçir
+        btnElement.classList.add('cooked');
+        btnElement.textContent = '✓ Yapıldı';
+        btnElement.disabled = true;
+
+        try {
+            // Arka plandaki API'ye yemeği ve kaloriyi yolla
+            await fetch('http://localhost:5000/api/calories/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ yemek: yemekAdi, kalori: kalori })
+            });
+            
+            // Veri başarıyla gitti! Şimdi kalori çubuğunu anında yenile!
+            kaloriGuncelle(); 
+            
+        } catch(e) {
+            console.error("Kalori eklenemedi:", e);
+            btnElement.textContent = 'Hata!';
+        }
     }
 
     // ─── ENVANTER FORMU ───────────────────────────────
@@ -479,12 +552,27 @@
             });
         }
     }, 600);
+    // dashboard.html içindeki script bloğunun içine yapıştır
+const refreshBtn = document.getElementById('refreshRecipesBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            console.log("Butona basıldı!");
+            const container = document.getElementById('suggestionList');
+            if (container) {
+                // EĞER KUTU VARSA BU YAZI ANINDA GELMELİ:
+                container.innerHTML = '<p style="text-align:center; color:#C44B1C; font-weight:bold;">AI Şef mutfağa girdi, tarif düşünüyor... 💭</p>';
+                oneriYukle(); 
+            } else {
+                console.error("HATA: suggestionList id'li kutu sayfada bulunamadı!");
+            }
+        });
+    }
 
     // ─── BAŞLAT ───────────────────────────────────────
     verileriGetir();
     kaloriGuncelle();
     bildirimleriYukle();
-    oneriYukle();
+    //oneriYukle();
   </script>
 </body>
 </html>

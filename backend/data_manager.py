@@ -881,6 +881,23 @@ def akilli_temizlik_yap():
         return True, silinenler
     except Exception as e:
         return False, []
+def bugunku_kaloriyi_getir():
+    """Bugün yenilen yemeklerin toplam kalorisini hesaplar."""
+    log_dosyasi = dosya_yolu_getir('daily_log.json')
+    tarih = datetime.now().strftime("%Y-%m-%d")
+    try:
+        if not os.path.exists(log_dosyasi):
+            with open(log_dosyasi, 'w', encoding='utf-8') as f:
+                json.dump({"gunluk_kayitlar": []}, f)
+                
+        with open(log_dosyasi, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            
+        toplam = sum(item.get("kalori", 0) for item in data.get("gunluk_kayitlar", []) if item.get("tarih") == tarih)
+        return toplam
+    except Exception as e:
+        print(f"Kalori hesaplama hatası: {e}")
+        return 0    
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:

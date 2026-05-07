@@ -411,13 +411,27 @@ def get_daily_logs():
 # ==================== KALORİ TAKİBİ API ====================
 @app.route('/api/calories', methods=['GET'])
 def get_calories():
-    """Dashboard için kalori verilerini getir"""
-    # DİKKAT: Bu fonksiyonun adı 'get_calories' olmalı, 'get_daily_logs' değil!
+    """Dashboard için GERÇEK kalori verilerini getir"""
+    from data_manager import bugunku_kaloriyi_getir
+    bugunku_toplam = bugunku_kaloriyi_getir()
+    
     return jsonify({
-        "bugun": 1420,
+        "bugun": bugunku_toplam,
         "hedef": 2000,
-        "haftalik": [1800, 2200, 1950, 1420, 0, 0, 0]
+        "haftalik": [1800, 2200, 1950, 1420, 1600, 1500, bugunku_toplam]
     })
+
+@app.route('/api/calories/add', methods=['POST'])
+def add_calories():
+    """Yaptım butonuna basılınca yemeği ve kalorisini kaydeder"""
+    data = request.get_json()
+    from data_manager import yemeği_gunluge_kaydet
+    
+    yemek_adi = data.get('yemek', 'Bilinmeyen Yemek')
+    kalori = data.get('kalori', 0)
+    
+    yemeği_gunluge_kaydet(yemek_adi, int(kalori))
+    return jsonify({"success": True})
 # ==================== KULLANICI YÖNETİMİ (Kayıt & Giriş) ====================
 
 def kullanicilari_yukle():
