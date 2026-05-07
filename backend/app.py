@@ -28,7 +28,8 @@ from data_manager import (
     akilli_envanter_analizi,
     secili_malzemelerle_tek_tarif,
     alisveris_linkleri_olustur,
-    piti_ile_sohbet_et
+    piti_ile_sohbet_et,
+    ai_alisveris_listesi_olustur
 )
 
 app = Flask(__name__)
@@ -611,18 +612,12 @@ def chat_with_piti():
 @app.route('/api/shopping-list/ai', methods=['POST'])
 def generate_ai_shopping_list():
     try:
-        # Arkadaşın buraya "Envantere bak, eksikleri bul, ChatGPT'ye sor" kodlarını yazacak.
-        # Şimdilik senin butonun çalıştığını kanıtlamak için sahte bir liste yolluyoruz:
-        sahte_liste = [
-            "🍅 1 kg Domates (Menemen için kritik!)",
-            "🥚 1 Koli Yumurta",
-            "🧀 500g Kaşar Peyniri",
-            "🥖 2 Adet Taze Ekmek"
-        ]
+        # 1. Adımda yazdığımız o muazzam Gemini fonksiyonunu çağırıyoruz
+        gercek_liste = ai_alisveris_listesi_olustur()
         
         return jsonify({
             "success": True,
-            "liste": sahte_liste
+            "liste": gercek_liste
         }), 200
         
     except Exception as e:

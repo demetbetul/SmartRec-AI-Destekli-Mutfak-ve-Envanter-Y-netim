@@ -797,7 +797,39 @@ def piti_ile_sohbet_et(kullanici_mesaji):
         return response.text
     except Exception as e:
         print(f"❌ Piti Sohbet Hatası: {e}")
-        return "Şu an mutfakta ufak bir yoğunluk var, birazdan tekrar sorar mısın? 😅"     
+        return "Şu an mutfakta ufak bir yoğunluk var, birazdan tekrar sorar mısın? 😅"    
+def ai_alisveris_listesi_olustur():
+    """Dolaptaki malzemelere bakarak yaratıcı ve eksikleri tamamlayan bir liste sunar."""
+    print("🛒 AI Alışveriş Listesi için düşünüyor...")
+    
+    # Dolaptaki ürünleri alıyoruz
+    malzemeler_listesi = ai_icin_malzeme_listesi_hazirla()
+    malzemeler_metni = ", ".join(malzemeler_listesi) if malzemeler_listesi else "Dolap tamamen boş."
+    
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen pratik bir mutfak asistanısın. Kullanıcının dolabındaki mevcut malzemeler şunlar: {malzemeler_metni}
+    
+    Lütfen bu malzemeleri göz önünde bulundurarak, mutfakta eksik olabilecek, bu malzemeleri tamamlayacak veya temel ihtiyaç olan 4-5 maddelik şık bir alışveriş listesi hazırla. 
+    Her maddenin başına içeriğiyle uyumlu bir emoji koy (Örn: "🥛 1 Litre Günlük Süt", "🌶️ Kırmızı Pul Biber").
+    
+    Cevabını SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin yazma:
+    {{
+        "liste": ["madde 1", "madde 2", "madde 3"]
+    }}
+    """
+    
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        data = json.loads(response.text)
+        return data.get("liste", ["Hata: Liste çekilemedi."])
+    except Exception as e:
+        print(f"❌ Alışveriş listesi AI hatası: {e}")
+        return ["⚠️ Sistem hatası oluştu.", "Lütfen tekrar deneyin."]     
     
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
