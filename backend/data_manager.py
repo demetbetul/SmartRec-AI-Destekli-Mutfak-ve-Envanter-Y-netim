@@ -791,9 +791,9 @@ def yemek_fotografi_bul(yemek_adi):
     # === 3. AŞAMA: VARSAYILAN FOTOĞRAF (Son Çare) ===
     print(f"🖼️ İki API de '{yemek_adi}' için görsel bulamadı, varsayılan tabak kullanılıyor.")
     return varsayilan_foto
-def piti_ile_sohbet_et(kullanici_mesaji):
+def remzi_ile_sohbet_et(kullanici_mesaji):
     """Kullanıcının mesajlarına envanterdeki duruma göre AI ile cevap verir."""
-    print("🤖 Piti mesajı düşünüyor...")
+    print("🤖 Remzi mesajı düşünüyor...")
     
     # Kullanıcının dolabındaki malzemeleri çekiyoruz ki ona göre cevap versin
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla()
@@ -802,7 +802,7 @@ def piti_ile_sohbet_et(kullanici_mesaji):
     model = genai.GenerativeModel('gemini-2.5-flash')
     
     prompt = f"""
-    Sen SmartRec projesinin mutfak asistanı Piti'sin. Çok samimi, yardımsever ve enerjik bir karakterin var.
+    Sen SmartRec projesinin mutfak asistanı Remzi'sin. Çok samimi, yardımsever ve enerjik bir karakterin var.
     Kullanıcının sana yazdığı mesaj: "{kullanici_mesaji}"
     Kullanıcının mutfak dolabındaki mevcut malzemeler: {malzemeler_metni}
     
@@ -814,7 +814,7 @@ def piti_ile_sohbet_et(kullanici_mesaji):
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        print(f"❌ Piti Sohbet Hatası: {e}")
+        print(f"❌ Remzi Sohbet Hatası: {e}")
         return "Şu an mutfakta ufak bir yoğunluk var, birazdan tekrar sorar mısın? 😅"    
 def ai_alisveris_listesi_olustur():
     """Dolaptaki malzemelere bakarak yaratıcı ve eksikleri tamamlayan bir liste sunar."""

@@ -28,7 +28,7 @@ from data_manager import (
     akilli_envanter_analizi,
     secili_malzemelerle_tek_tarif,
     alisveris_linkleri_olustur,
-    piti_ile_sohbet_et,
+    remzi_ile_sohbet_et,
     ai_alisveris_listesi_olustur,
     miktar_guncelle,
     akilli_temizlik_yap
@@ -602,17 +602,17 @@ def internal_error(error):
         "error": "Sunucu hatası"
     }), 500
 # ==================== PITI AI SOHBET API'si ====================
-@app.route('/api/chat', methods=['POST'])
-def chat_with_piti():
+@app.route('/api/ai/chat', methods=['POST'])
+def chat_with_remzi():
     try:
         data = request.get_json()
         kullanici_mesaji = data.get('mesaj', '')
         
-        print(f"Piti'ye gelen mesaj: {kullanici_mesaji}")
+        print(f"Remzi'ye gelen mesaj: {kullanici_mesaji}")
         
         # Arkadaşın buraya kendi AI kodlarını yazacak, şimdilik test cevabı dönüyoruz:
         # 1. Adımda yazdığımız gerçek Gemini beyin fonksiyonunu çağırıyoruz
-        gercek_cevap = piti_ile_sohbet_et(kullanici_mesaji)
+        gercek_cevap = remzi_ile_sohbet_et(kullanici_mesaji)
         
         return jsonify({
             "success": True,

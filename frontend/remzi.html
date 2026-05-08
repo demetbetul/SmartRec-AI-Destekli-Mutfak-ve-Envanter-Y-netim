@@ -246,6 +246,8 @@
       const chatBody = document.getElementById('remziChatBody');
       const userInput = document.getElementById('remziPageInput');
       const sendBtn = document.getElementById('remziPageSend');
+      // remzi.html içindeki mevcut chatContext satırını bul ve şununla değiştir:
+      let chatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba', 'Nasılsın' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al ve 'Selam! Bugün mutfakta sana nasıl yardımcı olabilirim, ne pişirelim?' gibi doğal bir soru sor. \n\nSADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. Tarif verirken de hep aynı şeyleri tekrarlama, yaratıcı alternatifler üret. \n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
 
       function _appendMsg(text, type) {
         const wrap = document.createElement('div');
@@ -262,6 +264,7 @@
         if (!msg) return;
         _appendMsg(msg, 'user');
         if (!msgText) userInput.value = '';
+        chatContext += "Kullanıcı: " + msg + "\n";
         const typingEl = document.createElement('div');
         typingEl.className = 'rchat-msg rchat-msg--bot';
         typingEl.innerHTML = `<div class="rchat-msg__avatar">🤖</div><div class="rchat-msg__bubble rchat-msg__typing"><span></span><span></span><span></span></div>`;
@@ -270,11 +273,16 @@
         try {
           const res = await fetch('http://localhost:5000/api/ai/chat', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: msg, userId: user?.id })
+            body: JSON.stringify({ mesaj: chatContext, userId: user?.id })
           });
           const data = await res.json();
           typingEl.remove();
-          _appendMsg(data.reply || data.cevap || 'Bir yanıt alınamadı.', 'bot');
+          const botReply = data.reply || data.cevap || 'Bir yanıt alınamadı.';
+          
+          // 4. BOTUN VERDİĞİ CEVABI DA HAFIZAYA YAZ Kİ BİR SONRAKİNDE UNUTMASIN
+          chatContext += "Remzi: " + botReply + "\n\n";
+          
+          _appendMsg(botReply, 'bot');
         } catch {
           typingEl.remove();
           _appendMsg('⚠️ Sunucuya şu an ulaşılamıyor. Lütfen tekrar deneyin.', 'bot');
