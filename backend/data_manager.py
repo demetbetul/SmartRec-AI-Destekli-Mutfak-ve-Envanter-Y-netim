@@ -337,7 +337,7 @@ def get_recipes_from_gemini(malzemeler_metni):
     Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
     
     Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır. 
-    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt ve bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle.
+    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt, bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle ve tüm menünün tahmini toplam hazırlanma süresini (Örn: "45 dk", "1 saat 15 dk") 'hazirlik_suresi' olarak belirt.
     
     Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya açıklama yazma:
     {{
@@ -349,6 +349,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "ana_yemek": "1. Menü Ana Yemek",
                 "tatli": "1. Menü Tatlı",
                 "zorluk": "Orta",
+                "hazirlik_suresi": "55 dk",
                 "eksik_malzemeler": ["malzeme1", "malzeme2"]
             }},
             {{
@@ -357,6 +358,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "ana_yemek": "2. Menü Ana Yemek",
                 "tatli": "2. Menü Tatlı",
                 "zorluk": "Kolay",
+                "hazirlik_suresi": "30 dk",
                 "eksik_malzemeler": ["malzeme3", "malzeme4"]
             }},
             {{
@@ -365,6 +367,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "ana_yemek": "3. Menü Ana Yemek",
                 "tatli": "3. Menü Tatlı",
                 "zorluk": "Zor",
+                "hazirlik_suresi": "90 dk",
                 "eksik_malzemeler": ["malzeme5", "malzeme6"]
             }}
         ]

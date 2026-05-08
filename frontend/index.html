@@ -428,7 +428,7 @@
               title: `Menü Seçeneği ${menu.id}`,
               desc: `🥣 ${menu.baslangic} &nbsp;·&nbsp; 🥘 ${menu.ana_yemek} &nbsp;·&nbsp; 🍰 ${menu.tatli}`,
               image: menu.gorseller?.ana_yemek_foto || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
-              time: '45-60 dk',
+              time: menu.hazirlik_suresi || "45 dk",
               difficulty: menu.zorluk || 'Orta',
               calories: toplamKalori || 0,
               tags: ['Tam Menü'],
