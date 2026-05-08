@@ -29,184 +29,72 @@ export const Favorites = {
   }
 };
 
-export const MOCK_RECIPES = [
-  {
-    id: 1, title: 'Mercimek Çorbası',
-    desc: 'Geleneksel Türk mutfağının vazgeçilmezi, kadife dokulu mercimek çorbası.',
-    time: '25 dk', difficulty: 'Kolay', calories: 180, score: '9.4',
-    tags: ['geleneksel', 'vejetaryen', 'corba', 'vegan', 'glutensiz'],
-    tagLabels: ['🍲 Çorba', '🌿 Vejetaryen', '🌱 Vegan', '🚫🌾 Glutensiz'],
-    emoji: '🍲',
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop',
-    ingredients: ['kırmızı mercimek', 'soğan', 'havuç', 'zeytinyağı', 'tuz', 'kimyon'],
-    steps: ['Soğan ve havucu ince ince doğrayın.','Zeytinyağında soğanları kavurun.','Mercimek ve havucu ekleyip 2 dk daha kavurun.','4 su bardağı su ekleyip 20 dakika pişirin.','Blenderdan geçirin, tuz ve kimyon ekleyin.','Servis ederken üzerine kırmızı pul biber sosun gezdirin.']
-  },
-  {
-    id: 2, title: 'Menemen',
-    desc: 'Taze domates ve biberlerle hazırlanan, kahvaltının yıldızı klasik Türk omleti.',
-    time: '15 dk', difficulty: 'Kolay', calories: 220, score: '9.1',
-    tags: ['kolay', 'vejetaryen', 'ana-menu', 'glutensiz'],
-    tagLabels: ['⚡ Kolay', '🌿 Vejetaryen', '🍽 Ana Menü', '🚫🌾 Glutensiz'],
-    emoji: '🍳',
-    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&auto=format&fit=crop',
-    ingredients: ['domates', 'yeşil biber', 'yumurta', 'zeytinyağı', 'tuz'],
-    steps: ['Biberleri ince halkalar halinde doğrayın.','Zeytinyağında biberleri 3 dk kavurun.','Domatesleri ekleyip suyunu çekene kadar pişirin.','Yumurtaları kırın ve karıştırarak pişirin.','Tuz ekleyip sıcak servis edin.']
-  },
-  {
-    id: 3, title: 'Zeytinyağlı Enginar',
-    desc: 'İzmir usulü, limon ve zeytinyağıyla pişirilmiş hafif ve sağlıklı enginar.',
-    time: '50 dk', difficulty: 'Orta', calories: 145, score: '8.8',
-    tags: ['saglikli', 'vejetaryen', 'ana-menu', 'vegan', 'glutensiz', 'sportif'],
-    tagLabels: ['🥗 Sağlıklı', '🌿 Vejetaryen', '🌱 Vegan', '💪 Sportif'],
-    emoji: '🥦',
-    image: 'https://images.unsplash.com/photo-1540914124281-342587941389?w=600&auto=format&fit=crop',
-    ingredients: ['enginar', 'limon', 'zeytinyağı', 'soğan', 'dereotu', 'tuz'],
-    steps: ['Enginarları temizleyip limonlu suya bırakın.','Soğanı ince doğrayıp zeytinyağında kavurun.','Enginarları ekleyin, su ve limon suyu ilave edin.','Kısık ateşte 35-40 dakika pişirin.','Dereotu ile süsleyip soğuk servis edin.']
-  },
-  {
-    id: 4, title: 'Tavuk Şiş',
-    desc: 'Marine edilmiş tavuk parçaları, közlenmiş sebzelerle birlikte servis edilir.',
-    time: '35 dk', difficulty: 'Orta', calories: 310, score: '9.6',
-    tags: ['saglikli', 'ana-menu', 'glutensiz', 'sportif'],
-    tagLabels: ['🥗 Sağlıklı', '🍽 Ana Menü', '🚫🌾 Glutensiz', '💪 Sportif'],
-    emoji: '🍗',
-    image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop',
-    ingredients: ['tavuk göğsü', 'zeytinyağı', 'sarımsak', 'kekik', 'biber', 'tuz'],
-    steps: ['Tavukları küp şeklinde kesin.','Zeytinyağı, sarımsak, kekik, tuz ve biberle marine edin (min. 1 saat).','Şişlere dizin, aralarına sebze ekleyebilirsiniz.','Izgara veya fırında 180°C\'de 25 dk pişirin.','Yanında pilav veya salata ile servis edin.']
-  },
-  {
-    id: 5, title: 'Baklava',
-    desc: 'Antep fıstıklı, ince yufkalı, şerbetli Türk tatlısının kraliçesi.',
-    time: '90 dk', difficulty: 'Zor', calories: 480, score: '9.9',
-    tags: ['tatli', 'geleneksel', 'vejetaryen'],
-    tagLabels: ['🍮 Tatlı', '🫕 Geleneksel', '🌿 Vejetaryen'],
-    emoji: '🍮',
-    image: 'https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&auto=format&fit=crop',
-    ingredients: ['yufka', 'antep fıstığı', 'tereyağı', 'şeker', 'su', 'limon'],
-    steps: ['Şerbeti hazırlayın: şeker, su ve limonla kaynatın, soğutun.','Tepsiye tereyağlı yufkaları kat kat serin.','Ortasına fıstık serpin, üstünü de yufkayla kapatın.','Baklavayı dilimleyin, üzerine tereyağı gezdirin.','Önceden ısıtılmış 170°C fırında 45 dk pişirin.','Fırından çıkınca soğuk şerbet dökün, dinlendirin.']
-  },
-  {
-    id: 6, title: 'Kısır',
-    desc: 'İnce bulgur, taze maydanoz ve nar ekşisiyle hazırlanan hafif meze.',
-    time: '20 dk', difficulty: 'Kolay', calories: 195, score: '8.7',
-    tags: ['kolay', 'vejetaryen', 'saglikli', 'salata', 'vegan'],
-    tagLabels: ['⚡ Kolay', '🌿 Vejetaryen', '🥗 Salata', '🌱 Vegan'],
-    emoji: '🥗',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop',
-    ingredients: ['ince bulgur', 'domates salçası', 'maydanoz', 'nar ekşisi', 'zeytinyağı', 'tuz'],
-    steps: ['Bulgurun üzerine kaynar su dökün, kabarmasını bekleyin.','Salça ve zeytinyağıyla yoğurun.','Nar ekşisi ve tuzu ekleyin.','İnce kıyılmış maydanozu ilave edin, karıştırın.','En az 15 dk dinlendirip servis edin.']
-  },
-  {
-    id: 7, title: 'İmam Bayıldı',
-    desc: 'Zeytinyağında pişirilmiş domates ve soğan dolgulu, fırında yumuşatılmış patlıcan.',
-    time: '60 dk', difficulty: 'Orta', calories: 165, score: '9.0',
-    tags: ['geleneksel', 'vejetaryen', 'ana-menu', 'vegan', 'glutensiz'],
-    tagLabels: ['🫕 Geleneksel', '🌿 Vejetaryen', '🍽 Ana Menü', '🌱 Vegan'],
-    emoji: '🍆',
-    image: 'https://images.unsplash.com/photo-1572453800999-e8d2d1589b7c?w=600&auto=format&fit=crop',
-    ingredients: ['patlıcan', 'domates', 'soğan', 'sarımsak', 'zeytinyağı', 'maydanoz'],
-    steps: ['Patlıcanları yıkayıp boyuna yarın, tuzlu suda bekletin.','Soğan ve sarımsağı zeytinyağında kavurun.','Domatesleri ekleyip 10 dk daha pişirin.','Harci patlıcanların içine doldurun.','Üzerine zeytinyağı gezdirin, fırında 180°C\'de 35 dk pişirin.','Soğuyunca servis edin.']
-  },
-  {
-    id: 8, title: 'Fırında Levrek',
-    desc: 'Limon, sarımsak ve dereotu ile marine edilmiş, çıtır görünümlü levrek filetosu.',
-    time: '40 dk', difficulty: 'Orta', calories: 250, score: '9.3',
-    tags: ['saglikli', 'ana-menu', 'glutensiz', 'sportif'],
-    tagLabels: ['🥗 Sağlıklı', '🍽 Ana Menü', '🚫🌾 Glutensiz', '💪 Sportif'],
-    emoji: '🐟',
-    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop',
-    ingredients: ['levrek', 'limon', 'sarımsak', 'dereotu', 'zeytinyağı', 'tuz'],
-    steps: ['Levreği yıkayıp kağıt havluyla kurulayın.','Sarımsak, limon suyu, zeytinyağı ve dereotunu karıştırın.','Balığı her iki yüzünden de marine edin.','200°C fırında 25-30 dakika pişirin.','Limon dilimleri ve dereotu ile servis edin.']
-  },
-  {
-    id: 9, title: 'Yeşil Mercimek Salatası',
-    desc: 'Yeşil mercimek, taze sebzeler ve limon soslu hafif bir protein bombası salata.',
-    time: '30 dk', difficulty: 'Kolay', calories: 210, score: '8.9',
-    tags: ['saglikli', 'vejetaryen', 'salata', 'vegan', 'glutensiz', 'sportif'],
-    tagLabels: ['🥗 Salata', '🌱 Vegan', '🚫🌾 Glutensiz', '💪 Sportif'],
-    emoji: '🥗',
-    image: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?w=600&auto=format&fit=crop',
-    ingredients: ['yeşil mercimek', 'domates', 'salatalık', 'maydanoz', 'limon', 'zeytinyağı'],
-    steps: ['Mercimeği haşlayıp soğutun.','Domates ve salatalığı küp küp kesin.','Tüm malzemeleri karıştırın.','Limon suyu, zeytinyağı ve tuzla sosunu yapın.','Üzerine nar tanesi ekleyip servis edin.']
-  },
-  {
-    id: 10, title: 'Tavuk Çorbası',
-    desc: 'Ev yapımı tavuk suyu ile hazırlanan, şifalı geleneksel çorba.',
-    time: '45 dk', difficulty: 'Kolay', calories: 160, score: '9.2',
-    tags: ['geleneksel', 'corba', 'glutensiz'],
-    tagLabels: ['🍲 Çorba', '🫕 Geleneksel', '🚫🌾 Glutensiz'],
-    emoji: '🍗',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop',
-    ingredients: ['tavuk', 'havuç', 'kereviz', 'soğan', 'tuz', 'karabiber', 'limon'],
-    steps: ['Tavuğu büyük tencereye alın, su ekleyin.','Sebzeleri ekleyip 30 dakika kaynatın.','Tavuğu çıkarıp didikleyin.','Çorbayı süzün, tavuk etini geri ekleyin.','Limon suyu ve karabiberle tatlandırın.']
-  },
-  {
-    id: 11, title: 'Sütlaç',
-    desc: 'Fırında üzeri kızarıp karamelleşen, soğuk servis edilen geleneksel pirinçli sütlü tatlı.',
-    time: '55 dk', difficulty: 'Orta', calories: 320, score: '9.5',
-    tags: ['tatli', 'geleneksel', 'vejetaryen', 'glutensiz'],
-    tagLabels: ['🍮 Tatlı', '🫕 Geleneksel', '🌿 Vejetaryen', '🚫🌾 Glutensiz'],
-    emoji: '🍮',
-    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&auto=format&fit=crop',
-    ingredients: ['pirinç', 'süt', 'şeker', 'vanilya', 'tuz'],
-    steps: ['Pirinci haşlayın.','Sütü kaynatıp pirinci ekleyin.','Şeker ve vanilyayı ilave edin, kısık ateşte pişirin.','Fırın kaplarına dökün.','200°C fırında üzeri kızarana kadar pişirin.','Soğuyunca buzdolabında bekletin.']
-  },
-  {
-    id: 12, title: 'Protein Bowl',
-    desc: 'Kinoa, tavuk, avokado ve renkli sebzelerden oluşan sporcu dostu besleyici kase.',
-    time: '25 dk', difficulty: 'Kolay', calories: 420, score: '9.0',
-    tags: ['saglikli', 'sportif', 'glutensiz', 'ana-menu'],
-    tagLabels: ['💪 Sportif', '🥗 Sağlıklı', '🚫🌾 Glutensiz', '🍽 Ana Menü'],
-    emoji: '🏋️',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop',
-    ingredients: ['kinoa', 'tavuk göğsü', 'avokado', 'cherry domates', 'ıspanak', 'limon', 'zeytinyağı'],
-    steps: ['Kinoayı haşlayın.','Tavuk göğsünü ızgarada pişirip dilimleyin.','Avokadonuzu dilimleyin.','Kasenize kinoa, tavuk, avokado ve taze sebzeleri dizin.','Limon suyu ve zeytinyağıyla sos yapın.','Üzerine döküp servis edin.']
-  },
-  {
-    id: 13, title: 'Domates Çorbası',
-    desc: 'Olgunlaşmış domateslerden yapılan, kremalı ve aromalı klasik çorba.',
-    time: '30 dk', difficulty: 'Kolay', calories: 140, score: '8.6',
-    tags: ['vejetaryen', 'corba', 'glutensiz'],
-    tagLabels: ['🍲 Çorba', '🌿 Vejetaryen', '🚫🌾 Glutensiz'],
-    emoji: '🍅',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop',
-    ingredients: ['domates', 'soğan', 'sarımsak', 'zeytinyağı', 'krema', 'fesleğen', 'tuz'],
-    steps: ['Soğan ve sarımsağı zeytinyağında kavurun.','Domatesleri ekleyip 15 dk pişirin.','Blenderdan geçirin.','Krema ekleyip karıştırın.','Fesleğen ile servis edin.']
-  },
-  {
-    id: 14, title: 'Mevsim Salatası',
-    desc: 'Renkli mevsim sebzeleriyle hazırlanmış, narenciyeli sos ile hafif bir salata.',
-    time: '10 dk', difficulty: 'Kolay', calories: 95, score: '8.5',
-    tags: ['saglikli', 'vejetaryen', 'salata', 'vegan', 'glutensiz', 'kolay'],
-    tagLabels: ['🥗 Salata', '🌱 Vegan', '🚫🌾 Glutensiz', '⚡ Kolay'],
-    emoji: '🥬',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop',
-    ingredients: ['marul', 'domates', 'salatalık', 'kırmızı soğan', 'limon', 'zeytinyağı', 'tuz'],
-    steps: ['Tüm sebzeleri yıkayıp doğrayın.','Büyük bir kaseye alın.','Limon suyu, zeytinyağı ve tuzla sos yapın.','Üzerine gezdirip hafifçe karıştırın.']
-  },
-  {
-    id: 15, title: 'Künefe',
-    desc: 'Antakya usulü, kaşar peynirli, şerbetli ve kadayıftan yapılan enfes tatlı.',
-    time: '35 dk', difficulty: 'Orta', calories: 510, score: '9.8',
-    tags: ['tatli', 'geleneksel', 'vejetaryen'],
-    tagLabels: ['🍮 Tatlı', '🫕 Geleneksel', '🌿 Vejetaryen'],
-    emoji: '🍯',
-    image: 'https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=600&auto=format&fit=crop',
-    ingredients: ['kadayıf', 'dil peyniri', 'tereyağı', 'şeker', 'su', 'limon', 'antep fıstığı'],
-    steps: ['Şerbeti hazırlayın ve soğutun.','Kadayıfı eritilmiş tereyağıyla yoğurun.','Tepsiyi yağlayıp kadayıfın yarısını serin.','Peyniri yerleştirip kalan kadayıfı üste serin.','Orta ateşte her iki yüzü de altın sarısı olana kadar pişirin.','Sıcakken şerbet dökün, fıstıkla süsleyin.']
-  },
-  {
-    id: 16, title: 'Çoban Salatası',
-    desc: 'Taze domates, salatalık ve biberden oluşan Türk mutfağının vazgeçilmez salatası.',
-    time: '10 dk', difficulty: 'Kolay', calories: 80, score: '8.8',
-    tags: ['saglikli', 'vejetaryen', 'salata', 'vegan', 'glutensiz', 'kolay', 'geleneksel'],
-    tagLabels: ['🥗 Salata', '🌱 Vegan', '🫕 Geleneksel', '⚡ Kolay'],
-    emoji: '🥗',
-    image: 'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=600&auto=format&fit=crop',
-    ingredients: ['domates', 'salatalık', 'yeşil biber', 'kırmızı soğan', 'maydanoz', 'zeytinyağı', 'limon'],
-    steps: ['Tüm sebzeleri küçük küp şeklinde doğrayın.','Bir kaseye alın.','Zeytinyağı, limon suyu ve tuzla sos yapıp gezdirin.','Maydanoz ekleyip karıştırarak servis edin.']
-  }
-];
+// ─── JSON'DAN DİNAMİK VERİ ÇEKME (HTML'İ BOZMAYAN SİHİRLİ YÖNTEM) ───
+export let MOCK_RECIPES = [];
+
+try {
+    // VS Code klasör yapına göre bir üst klasördeki data/recipes.json'a gidiyoruz
+    const response = await fetch('../data/recipes.json?v=' + new Date().getTime());
+    const data = await response.json();
+
+    // JSON verisini arayüzün (HTML'in) anlayacağı kart formata çeviriyoruz
+    MOCK_RECIPES = data.tarifler.map(t => {
+        // 1. Etiket, kategori ve zorluğu birleştirip tekrarları siliyoruz
+        let rawTags = [...(t.etiketler || []), t.kategori, t.zorluk];
+        rawTags = [...new Set(rawTags.filter(Boolean))]; 
+        
+        return {
+            id: t.id,
+            title: t.ad.charAt(0).toUpperCase() + t.ad.slice(1), 
+            desc: t.aciklama,
+            image: t.resim_url || t.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+            time: t.toplam_sure || t.hazirlanma_suresi || "30 dk",
+            difficulty: t.zorluk ? (t.zorluk.charAt(0).toUpperCase() + t.zorluk.slice(1)) : "Orta",
+            calories: t.kalori || 0,
+            
+            // 2. FİLTRELER İÇİN (Türkçe karakterleri düzeltiyoruz, örn: "çorba" -> "corba")
+            tags: rawTags.map(tag => {
+                let lower = String(tag).toLowerCase();
+                if (lower === 'ana yemek') return 'ana-menu';
+                if (lower === 'çorba') return 'corba';
+                if (lower === 'tatlı') return 'tatli';
+                if (lower === 'sağlıklı') return 'saglikli';
+                if (lower === 'kahvaltı') return 'kahvalti';
+                
+                const charMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', ' ': '-' };
+                return lower.replace(/[çğıöşü ]/g, m => charMap[m] || m);
+            }),
+
+            // 3. EMOJİLİ KART ROZETLERİ İÇİN (Kartın üstünde güzel görünsün diye)
+            tagLabels: rawTags.map(tag => {
+                let lower = String(tag).toLowerCase();
+                let emoji = '🏷️';
+                if (lower === 'çorba') emoji = '🍲';
+                else if (lower === 'ana yemek') emoji = '🍽️';
+                else if (lower === 'tatlı') emoji = '🍮';
+                else if (lower === 'salata') emoji = '🥗';
+                else if (lower === 'kahvaltı') emoji = '🍳';
+                else if (lower === 'vejetaryen') emoji = '🌿';
+                else if (lower === 'vegan') emoji = '🌱';
+                else if (lower === 'sağlıklı') emoji = '💚';
+                else if (lower === 'geleneksel') emoji = '🫕';
+                else if (lower === 'kolay' || lower === 'pratik') emoji = '⚡';
+                
+                return `${emoji} ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
+            }),
+
+            emoji: '✨',
+            score: "9.5",
+            ingredients: t.malzemeler ? t.malzemeler.map(m => typeof m === 'object' ? `${m.miktar} ${m.birim} ${m.isim}` : m) : [],
+            steps: t.hazirlanis || []
+        };
+    });
+    
+    console.log("✅ 50 Tarif JSON'dan BAŞARIYLA çekildi!", MOCK_RECIPES);
+} catch (error) {
+    console.error("❌ JSON çekilemedi. Fetch yolunu ('../data/recipes.json') kontrol et.", error);
+}
+
 
 // ─── Kalori Kayıt ─────────────────────────────────────────────────────────────
 export function logCalories(recipeId) {
