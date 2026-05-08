@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartRec — Kalori Takibi</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .cal-layout { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+    .cal-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .cal-card { background: var(--color-surface,#fff); border-radius: 1rem; padding: 1.25rem 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+    .cal-card__label { font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:#888; margin-bottom:.4rem; }
+    .cal-card__value { font-size:2rem; font-weight:800; color:#C44B1C; }
+    .cal-card__sub { font-size:.82rem; color:#999; margin-top:.25rem; }
+
+    .cal-progress-wrap { background:var(--color-surface,#fff); border-radius:1rem; padding:1.5rem; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+    .cal-progress-label { display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:.5rem; }
+    .cal-progress-bar { height:14px; border-radius:7px; background:#f0f0f0; overflow:hidden; }
+    .cal-progress-fill { height:100%; border-radius:7px; background:linear-gradient(90deg, #C44B1C, #e8825f); transition: width .5s ease; }
+
+    .cal-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media(max-width:700px){ .cal-charts{ grid-template-columns:1fr; } }
+    .chart-box { background:var(--color-surface,#fff); border-radius:1rem; padding:1.25rem; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+    .chart-box__title { font-weight:700; margin-bottom:1rem; font-size:.95rem; }
+
+    .cal-log { background:var(--color-surface,#fff); border-radius:1rem; padding:1.5rem; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+    .cal-log__title { font-weight:700; margin-bottom:1rem; }
+    .cal-log__table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    .cal-log__table th { text-align:left; padding:.5rem .75rem; border-bottom:2px solid #eee; color:#666; font-weight:600; }
+    .cal-log__table td { padding:.5rem .75rem; border-bottom:1px solid #f5f5f5; }
+
+    .cal-manual { background:var(--color-surface,#fff); border-radius:1rem; padding:1.5rem; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+    .cal-manual__title { font-weight:700; margin-bottom:1rem; }
+    .cal-manual__row { display:flex; gap:.75rem; flex-wrap:wrap; }
+    .cal-manual__row input { flex:1; min-width:140px; padding:.6rem 1rem; border:1px solid #ddd; border-radius:.5rem; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <main class="main-content">
+    <div class="cal-layout">
+      <div class="page-header">
+        <h1 class="page-title">🔥 Kalori <span class="text--accent">Takibi</span></h1>
+        <p class="page-desc">Günlük ve haftalık kalori hedeflerinizi takip edin</p>
+      </div>
+
+      <!-- Özet kartlar -->
+      <div class="cal-summary">
+        <div class="cal-card">
+          <div class="cal-card__label">Bugün Tüketilen</div>
+          <div class="cal-card__value" id="todayConsumed">0</div>
+          <div class="cal-card__sub">kcal</div>
+        </div>
+        <div class="cal-card">
+          <div class="cal-card__label">Günlük Hedef</div>
+          <div class="cal-card__value" id="dailyGoal">2000</div>
+          <div class="cal-card__sub">kcal · <button class="btn btn--ghost btn--sm" id="editGoalBtn" style="font-size:.75rem;padding:.1rem .5rem;">Düzenle</button></div>
+        </div>
+        <div class="cal-card">
+          <div class="cal-card__label">Kalan</div>
+          <div class="cal-card__value" id="remaining">2000</div>
+          <div class="cal-card__sub">kcal</div>
+        </div>
+        <div class="cal-card">
+          <div class="cal-card__label">Bu Hafta Toplam</div>
+          <div class="cal-card__value" id="weekTotal">0</div>
+          <div class="cal-card__sub">kcal</div>
+        </div>
+      </div>
+
+      <!-- İlerleme çubuğu -->
+      <div class="cal-progress-wrap">
+        <div class="cal-progress-label">
+          <span>Günlük İlerleme</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="cal-progress-bar">
+          <div class="cal-progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Grafikler -->
+      <div class="cal-charts">
+        <div class="chart-box">
+          <div class="chart-box__title">📅 Bugünkü Dağılım</div>
+          <canvas id="todayChart" height="220"></canvas>
+        </div>
+        <div class="chart-box">
+          <div class="chart-box__title">📈 Haftalık Kalori</div>
+          <canvas id="weeklyChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Manuel giriş -->
+      <div class="cal-manual">
+        <div class="cal-manual__title">➕ Manuel Kalori Ekle</div>
+        <div class="cal-manual__row">
+          <input type="text"   id="manualName" placeholder="Yemek adı" />
+          <input type="number" id="manualCal"  placeholder="Kalori (kcal)" min="1" />
+          <button class="btn btn--primary" id="addManualBtn">Ekle</button>
+        </div>
+      </div>
+
+      <!-- Kayıt tablosu -->
+      <div class="cal-log">
+        <div class="cal-log__title">📋 Bugünkü Kayıtlar</div>
+        <table class="cal-log__table">
+          <thead><tr><th>Yemek</th><th>Kalori</th><th>Saat</th><th></th></tr></thead>
+          <tbody id="logTableBody"><tr><td colspan="4" style="color:#999;text-align:center;">Henüz kayıt yok.</td></tr></tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="logo"><span class="logo__icon">🍽</span><span class="logo__text">SmartRec</span></div>
+      <p class="footer__copy">© 2025 SmartRec. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+  <div id="chatbot-root"></div>
+
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { initPage, Auth } from './js/auth.js';
+    import { initRemzi, initDrawer } from './js/remzi.js';
+
+    document.getElementById('app-header').innerHTML   = renderHeader('calories');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+    initDrawer();
+    initRemzi();
+
+    if (!Auth.requireAuth()) { /* yönlendirilecek */ }
+
+    // ─── Veri ────────────────────────────────────────────────────────────
+    const LOG_KEY  = 'smartrec_calories_log';
+    const GOAL_KEY = 'smartrec_cal_goal';
+    const today    = new Date().toISOString().split('T')[0];
+    const DAYS     = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+
+    function getLog() { try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; } }
+    function saveLog(l) { localStorage.setItem(LOG_KEY, JSON.stringify(l)); }
+    function getGoal() { return Number(localStorage.getItem(GOAL_KEY) || 2000); }
+
+    function getTodayItems() { return getLog().filter(i => i.date === today); }
+    function getTodayTotal() { return getTodayItems().reduce((s, i) => s + i.calories, 0); }
+
+    function getWeekData() {
+      const now = new Date();
+      return Array.from({ length: 7 }, (_, d) => {
+        const dt = new Date(now); dt.setDate(now.getDate() - 6 + d);
+        const dateStr = dt.toISOString().split('T')[0];
+        const total = getLog().filter(i => i.date === dateStr).reduce((s, i) => s + i.calories, 0);
+        return { label: DAYS[dt.getDay() === 0 ? 6 : dt.getDay() - 1], total };
+      });
+    }
+
+    // ─── UI Güncelle ─────────────────────────────────────────────────────
+    let todayChart, weeklyChart;
+
+    function refresh() {
+      const consumed = getTodayTotal();
+      const goal     = getGoal();
+      const pct      = Math.min(100, Math.round((consumed / goal) * 100));
+      const weekItems = getWeekData();
+      const weekTotal = weekItems.reduce((s, d) => s + d.total, 0);
+
+      document.getElementById('todayConsumed').textContent = consumed;
+      document.getElementById('dailyGoal').textContent     = goal;
+      document.getElementById('remaining').textContent     = Math.max(0, goal - consumed);
+      document.getElementById('weekTotal').textContent     = weekTotal;
+      document.getElementById('progressPct').textContent   = pct + '%';
+      document.getElementById('progressFill').style.width  = pct + '%';
+      document.getElementById('progressFill').style.background =
+        pct > 100 ? '#e74c3c' : 'linear-gradient(90deg,#C44B1C,#e8825f)';
+
+      // Today doughnut
+      const todayItems = getTodayItems();
+      const ctx1 = document.getElementById('todayChart').getContext('2d');
+      if (todayChart) todayChart.destroy();
+      todayChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: todayItems.length ? todayItems.map(i => i.title) : ['Kayıt Yok'],
+          datasets: [{ data: todayItems.length ? todayItems.map(i => i.calories) : [1],
+            backgroundColor: todayItems.length
+              ? ['#C44B1C','#e8825f','#f4a97f','#f9d0b5','#fde8d8','#ffe9e0']
+              : ['#eee'] }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } } }
+      });
+
+      // Weekly bar
+      const ctx2 = document.getElementById('weeklyChart').getContext('2d');
+      if (weeklyChart) weeklyChart.destroy();
+      weeklyChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: weekItems.map(d => d.label),
+          datasets: [{
+            label: 'Kalori (kcal)',
+            data: weekItems.map(d => d.total),
+            backgroundColor: weekItems.map((_, i) => i === 6 ? '#C44B1C' : '#f4a97f'),
+            borderRadius: 6,
+          }, {
+            type: 'line', label: 'Hedef', data: Array(7).fill(goal),
+            borderColor: '#C44B1C', borderDash: [5, 5], borderWidth: 1.5,
+            pointRadius: 0, fill: false,
+          }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, grid: { color: '#f5f5f5' } } }, plugins: { legend: { labels: { font: { size: 11 } } } } }
+      });
+
+      // Tablo
+      const tbody = document.getElementById('logTableBody');
+      if (!todayItems.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#999;text-align:center;">Henüz kayıt yok.</td></tr>';
+      } else {
+        tbody.innerHTML = todayItems.map(i => {
+          const time = new Date(i.ts).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+          return `<tr>
+            <td>${i.title}</td>
+            <td><strong>${i.calories}</strong> kcal</td>
+            <td>${time}</td>
+            <td><button class="btn btn--ghost btn--sm del-log" data-ts="${i.ts}" style="font-size:.7rem;padding:.1rem .4rem">✕</button></td>
+          </tr>`;
+        }).join('');
+        tbody.querySelectorAll('.del-log').forEach(btn => {
+          btn.addEventListener('click', () => {
+            saveLog(getLog().filter(i => i.ts !== Number(btn.dataset.ts)));
+            refresh();
+          });
+        });
+      }
+    }
+
+    // ─── Manuel Ekle ─────────────────────────────────────────────────────
+    document.getElementById('addManualBtn').addEventListener('click', () => {
+      const name = document.getElementById('manualName').value.trim();
+      const cal  = Number(document.getElementById('manualCal').value);
+      if (!name || !cal) return;
+      const log = getLog();
+      log.push({ date: today, recipeId: null, title: name, calories: cal, ts: Date.now() });
+      saveLog(log);
+      document.getElementById('manualName').value = '';
+      document.getElementById('manualCal').value  = '';
+      refresh();
+    });
+
+    // Hedef düzenle
+    document.getElementById('editGoalBtn').addEventListener('click', () => {
+      const val = prompt('Günlük kalori hedefinizi girin:', getGoal());
+      if (val && Number(val) > 0) { localStorage.setItem(GOAL_KEY, val); refresh(); }
+    });
+
+    // Tarif sayfasından gelen event
+    window.addEventListener('smartrec:calorie-logged', refresh);
+
+    refresh();
+  </script>
+</body>
+</html>

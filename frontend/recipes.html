@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartRec — Tarifler</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    .filter-section {
+      max-width: 1280px;
+      margin: 0 auto 1.5rem;
+      padding: 0 2rem;
+    }
+    .filter-group {
+      background: #fff;
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .filter-group__label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--clr-text-muted);
+      margin-bottom: 0.65rem;
+      display: block;
+    }
+    .filter-group__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .filter-bar-bottom {
+      max-width: 1280px;
+      margin: 0 auto 1.5rem;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .active-filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.7rem;
+      background: var(--clr-accent);
+      color: #fff;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .active-filter-chip button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0;
+      line-height: 1;
+    }
+    .active-filter-chip button:hover { color: #fff; }
+    .clear-all-btn {
+      background: none;
+      border: none;
+      color: var(--clr-accent);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-header"></div>
+
+  <main class="main-content" style="padding-top: 6rem;">
+    <div class="page-header">
+      <h1 class="page-title">Tüm <span class="text--accent">Tarifler</span></h1>
+      <p class="page-desc">500'den fazla tarif arasından size en uygununu bulun</p>
+    </div>
+
+    <!-- Kategori Filtresi -->
+    <div class="filter-section">
+      <div class="filter-group">
+        <span class="filter-group__label">📂 Kategori</span>
+        <div class="filter-group__tags">
+          <button class="filter-btn filter-btn--active" data-group="cat" data-filter="all">Tümü</button>
+          <button class="filter-btn" data-group="cat" data-filter="ana-menu">🍽 Ana Menü</button>
+          <button class="filter-btn" data-group="cat" data-filter="corba">🍲 Çorba</button>
+          <button class="filter-btn" data-group="cat" data-filter="salata">🥗 Salata</button>
+          <button class="filter-btn" data-group="cat" data-filter="tatli">🍮 Tatlı</button>
+          <button class="filter-btn" data-group="cat" data-filter="geleneksel">🫕 Geleneksel</button>
+          <button class="filter-btn" data-group="cat" data-filter="kolay">⚡ Kolay</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group__label">🌿 Diyet & Yaşam Tarzı</span>
+        <div class="filter-group__tags">
+          <button class="filter-btn" data-group="diet" data-filter="vejetaryen">🌿 Vejetaryen</button>
+          <button class="filter-btn" data-group="diet" data-filter="vegan">🌱 Vegan</button>
+          <button class="filter-btn" data-group="diet" data-filter="glutensiz">🚫🌾 Glutensiz</button>
+          <button class="filter-btn" data-group="diet" data-filter="saglikli">💚 Sağlıklı</button>
+          <button class="filter-btn" data-group="diet" data-filter="sportif">💪 Sportif</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alt Filtre Çubuğu (aktif filtreler + sıralama) -->
+    <div class="filter-bar-bottom">
+      <div class="active-filters" id="activeFiltersWrap">
+        <span style="font-size:0.82rem; color:var(--clr-text-muted);" id="activeFiltersLabel">Filtre seçilmedi</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <p class="results-info" id="resultsInfo" style="margin:0;">Yükleniyor...</p>
+        <select class="select" id="sortSelect">
+          <option value="popular">En Popüler</option>
+          <option value="newest">En Yeni</option>
+          <option value="calories-asc">Kalori (Az→Çok)</option>
+          <option value="calories-desc">Kalori (Çok→Az)</option>
+          <option value="time-asc">Süre (Az→Çok)</option>
+          <option value="score-desc">Puan (Yüksek→Düşük)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid--menu" id="recipeCards"></div>
+
+    <div class="load-more-wrap">
+      <button class="btn btn--outline btn--lg" id="loadMoreBtn">Daha Fazla Yükle</button>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="logo"><span class="logo__icon">🍽</span><span class="logo__text">SmartRec</span></div>
+      <p class="footer__copy">© 2025 SmartRec. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+  <div id="chatbot-root"></div>
+
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { initPage }   from './js/auth.js';
+    import { initRemzi, initDrawer } from './js/remzi.js';
+    import { MOCK_RECIPES, createRecipeCard, initRecipeCardEvents } from './js/recipes.js';
+
+    document.getElementById('app-header').innerHTML  = renderHeader('recipes');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+    initRemzi();
+    initDrawer();
+
+    // Aktif filtreler
+    let activeFilters = { cat: 'all', diet: null };
+
+    const params = new URLSearchParams(location.search);
+    const urlCat = params.get('cat');
+    const urlQ   = params.get('q');
+    if (urlCat) activeFilters.cat = urlCat;
+
+    // Filtre butonlarını başlat
+    if (urlCat) {
+      document.querySelectorAll('[data-group="cat"]').forEach(btn => {
+        btn.classList.toggle('filter-btn--active', btn.dataset.filter === urlCat);
+      });
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('recipeCards');
+      const info = document.getElementById('resultsInfo');
+      if (!grid) return;
+
+      let recipes = [...MOCK_RECIPES];
+
+      // URL arama
+      if (urlQ) {
+        const q = urlQ.toLowerCase();
+        recipes = recipes.filter(r => r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+      }
+
+      // Kategori filtresi
+      if (activeFilters.cat && activeFilters.cat !== 'all') {
+        recipes = recipes.filter(r => r.tags.includes(activeFilters.cat));
+      }
+
+      // Diyet filtresi
+      if (activeFilters.diet) {
+        recipes = recipes.filter(r => r.tags.includes(activeFilters.diet));
+      }
+
+      // Sıralama
+      const sort = document.getElementById('sortSelect')?.value || 'popular';
+      if (sort === 'calories-asc')  recipes.sort((a, b) => a.calories - b.calories);
+      else if (sort === 'calories-desc') recipes.sort((a, b) => b.calories - a.calories);
+      else if (sort === 'time-asc') recipes.sort((a, b) => parseInt(a.time) - parseInt(b.time));
+      else if (sort === 'score-desc') recipes.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+
+      grid.innerHTML = recipes.length
+        ? recipes.map(r => createRecipeCard(r, { showDetail: true, showMissing: true, showCooked: true })).join('')
+        : `<div style="grid-column:1/-1; text-align:center; padding:4rem 1rem; color:var(--clr-text-muted);">
+            <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
+            <p style="font-size:1.1rem; font-weight:600;">Bu filtre kombinasyonuna uygun tarif bulunamadı.</p>
+            <button class="btn btn--outline" style="margin-top:1rem;" onclick="clearAllFilters()">Filtreleri Temizle</button>
+           </div>`;
+      if (info) info.textContent = `${recipes.length} tarif gösteriliyor`;
+
+      initRecipeCardEvents(grid, recipes);
+      updateActiveFilterChips();
+    }
+
+    function updateActiveFilterChips() {
+      const wrap = document.getElementById('activeFiltersWrap');
+      const label = document.getElementById('activeFiltersLabel');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      const chips = [];
+
+      if (activeFilters.cat && activeFilters.cat !== 'all') {
+        const btn = document.querySelector(`[data-group="cat"][data-filter="${activeFilters.cat}"]`);
+        if (btn) chips.push({ label: btn.textContent, key: 'cat' });
+      }
+      if (activeFilters.diet) {
+        const btn = document.querySelector(`[data-group="diet"][data-filter="${activeFilters.diet}"]`);
+        if (btn) chips.push({ label: btn.textContent, key: 'diet' });
+      }
+      if (urlQ) chips.push({ label: `🔍 "${urlQ}"`, key: 'q' });
+
+      if (chips.length === 0) {
+        wrap.innerHTML = '<span style="font-size:0.82rem; color:var(--clr-text-muted);">Filtre seçilmedi</span>';
+      } else {
+        chips.forEach(chip => {
+          const el = document.createElement('span');
+          el.className = 'active-filter-chip';
+          el.innerHTML = `${chip.label} <button onclick="removeFilter('${chip.key}')" title="Kaldır">✕</button>`;
+          wrap.appendChild(el);
+        });
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'clear-all-btn';
+        clearBtn.textContent = 'Tümünü Temizle';
+        clearBtn.onclick = clearAllFilters;
+        wrap.appendChild(clearBtn);
+      }
+    }
+
+    window.removeFilter = function(key) {
+      if (key === 'cat') { activeFilters.cat = 'all'; document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.toggle('filter-btn--active', b.dataset.filter === 'all')); }
+      if (key === 'diet') { activeFilters.diet = null; document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active')); }
+      if (key === 'q') { window.location.href = 'recipes.html'; return; }
+      renderCards();
+    };
+
+    window.clearAllFilters = function() {
+      activeFilters = { cat: 'all', diet: null };
+      document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.toggle('filter-btn--active', b.dataset.filter === 'all'));
+      document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active'));
+      renderCards();
+    };
+
+    // Filtre buton olayları
+    document.querySelectorAll('[data-group="cat"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.remove('filter-btn--active'));
+        btn.classList.add('filter-btn--active');
+        activeFilters.cat = btn.dataset.filter;
+        renderCards();
+      });
+    });
+
+    document.querySelectorAll('[data-group="diet"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isActive = btn.classList.contains('filter-btn--active');
+        document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active'));
+        if (!isActive) {
+          btn.classList.add('filter-btn--active');
+          activeFilters.diet = btn.dataset.filter;
+        } else {
+          activeFilters.diet = null;
+        }
+        renderCards();
+      });
+    });
+
+    document.getElementById('sortSelect')?.addEventListener('change', () => renderCards());
+
+    document.getElementById('loadMoreBtn')?.addEventListener('click', e => {
+      e.target.textContent = 'Tümü Yüklendi';
+      e.target.disabled = true;
+    });
+
+    renderCards();
+  </script>
+</body>
+</html>

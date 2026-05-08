@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartRec — Favori Tariflerim</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    .fav-categories {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto 2rem;
+      padding: 0 2rem;
+      box-sizing: border-box;
+    }
+    .fav-cat-section {
+      margin-bottom: 3rem;
+    }
+    .fav-cat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--clr-border);
+    }
+    .fav-cat-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--clr-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .fav-cat-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .fav-cat-count {
+      margin-left: auto;
+      background: var(--clr-accent-light);
+      color: var(--clr-accent);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      animation: fadeInUp 0.4s ease both;
+    }
+    .empty-state__icon { font-size: 4rem; margin-bottom: 1rem; }
+    .empty-state__title { font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 0.75rem; }
+    .empty-state__desc { color: var(--clr-text-muted); font-size: 1rem; max-width: 440px; margin: 0 auto 2rem; line-height: 1.6; }
+    .auth-required-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      animation: fadeInUp 0.4s ease both;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-header"></div>
+
+  <main class="main-content" style="padding-top: 6rem;">
+    <div class="page-header">
+      <h1 class="page-title">Favori <span class="text--accent">Tariflerim</span></h1>
+      <p class="page-desc">Beğenip kaydettiğiniz tüm tariflere buradan ulaşabilirsiniz</p>
+    </div>
+
+    <div id="mainContent">
+      <!-- JS tarafından doldurulacak -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="logo"><span class="logo__icon">🍽</span><span class="logo__text">SmartRec</span></div>
+      <p class="footer__copy">© 2025 SmartRec. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+  <div id="chatbot-root"></div>
+
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { initPage, Auth } from './js/auth.js';
+    import { initRemzi, initDrawer } from './js/remzi.js';
+    import { MOCK_RECIPES, Favorites, createRecipeCard, initRecipeCardEvents } from './js/recipes.js';
+
+    document.getElementById('app-header').innerHTML  = renderHeader('favorites');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+    initRemzi();
+    initDrawer();
+
+    const CATEGORIES = [
+      { key: 'corba',      label: 'Çorbalar',         icon: '🍲', color: '#E8821E' },
+      { key: 'ana-menu',   label: 'Ana Menüler',       icon: '🍽', color: '#C44B1C' },
+      { key: 'salata',     label: 'Salatalar',         icon: '🥗', color: '#2D7A4F' },
+      { key: 'tatli',      label: 'Tatlılar',          icon: '🍮', color: '#D4720A' },
+      { key: 'vejetaryen', label: 'Vejetaryen',        icon: '🌿', color: '#4AAF7A' },
+      { key: 'vegan',      label: 'Vegan',             icon: '🌱', color: '#27ae60' },
+      { key: 'sportif',    label: 'Sportif / Fit',     icon: '💪', color: '#2980b9' },
+      { key: 'glutensiz',  label: 'Glutensiz',         icon: '🚫🌾', color: '#8e44ad' },
+      { key: 'geleneksel', label: 'Geleneksel',        icon: '🫕', color: '#795548' },
+    ];
+
+    function render() {
+      const main = document.getElementById('mainContent');
+      if (!Auth.isLoggedIn()) {
+        main.innerHTML = `
+          <div class="auth-required-state">
+            <div style="font-size:3.5rem; margin-bottom:1rem;">🔒</div>
+            <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-bottom:0.75rem;">Giriş Yapmanız Gerekiyor</h2>
+            <p style="color:var(--clr-text-muted); max-width:380px; margin:0 auto 2rem; line-height:1.6;">
+              Favori tariflerinizi görmek için hesabınıza giriş yapın veya ücretsiz kayıt olun.
+            </p>
+            <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+              <a href="login.html" class="btn btn--primary btn--lg">Giriş Yap</a>
+              <a href="login.html?tab=register" class="btn btn--outline btn--lg">Kayıt Ol</a>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const favIds = Favorites.getAll();
+      if (favIds.length === 0) {
+        main.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">❤️</div>
+            <h2 class="empty-state__title">Henüz favori tarifin yok</h2>
+            <p class="empty-state__desc">Tarifleri incelerken ♡ butonuna tıklayarak favori listenize ekleyebilirsiniz.</p>
+            <a href="recipes.html" class="btn btn--primary btn--lg">Tariflere Göz At</a>
+          </div>`;
+        return;
+      }
+
+      const favRecipes = MOCK_RECIPES.filter(r => favIds.includes(r.id));
+
+      // Toplam kısım
+      let html = `<div class="fav-summary">
+        <div style="background:#fff; border:1.5px solid var(--clr-border); border-radius:var(--radius-md); padding:1.25rem 1.5rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <span style="font-size:1.5rem;">❤️</span>
+          <div>
+            <div style="font-family:var(--font-display); font-size:1.1rem; font-weight:700;">${favRecipes.length} favori tarif</div>
+            <div style="color:var(--clr-text-muted); font-size:0.85rem;">Toplam kayıtlı tarifiniz</div>
+          </div>
+          <a href="recipes.html" class="btn btn--outline btn--sm" style="margin-left:auto;">+ Yeni Tarif Ekle</a>
+        </div>
+      </div>`;
+
+      // Her kategori için bölüm
+      html += `<div class="fav-categories">`;
+
+      // Önce kategorisiz (diğer) kontrol
+      let shownIds = new Set();
+      const catSections = [];
+
+      CATEGORIES.forEach(cat => {
+        const inCat = favRecipes.filter(r => r.tags.includes(cat.key));
+        if (inCat.length > 0) {
+          catSections.push({ ...cat, recipes: inCat });
+          inCat.forEach(r => shownIds.add(r.id));
+        }
+      });
+
+      // Hiçbir kategoriye girmeyen favoriler
+      const uncategorized = favRecipes.filter(r => !shownIds.has(r.id));
+
+      if (catSections.length === 0 && uncategorized.length > 0) {
+        // Tüm favoriler kategorisiz
+        html += buildSection({ key: 'all', label: 'Tüm Favoriler', icon: '❤️', color: '#C44B1C' }, favRecipes);
+      } else {
+        catSections.forEach(cat => {
+          html += buildSection(cat, cat.recipes);
+        });
+        if (uncategorized.length > 0) {
+          html += buildSection({ key: 'diger', label: 'Diğer', icon: '📌', color: '#888' }, uncategorized);
+        }
+      }
+
+      html += `</div>`;
+      main.innerHTML = html;
+
+      // Kart eventlerini başlat
+      document.querySelectorAll('.fav-cat-section .card-grid').forEach(grid => {
+        initRecipeCardEvents(grid, MOCK_RECIPES);
+      });
+
+      // Favori değişimini dinle — sayfayı yenile
+      window.addEventListener('smartrec:fav-change', () => render());
+    }
+
+    function buildSection(cat, recipes) {
+      const cards = recipes.map(r => createRecipeCard(r, { showDetail: true, showMissing: true, showCooked: true })).join('');
+      return `
+        <div class="fav-cat-section">
+          <div class="fav-cat-header">
+            <div class="fav-cat-icon" style="background:${cat.color};">${cat.icon}</div>
+            <h2 class="fav-cat-title">${cat.label}</h2>
+            <span class="fav-cat-count">${recipes.length} tarif</span>
+          </div>
+          <div class="card-grid card-grid--menu">${cards}</div>
+        </div>`;
+    }
+
+    render();
+  </script>
+</body>
+</html>

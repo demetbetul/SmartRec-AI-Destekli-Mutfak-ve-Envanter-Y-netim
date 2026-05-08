@@ -16,7 +16,7 @@
   <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="hero__bg-pattern"></div>
-    <div class="hero__content">
+    <div class="hero__inner"> <div class="hero__content">
       <h1 class="hero__title">Bugün Ne <span class="text--accent">Pişirsem?</span></h1>
       <p class="hero__subtitle">AI destekli akıllı tarif önerileri ile mutfağınızı keşfedin</p>
       <div class="search-bar">
@@ -86,9 +86,9 @@
 
     <section class="piti-banner">
       <div class="piti-banner__icon">✦</div>
-      <h2 class="piti-banner__title">AI Asistanı Piti ile Tanışın</h2>
+      <h2 class="piti-banner__title">AI Asistanı Remzi ile Tanışın</h2>
       <p class="piti-banner__desc">Mutfağınızdaki malzemelere göre özel tarif önerileri alın, beslenme takibi yapın ve daha fazlası...</p>
-      <button class="btn btn--white" id="openPitiBanner">Hemen Deneyin</button>
+      <button class="btn btn--white" id="openRemziBanner">Hemen Deneyin</button>
     </section>
 
   </main>
@@ -110,7 +110,7 @@
   <script type="module">
     import { renderHeader, renderChatbot } from './js/header.js';
     import { initPage } from './js/auth.js';
-    import { initPiti } from './js/piti.js';
+    import { initRemzi, initDrawer } from './js/remzi.js';
     import { MOCK_RECIPES, renderRecipeGrid } from './js/recipes.js';
 
     // Header + Chatbot inject
@@ -119,16 +119,17 @@
 
     // Auth state
     initPage();
-    initPiti();
+    initRemzi();
+    initDrawer();
 
     // Tarif gridleri
     const daily       = MOCK_RECIPES.slice(0, 3);
     const traditional = MOCK_RECIPES.filter(r => r.tags.includes('geleneksel'));
     const healthy     = MOCK_RECIPES.filter(r => r.tags.includes('saglikli'));
 
-    renderRecipeGrid('dailyCards', daily);
-    renderRecipeGrid('traditionalCards', traditional);
-    renderRecipeGrid('healthyCards', healthy);
+    renderRecipeGrid('dailyCards', daily, { showDetail: true });
+    renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
+    renderRecipeGrid('healthyCards', healthy, { showDetail: true });
 
     // Arama
     document.getElementById('searchBtn')?.addEventListener('click', () => {
@@ -146,9 +147,9 @@
       });
     });
 
-    // Banner Piti açma
-    document.getElementById('openPitiBanner')?.addEventListener('click', () => {
-      document.getElementById('chatbotModal')?.classList.add('open');
+    // Banner Remzi açma
+    document.getElementById('openRemziBanner')?.addEventListener('click', () => {
+    document.getElementById('chatbotModal')?.classList.add('open');
     });
   </script>
 </body>

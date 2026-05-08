@@ -89,7 +89,7 @@
 
     // ─── Zaten giriş yapılmışsa dashboard'a yönlendir ───
     if (Auth.isLoggedIn()) {
-      window.location.replace('dashboard.html');
+      window.location.replace('index.html');
     }
 
     // ─── Tab Geçişi ───
@@ -171,7 +171,7 @@
         const data = await res.json();
         if (data.success) {
           Auth.setUser(data.user);
-          const redirect = sessionStorage.getItem('redirect_after_login') || 'dashboard.html';
+          const redirect = sessionStorage.getItem('redirect_after_login') || 'index.html';
           sessionStorage.removeItem('redirect_after_login');
           window.location.href = redirect;
         } else {
@@ -223,7 +223,7 @@
         if (data.success) {
           // Kayıt sonrası otomatik giriş yap
           Auth.setUser({ ad: name.value.trim(), email: email.value.trim() });
-          window.location.href = 'dashboard.html';
+          window.location.href = 'index.html';
         } else {
           setApiError('registerApiError', data.message || 'Kayıt sırasında hata oluştu.');
         }

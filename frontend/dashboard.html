@@ -23,8 +23,8 @@
       </div>
       <div class="dashboard__stats">
         <div class="stat-pill">🥘 <strong id="inventoryCount">—</strong> Malzeme</div>
-        <div class="stat-pill stat-pill--warn">⚠️ <strong id="expiryCount">—</strong> SKT Uyarısı</div>
-        <div class="stat-pill stat-pill--ok">🛒 <strong id="shoppingCount">—</strong> Alışveriş</div>
+        <div class="stat-pill stat-pill--warn">⚠️ <strong id="expiryCount">0</strong> SKT Uyarısı</div>
+        <div class="stat-pill stat-pill--ok">🛒 <strong id="shoppingCount">0</strong> Alışveriş</div>
       </div>
     </div>
 
@@ -34,7 +34,10 @@
       <section class="dash-card dash-card--inventory">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🧊 Envanter</h2>
-          <button class="btn btn--primary btn--sm" id="addInventoryBtn">+ Malzeme Ekle</button>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn btn--ghost btn--sm" id="smartCleanBtn">🪄 Temizlik</button>
+            <button class="btn btn--primary btn--sm" id="addInventoryBtn">+ Ekle</button>
+          </div>
         </div>
         <div class="skt-legend">
           <span class="skt-dot skt-dot--green"></span> Taze
@@ -43,7 +46,8 @@
         </div>
         <div class="inventory-list" id="inventoryList"></div>
         <div class="mini-form hidden" id="addInventoryForm">
-          <input type="text" class="input" id="newItemName" list="material-suggestions" placeholder="Malzeme adı (örn: Yumurta)" autocomplete="off" />
+          <input type="text" class="input" id="newItemName" list="material-suggestions"
+                 placeholder="Malzeme adı (örn: Yumurta)" autocomplete="off" />
           <datalist id="material-suggestions">
             <option value="Süt"><option value="Yumurta"><option value="Un">
             <option value="Domates"><option value="Peynir"><option value="Zeytinyağı">
@@ -62,7 +66,7 @@
       <section class="dash-card dash-card--calories">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🔥 Kalori Takibi</h2>
-          <span class="badge badge--accent" id="todayCalLabel">Bugün: — kcal</span>
+          <span class="badge badge--accent" id="todayCalLabel">Bugün: 0 kcal</span>
         </div>
         <div class="chart-wrap">
           <canvas id="calorieChart"></canvas>
@@ -71,7 +75,11 @@
           <div class="calorie-goal__bar">
             <div class="calorie-goal__fill" id="calorieBar" style="width:0%"></div>
           </div>
-          <p class="calorie-goal__label">Günlük hedef: <strong>2000 kcal</strong> — <span id="calorieRemaining">—</span></p>
+          <p class="calorie-goal__label">
+            Günlük hedef: <strong id="goalDisplay">2000 kcal</strong> —
+            <span id="calorieRemaining">2000 kcal kaldı</span>
+            <button class="btn btn--ghost btn--sm" id="editGoalBtn" style="font-size:0.75rem;padding:0.1rem 0.5rem;margin-left:0.5rem;">Düzenle</button>
+          </p>
         </div>
       </section>
 
@@ -79,21 +87,23 @@
       <section class="dash-card dash-card--shopping">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🛒 Alışveriş Listesi</h2>
-          <button class="btn btn--ghost btn--sm" id="autoGenBtn">✦ AI ile Oluştur</button>
+          <button class="btn btn--ghost btn--sm" id="clearCheckedShopBtn">✓ Temizle</button>
         </div>
         <ul class="shopping-list" id="shoppingList"></ul>
-        <button class="btn btn--outline btn--sm" style="margin-top:1rem;" id="addShoppingItemBtn">+ Manuel Ekle</button>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input type="text" id="shopItemInput" class="input" placeholder="Ürün ekle..." style="flex:1;min-width:120px;" />
+          <button class="btn btn--primary btn--sm" id="addShopBtn">Ekle</button>
+        </div>
       </section>
 
       <!-- ===== ÖNERİLEN TARİFLER ===== -->
       <section class="dash-card dash-card--suggestions">
-    <div class="dash-card__header">
-        <h2 class="dash-card__title">💡 Elinizdekilerle Yapabilecekleriniz</h2>
-        <button class="btn btn--ghost btn--sm" id="refreshRecipesBtn" style="margin-left: auto;">🔄 Yeni Tarif Düşün</button>
-    </div>
-    <div class="suggestion-list" id="suggestionList"></div> 
-</section>
-      
+        <div class="dash-card__header">
+          <h2 class="dash-card__title">💡 Elinizdekilerle Yapabilecekleriniz</h2>
+        </div>
+        <div class="suggestion-list" id="suggestionList"></div>
+      </section>
+
       <!-- ===== BİLDİRİMLER ===== -->
       <section class="dash-card dash-card--notifications">
         <div class="dash-card__header">
@@ -110,20 +120,21 @@
   <script type="module">
     import { renderHeader, renderChatbot } from './js/header.js';
     import { Auth, initPage } from './js/auth.js';
-    import { initPiti } from './js/piti.js';
+    import { initRemzi, initDrawer, getInventory } from './js/remzi.js';
+    import { MOCK_RECIPES, logCalories, openRecipeDetail } from './js/recipes.js';
 
-    // ─── AUTH GUARD ───────────────────────────────────
-    // Header'ı inject et, sonra auth kontrolü yap
+    // ─── HEADER + AUTH ────────────────────────────────────
     document.getElementById('app-header').innerHTML = renderHeader('dashboard');
     document.getElementById('chatbot-root').innerHTML = renderChatbot();
     initPage();
+    initRemzi();
+    initDrawer();
 
-    if (!Auth.requireAuth()) {
-      // requireAuth() zaten banner gösterip yönlendiriyor
-      // Script duraksatılır, dashboard içeriği yüklenmez
+    if (!Auth.isLoggedIn()) {
+      Auth.requireAuth('dashboard.html');
       throw new Error('AUTH_REQUIRED');
     }
-    // ─── KULLANICI BİLGİSİ ────────────────────────────
+
     const user = Auth.getUser();
     const displayName = (user?.ad || user?.name || 'Kullanıcı')
       .trim().split(' ')
@@ -133,171 +144,199 @@
     const subtitleEl = document.getElementById('userNameDisplay');
     if (subtitleEl) subtitleEl.textContent = `Hoş geldin, ${displayName}! Mutfak envanterini yönet.`;
 
-    // Piti
-    initPiti();
-    const pitiBody = document.getElementById('chatbotBody');
-    if (pitiBody) {
-      const firstMsg = pitiBody.querySelector('.chat-msg--bot p');
-      if (firstMsg) firstMsg.innerHTML = `Merhaba <strong>${displayName}</strong>! 👋 Envanterine baktım — bugün sana özel tarif önereyim mi?`;
-      
-      // --- İŞTE BULUNAMAYAN HIZLI KOMUT ÇİPLERİ BURADAN FIRLATILIYOR ---
-      if (!document.getElementById('pitiQuickActions')) {
-          const quickActionsDiv = document.createElement('div');
-          quickActionsDiv.id = 'pitiQuickActions';
-          quickActionsDiv.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;';
-          quickActionsDiv.innerHTML = `
-            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Bugün ne pişirsem?</button>
-            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Nelerim bozulmak üzere?</button>
-            <button class="btn btn--ghost btn--sm quick-prompt-btn" style="border-radius: 20px; font-size: 0.75rem;">Tatlı krizi!</button>
-          `;
-          pitiBody.appendChild(quickActionsDiv);
+    // ─── LOCAL STORAGE KEYS ───────────────────────────────
+    const LS_INV   = 'smartrec_inventory';
+    const LS_SHOP  = 'smartrec_shopping';
+    const LS_CAL   = 'smartrec_calories_log';
+    const LS_GOAL  = 'smartrec_cal_goal';
 
-          // Çiplere tıklama büyüsü
-          quickActionsDiv.querySelectorAll('.quick-prompt-btn').forEach(btn => {
-              btn.addEventListener('click', (e) => {
-                  const input = document.getElementById('chatbotInput');
-                  const sendBtn = document.getElementById('chatbotSend');
-                  if(input && sendBtn) {
-                      input.value = e.target.textContent;
-                      sendBtn.click(); // Kullanıcı yazmış gibi Gönder'e basar
-                      quickActionsDiv.style.display = 'none'; // Çipleri ekrandan siler
-                  }
-              });
-          });
+    function getInv()  { try { return JSON.parse(localStorage.getItem(LS_INV)  || '[]'); } catch { return []; } }
+    function saveInv(d) { localStorage.setItem(LS_INV,  JSON.stringify(d)); }
+    function getShop() { try { return JSON.parse(localStorage.getItem(LS_SHOP) || '[]'); } catch { return []; } }
+    function saveShop(d){ localStorage.setItem(LS_SHOP, JSON.stringify(d)); }
+    function getGoal() { return parseInt(localStorage.getItem(LS_GOAL) || '2000'); }
+    function saveGoal(g){ localStorage.setItem(LS_GOAL, g); }
+
+    function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+    function getTodayCalories() {
+      const log = JSON.parse(localStorage.getItem(LS_CAL) || '[]');
+      const today = todayStr();
+      return log.filter(e => e.date === today).reduce((s, e) => s + (e.calories || 0), 0);
+    }
+
+    function getWeeklyCalories() {
+      const log = JSON.parse(localStorage.getItem(LS_CAL) || '[]');
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        days.push(log.filter(e => e.date === key).reduce((s, e) => s + (e.calories || 0), 0));
       }
+      return days;
     }
 
-    // ─── ENVANTERİ ÇEKME ──────────────────────────────
-    async function verileriGetir() {
-      try {
-        const res = await fetch('http://localhost:5000/api/inventory');
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        const liste = Array.isArray(data) ? data : data.envanter || [];
-        envanteriCiz(liste);
-        const badge = document.getElementById('inventoryCount');
-        if (badge) badge.textContent = liste.length;
-      } catch {
-        // Backend yoksa mock veri göster
-        envanteriCiz(MOCK_ENVANTER);
-        const badge = document.getElementById('inventoryCount');
-        if (badge) badge.textContent = MOCK_ENVANTER.length;
-      }
-    }
-
-    const MOCK_ENVANTER = [
-      { ad: 'Yumurta',    skt: dayOffset(5),  miktar: 12 },
-      { ad: 'Süt',        skt: dayOffset(2),  miktar: 1  },
-      { ad: 'Domates',    skt: dayOffset(-1), miktar: 6  },
-      { ad: 'Tavuk',      skt: dayOffset(3),  miktar: 2  },
-      { ad: 'Zeytinyağı', skt: dayOffset(90), miktar: 1  },
-    ];
-
-    function dayOffset(n) {
-      const d = new Date();
-      d.setDate(d.getDate() + n);
-      return d.toISOString().split('T')[0];
-    }
-
-    function envanteriCiz(liste) {
+    // ─── ENVANTER ────────────────────────────────────────
+    function renderInventory() {
       const container = document.getElementById('inventoryList');
       if (!container) return;
+      const items = getInv();
+      const badge = document.getElementById('inventoryCount');
+      if (badge) badge.textContent = items.length;
+
+      if (!items.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:1.5rem 0;font-size:0.9rem;">Henüz malzeme eklenmedi. ↑ Ekle butonunu kullanın.</p>';
+        document.getElementById('expiryCount').textContent = '0';
+        _renderSuggestions();
+        return;
+      }
+
       const today = new Date();
       let warnCount = 0;
-      
-      container.innerHTML = liste.map(item => {
-        const sktDate = new Date(item.skt);
-        const diff = Math.ceil((sktDate - today) / 86400000);
-        const color = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
-        const cls   = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : 'inventory-item--green';
-        if (diff < 0 || diff <= 3) warnCount++;
-        
+
+      container.innerHTML = items.map(item => {
+        const diff = item.skt
+          ? Math.ceil((new Date(item.skt) - today) / 86400000)
+          : 999;
+        const dotColor = diff < 0 ? '#C0392B' : diff <= 3 ? '#D4720A' : '#2D7A4F';
+        const cls      = diff < 0 ? 'inventory-item--red' : diff <= 3 ? 'inventory-item--orange' : 'inventory-item--green';
+        const badge    = diff < 0
+          ? `<span style="font-size:.72rem;color:#C0392B;font-weight:600;">SKT geçmiş</span>`
+          : diff <= 3
+          ? `<span style="font-size:.72rem;color:#D4720A;font-weight:600;">${diff}g kaldı</span>`
+          : '';
+        if (diff <= 3) warnCount++;
+
         return `
-          <div class="inventory-item ${cls}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; border: 1px solid #eee;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="inventory-item__dot" style="background:${color}; width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
-              <strong class="inventory-item__name" style="color: #333;">${item.ad}</strong>
+          <div class="inventory-item ${cls}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;margin-bottom:6px;border-radius:10px;border:1.5px solid #eee;background:#fafaf8;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+              <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
+              <span style="font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.ad}</span>
+              ${badge}
             </div>
-            <div style="display: flex; align-items: center; gap: 15px; color: #666; font-size: 0.85rem;">
-              <span class="inventory-item__expiry">${item.skt}</span>
-              <span class="inventory-item__qty" style="font-weight: bold; color: #444;">${item.miktar} adet</span>
-              
-              <div style="display: flex; gap: 5px; margin-left: 10px;">
-                <button class="qty-btn minus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #e74c3c;">-</button>
-                <button class="qty-btn plus-btn" data-id="${item.ad}" style="background: #f1f2f6; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: #27ae60;">+</button>
-                <button class="delete-item-btn" data-id="${item.ad}" style="background: #ffeaea; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #e74c3c;" title="Sil">🗑️</button>
-              </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <span style="font-size:0.8rem;color:#888;">${item.miktar} adet</span>
+              <button class="qty-btn" data-action="minus" data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">−</button>
+              <button class="qty-btn" data-action="plus"  data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">+</button>
+              <button class="del-btn" data-id="${item.id}" style="width:24px;height:24px;border:none;border-radius:6px;background:#fef0f0;cursor:pointer;font-size:0.8rem;color:#e74c3c;">✕</button>
             </div>
           </div>`;
       }).join('');
-      
-      const expiryBadge = document.getElementById('expiryCount');
-      if (expiryBadge) expiryBadge.textContent = warnCount;
 
-      // Buton İşlevleri
-      const islemYap = async (url, method = 'POST') => {
-        try {
-            const response = await fetch(url, { method });
-            if (response.ok) verileriGetir(); 
-        } catch (err) { console.error("Sunucuya ulaşılamıyor."); }
-      };
+      document.getElementById('expiryCount').textContent = warnCount;
 
-      container.querySelectorAll('.minus-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${e.currentTarget.getAttribute('data-id')}?degisim=-1`));
-      });
-
-      container.querySelectorAll('.plus-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => islemYap(`http://localhost:5000/api/inventory/qty/${e.currentTarget.getAttribute('data-id')}?degisim=1`));
-      });
-
-      container.querySelectorAll('.delete-item-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = e.currentTarget.getAttribute('data-id');
-            if(confirm(`"${id}" çöpe atılacak. Emin misiniz?`)) {
-                islemYap(`http://localhost:5000/api/inventory/remove/${id}`, 'DELETE');
-            }
+      container.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const items = getInv();
+          const idx = items.findIndex(i => String(i.id) === btn.dataset.id);
+          if (idx < 0) return;
+          if (btn.dataset.action === 'plus')  items[idx].miktar = (items[idx].miktar || 1) + 1;
+          if (btn.dataset.action === 'minus') items[idx].miktar = Math.max(0, (items[idx].miktar || 1) - 1);
+          if (items[idx].miktar === 0) items.splice(idx, 1);
+          saveInv(items);
+          renderInventory();
+          _renderSuggestions();
         });
       });
+
+      container.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const items = getInv().filter(i => String(i.id) !== btn.dataset.id);
+          saveInv(items);
+          renderInventory();
+          _renderSuggestions();
+        });
+      });
+
+      _renderSuggestions();
+      _renderNotifications(items);
     }
 
-    // ─── KALORİ ───────────────────────────────────────
-    async function kaloriGuncelle() {
-      try {
-        const res = await fetch('http://localhost:5000/api/calories');
-        const d = await res.json();
-        renderKalori(d.bugun, d.hedef, d.haftalik);
-      } catch {
-        renderKalori(1420, 2000, [1800, 1600, 2100, 1750, 1900, 1420, 0]);
+    // Envanter formu
+    const addInventoryBtn   = document.getElementById('addInventoryBtn');
+    const addInventoryForm  = document.getElementById('addInventoryForm');
+    const saveInventoryBtn  = document.getElementById('saveInventoryBtn');
+    const cancelInventoryBtn= document.getElementById('cancelInventoryBtn');
+    const inputAd           = document.getElementById('newItemName');
+    const inputSKT          = document.getElementById('newItemExpiry');
+    const inputMiktar       = document.getElementById('newItemQty');
+
+    addInventoryBtn?.addEventListener('click', () => {
+      addInventoryForm?.classList.toggle('hidden');
+      inputAd?.focus();
+    });
+    cancelInventoryBtn?.addEventListener('click', () => {
+      addInventoryForm?.classList.add('hidden');
+      inputAd.value = ''; inputSKT.value = ''; inputMiktar.value = '1';
+    });
+    saveInventoryBtn?.addEventListener('click', () => {
+      const name = inputAd?.value.trim();
+      if (!name) { inputAd?.focus(); return; }
+      const items = getInv();
+      items.push({ id: Date.now(), ad: name, miktar: Number(inputMiktar?.value) || 1, skt: inputSKT?.value || '' });
+      saveInv(items);
+      cancelInventoryBtn.click();
+      renderInventory();
+    });
+    [inputAd, inputSKT, inputMiktar].forEach((inp, i, arr) => {
+      inp?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); i < arr.length-1 ? arr[i+1]?.focus() : saveInventoryBtn?.click(); }
+      });
+    });
+
+    // Akıllı temizlik
+    document.getElementById('smartCleanBtn')?.addEventListener('click', () => {
+      const items = getInv();
+      const today = todayStr();
+      const expired = items.filter(i => i.skt && i.skt < today).map(i => i.ad);
+      const fresh   = items.filter(i => !i.skt || i.skt >= today);
+      if (!expired.length) {
+        _toast('✨ Dolapta tarihi geçmiş ürün yok, her şey taze!', 'info');
+        return;
       }
-    }
+      if (confirm(`Tarihi geçmiş ${expired.length} ürün temizlenecek:\n${expired.join(', ')}\n\nDevam edilsin mi?`)) {
+        saveInv(fresh);
+        renderInventory();
+        _toast(`🧹 ${expired.length} ürün temizlendi.`, 'success');
+      }
+    });
 
-    function renderKalori(bugun, hedef, haftalik) {
-      const kalan = hedef - bugun;
-      const yuzde = Math.min((bugun / hedef) * 100, 100);
-      const todayEl    = document.getElementById('todayCalLabel');
-      const remainEl   = document.getElementById('calorieRemaining');
-      const barEl      = document.getElementById('calorieBar');
-      const chartCanvas = document.getElementById('calorieChart');
+    // ─── KALORİ ────────────────────────────────────────
+    let calorieChartInstance = null;
 
-      if (todayEl)  todayEl.textContent = `Bugün: ${bugun} kcal`;
-      if (remainEl) remainEl.textContent = kalan > 0 ? `${kalan} kcal kaldı` : '🎯 Hedefe ulaşıldı!';
-      if (barEl) {
-        barEl.style.width = `${yuzde}%`;
-        barEl.style.background = bugun > hedef
+    function renderCalorie() {
+      const today   = getTodayCalories();
+      const goal    = getGoal();
+      const kalan   = goal - today;
+      const yuzde   = Math.min((today / goal) * 100, 100);
+      const weekly  = getWeeklyCalories();
+
+      document.getElementById('todayCalLabel').textContent = `Bugün: ${today} kcal`;
+      document.getElementById('goalDisplay').textContent = `${goal} kcal`;
+      document.getElementById('calorieRemaining').textContent = kalan > 0
+        ? `${kalan} kcal kaldı`
+        : '🎯 Hedefe ulaşıldı!';
+      const bar = document.getElementById('calorieBar');
+      if (bar) {
+        bar.style.width = yuzde + '%';
+        bar.style.background = today > goal
           ? 'linear-gradient(90deg, #e74c3c, #c0392b)'
           : 'linear-gradient(90deg, #2D7A4F, #4AAF7A)';
       }
-      if (chartCanvas && typeof Chart !== 'undefined') {
-        new Chart(chartCanvas, {
+
+      const canvas = document.getElementById('calorieChart');
+      if (canvas && typeof Chart !== 'undefined') {
+        if (calorieChartInstance) calorieChartInstance.destroy();
+        calorieChartInstance = new Chart(canvas, {
           type: 'line',
           data: {
             labels: ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'],
             datasets: [{
               label: 'Kalori',
-              data: haftalik,
+              data: weekly,
               borderColor: '#C44B1C',
               backgroundColor: 'rgba(196,75,28,0.08)',
-              fill: true, tension: 0.4, pointRadius: 3,
+              fill: true, tension: 0.4, pointRadius: 4,
               pointBackgroundColor: '#C44B1C',
             }]
           },
@@ -310,269 +349,195 @@
       }
     }
 
-    // ─── GERÇEK BİLDİRİMLER ──────────────────────────────────
-    async function bildirimleriYukle() {
-      const container = document.getElementById('notificationsList');
-      if (!container) return;
-      
-      try {
-        const res = await fetch('http://localhost:5000/api/notifications');
-        const data = await res.json();
-        
-        if (data.success && data.bildirimler.length > 0) {
-            container.innerHTML = data.bildirimler.map(n => `
-            <div class="notif-item notif-item--${n.tip}">
-              <span class="notif-icon">${n.tip === 'danger' ? '🚨' : n.tip === 'warning' ? '⏳' : '🛒'}</span>
-              <div class="notif-text">
-                <strong>${n.tip === 'danger' ? 'Bozuldu / SKT Geçti!' : n.tip === 'warning' ? 'SKT Yaklaşıyor' : 'Stok Azalıyor'}</strong>
-                <span>${n.mesaj}</span>
-              </div>
-            </div>`).join('');
-        } else {
-            container.innerHTML = `<p style="text-align:center; color:#888; padding: 10px;">Her şey taptaze, bildirim yok! ✨</p>`;
-        }
-      } catch (e) {
-          container.innerHTML = `<p style="color:red; text-align:center;">Bildirimler alınamadı.</p>`;
+    document.getElementById('editGoalBtn')?.addEventListener('click', () => {
+      const current = getGoal();
+      const input = prompt('Günlük kalori hedefinizi girin:', current);
+      const val = parseInt(input);
+      if (val && val > 0) {
+        saveGoal(val);
+        renderCalorie();
+        _toast('✅ Kalori hedefi güncellendi.', 'success');
       }
+    });
+
+    window.addEventListener('smartrec:calorie-logged', () => renderCalorie());
+
+    // ─── ALIŞVERİŞ ─────────────────────────────────────
+    function renderShopping() {
+      const list = document.getElementById('shoppingList');
+      if (!list) return;
+      const items = getShop();
+      const count = document.getElementById('shoppingCount');
+      if (count) count.textContent = items.length;
+
+      if (!items.length) {
+        list.innerHTML = '<li style="color:#aaa;font-size:0.85rem;padding:0.5rem 0;list-style:none;">Alışveriş listesi boş.</li>';
+        return;
+      }
+
+      list.innerHTML = items.map(item => `
+        <li class="shopping-item${item.checked ? ' checked' : ''}" data-id="${item.id}"
+            style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.8rem;border-radius:8px;border:1.5px solid #eee;margin-bottom:4px;list-style:none;">
+          <input type="checkbox" class="shop-cb" data-id="${item.id}" ${item.checked ? 'checked' : ''}
+                 style="accent-color:var(--clr-accent);width:15px;height:15px;" />
+          <span style="flex:1;font-size:0.875rem;${item.checked ? 'text-decoration:line-through;opacity:0.5;' : ''}">${item.ad}</span>
+          <button class="del-shop-btn" data-id="${item.id}"
+                  style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem;" aria-label="Sil">✕</button>
+        </li>`).join('');
+
+      list.querySelectorAll('.shop-cb').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const all = getShop();
+          const it = all.find(i => String(i.id) === cb.dataset.id);
+          if (it) it.checked = cb.checked;
+          saveShop(all);
+          renderShopping();
+        });
+      });
+      list.querySelectorAll('.del-shop-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          saveShop(getShop().filter(i => String(i.id) !== btn.dataset.id));
+          renderShopping();
+        });
+      });
     }
-    // ─── GERÇEK AI ÖNERİLERİ VE KALORİ BAĞLANTISI ─────────────────────
-    async function oneriYukle() {
+
+    function _addShopItem(name) {
+      if (!name?.trim()) return;
+      const items = getShop();
+      items.push({ id: Date.now() + Math.random(), ad: name.trim(), checked: false });
+      saveShop(items);
+      renderShopping();
+    }
+
+    document.getElementById('addShopBtn')?.addEventListener('click', () => {
+      const inp = document.getElementById('shopItemInput');
+      _addShopItem(inp?.value);
+      if (inp) inp.value = '';
+      inp?.focus();
+    });
+    document.getElementById('shopItemInput')?.addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById('addShopBtn').click();
+    });
+    document.getElementById('clearCheckedShopBtn')?.addEventListener('click', () => {
+      saveShop(getShop().filter(i => !i.checked));
+      renderShopping();
+    });
+
+    window.addEventListener('smartrec:inventory-change', () => {
+      renderInventory();
+      renderShopping();
+    });
+
+    // ─── ÖNERİLEN TARİFLER ─────────────────────────────
+    function _renderSuggestions() {
       const container = document.getElementById('suggestionList');
       if (!container) return;
-      
-      container.innerHTML = '<p style="text-align:center; color:#888; font-style:italic;">AI Şef dolabınıza bakıp tarif düşünüyor... 💭</p>';
+      const invNames = getInv().map(i => i.ad.toLowerCase());
 
-      try {
-        // AI kapısından GERÇEK tarifleri istiyoruz
-        const res = await fetch('http://localhost:5000/api/menu/create');
-        const data = await res.json();
+      // Envanterle eşleşen tarifi skorla
+      const scored = MOCK_RECIPES.map(r => {
+        const match = r.ingredients.filter(ing => invNames.some(n => n.includes(ing.toLowerCase()) || ing.toLowerCase().includes(n)));
+        return { ...r, matchCount: match.length };
+      })
+        .filter(r => r.matchCount > 0)
+        .sort((a, b) => b.matchCount - a.matchCount)
+        .slice(0, 4);
 
-        if (data.success && data.menu && data.menu.menuler) {
-          // AI 3 menü dönüyor, her menünün ana yemeğini listeleyelim
-          container.innerHTML = data.menu.menuler.map(m => {
-            // Kaloriyi sayı olarak alalım (örn: "315 kcal" -> 315)
-            const kaloriMiktari = parseInt(m.kaloriler.ana_yemek_kalori) || 300; 
-            
-            return `
-            <div class="suggestion-item">
-              <span class="suggestion-item__emoji">🍲</span>
-              <div class="suggestion-item__info">
-                <p class="suggestion-item__name">${m.ana_yemek}</p>
-                <p class="suggestion-item__meta">${kaloriMiktari} kcal · AI Önerisi</p>
-              </div>
-              <button class="cooked-btn" onclick="yemegiKaydet('${m.ana_yemek}', ${kaloriMiktari}, this)">Yaptım</button>
-            </div>`;
-          }).join('');
-        } else {
-          container.innerHTML = '<p style="text-align:center; color:#888;">Şu an için yeni tarif bulunamadı.</p>';
-        }
-      } catch (e) {
-          container.innerHTML = '<p style="text-align:center; color:#C0392B;">AI Şef şu an meşgul.</p>';
+      if (!scored.length) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:1.5rem 0;color:var(--clr-text-muted);">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">🧊</div>
+            <p style="font-size:0.9rem;">Envanter ekleyince size özel tarif önerilecek.</p>
+          </div>`;
+        return;
       }
-    }
-    
 
-    // Yaptım butonuna basılınca Backend'e kaloriyi gönderen sihirli fonksiyon
-    window.yemegiKaydet = async function(yemekAdi, kalori, btnElement) {
-        // Butonu görsel olarak "Yapıldı" durumuna geçir
-        btnElement.classList.add('cooked');
-        btnElement.textContent = '✓ Yapıldı';
-        btnElement.disabled = true;
+      container.innerHTML = scored.map(r => `
+        <div class="suggestion-item" data-id="${r.id}" style="cursor:pointer;">
+          <span class="suggestion-item__emoji">${r.emoji}</span>
+          <div class="suggestion-item__info">
+            <p class="suggestion-item__name">${r.title}</p>
+            <p class="suggestion-item__meta">${r.matchCount} malzeme eşleşti · ${r.calories} kcal</p>
+          </div>
+          <button class="cooked-btn log-cooked" data-id="${r.id}" data-cal="${r.calories}">Yaptım</button>
+        </div>`).join('');
 
-        try {
-            // Arka plandaki API'ye yemeği ve kaloriyi yolla
-            await fetch('http://localhost:5000/api/calories/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ yemek: yemekAdi, kalori: kalori })
-            });
-            
-            // Veri başarıyla gitti! Şimdi kalori çubuğunu anında yenile!
-            kaloriGuncelle(); 
-            
-        } catch(e) {
-            console.error("Kalori eklenemedi:", e);
-            btnElement.textContent = 'Hata!';
-        }
-    }
-
-    // ─── ENVANTER FORMU ───────────────────────────────
-    const addBtn    = document.getElementById('addInventoryBtn');
-    const formDiv   = document.getElementById('addInventoryForm');
-    const saveBtn   = document.getElementById('saveInventoryBtn');
-    const cancelBtn = document.getElementById('cancelInventoryBtn');
-    const inputAd   = document.getElementById('newItemName');
-    const inputSKT  = document.getElementById('newItemExpiry');
-    const inputMiktar = document.getElementById('newItemQty');
-
-    addBtn?.addEventListener('click', () => formDiv?.classList.toggle('hidden'));
-    cancelBtn?.addEventListener('click', () => {
-      formDiv?.classList.add('hidden');
-      if (inputAd)     inputAd.value = '';
-      if (inputSKT)    inputSKT.value = '';
-      if (inputMiktar) inputMiktar.value = '1';
-    });
-
-    saveBtn?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const isim   = inputAd?.value.trim();
-      const skt    = inputSKT?.value;
-      const miktar = Number(inputMiktar?.value) || 1;
-      if (!isim) { inputAd?.focus(); return; }
-      if (/^\d+$/.test(isim)) { alert('⚠️ Malzeme adı sadece sayı olamaz!'); return; }
-      try {
-        const res = await fetch('http://localhost:5000/api/inventory/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ad: isim, skt, miktar })
+      container.querySelectorAll('.suggestion-item').forEach(el => {
+        el.addEventListener('click', e => {
+          if (e.target.closest('.log-cooked')) return;
+          openRecipeDetail(Number(el.dataset.id));
         });
-        if (res.ok) { verileriGetir(); cancelBtn?.click(); }
-      } catch {
-        // Offline: UI'a mock olarak ekle
-        cancelBtn?.click();
-        verileriGetir();
+      });
+
+      container.querySelectorAll('.log-cooked').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          logCalories(Number(btn.dataset.id));
+          btn.textContent = '✓ Yapıldı';
+          btn.disabled = true;
+          btn.classList.add('cooked');
+          renderCalorie();
+        });
+      });
+    }
+
+    // ─── BİLDİRİMLER ────────────────────────────────────
+    function _renderNotifications(items) {
+      const container = document.getElementById('notificationsList');
+      if (!container) return;
+      const today = todayStr();
+      const notifs = [];
+
+      items.forEach(item => {
+        if (!item.skt) return;
+        const diff = Math.ceil((new Date(item.skt) - new Date(today)) / 86400000);
+        if (diff < 0) notifs.push({ type: 'warn', icon: '🚨', title: 'SKT Geçti!', text: `${item.ad} bozulmuş olabilir.` });
+        else if (diff <= 3) notifs.push({ type: 'warn', icon: '⏳', title: 'SKT Yaklaşıyor', text: `${item.ad} — ${diff} gün kaldı.` });
+      });
+
+      const invNames = items.map(i => i.ad.toLowerCase());
+      const matchedRecipes = MOCK_RECIPES.filter(r =>
+        r.ingredients.some(ing => invNames.some(n => n.includes(ing.toLowerCase())))
+      );
+      if (matchedRecipes.length) {
+        notifs.push({ type: 'info', icon: '💡', title: 'Tarif Önerisi', text: `Envanterinize göre ${matchedRecipes.length} tarif yapabilirsiniz.` });
       }
-    });
 
-    // Enter ile inputlar arası geçiş
-    [inputAd, inputSKT, inputMiktar].forEach((input, i, arr) => {
-      input?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          i < arr.length - 1 ? arr[i + 1]?.focus() : saveBtn?.click();
-        }
-      });
-    });
-
-    // ─── ALIŞVERİŞ LİSTESİ ────────────────────────────
-    const shoppingList = document.getElementById('shoppingList');
-    const shoppingCount = document.getElementById('shoppingCount');
-
-    function listeyeEkle(metin) {
-      if (!shoppingList || !metin.trim()) return;
-      const li = document.createElement('li');
-      li.className = 'shopping-item';
-      li.innerHTML = `
-        <input type="checkbox" />
-        <span class="shopping-item__name">${metin}</span>
-        <button style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:1rem;" aria-label="Sil">✕</button>
-      `;
-      const cb  = li.querySelector('input');
-      const txt = li.querySelector('.shopping-item__name');
-      const del = li.querySelector('button');
-      cb?.addEventListener('change', () => {
-        txt.style.textDecoration = cb.checked ? 'line-through' : 'none';
-        txt.style.opacity = cb.checked ? '0.5' : '1';
-      });
-      del?.addEventListener('click', () => {
-        li.style.opacity = '0';
-        li.style.transition = 'opacity 0.2s';
-        setTimeout(() => { li.remove(); updateShoppingCount(); }, 200);
-      });
-      shoppingList.prepend(li);
-      updateShoppingCount();
-    }
-
-    function updateShoppingCount() {
-      if (shoppingCount) shoppingCount.textContent = shoppingList?.querySelectorAll('li').length || 0;
-    }
-
-    document.getElementById('addShoppingItemBtn')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (document.getElementById('manualInputContainer')) return;
-      const container = document.createElement('div');
-      container.id = 'manualInputContainer';
-      container.style.cssText = 'display:flex;gap:8px;margin-top:12px;animation:fadeIn 0.3s';
-      container.innerHTML = `
-        <input type="text" id="manualItemInput" class="input" placeholder="Örn: 1 kg Elma..." style="flex:1" />
-        <button class="btn btn--primary btn--sm" id="confirmManualAdd">Ekle</button>
-        <button class="btn btn--ghost btn--sm" id="cancelManualAdd">İptal</button>
-      `;
-      document.getElementById('addShoppingItemBtn').parentElement?.appendChild(container);
-      const inp = document.getElementById('manualItemInput');
-      inp?.focus();
-      const kaydet = () => {
-        if (inp?.value.trim()) { listeyeEkle(inp.value.trim()); inp.value = ''; inp.focus(); }
-      };
-      document.getElementById('confirmManualAdd')?.addEventListener('click', kaydet);
-      inp?.addEventListener('keypress', (e) => { if (e.key === 'Enter') kaydet(); });
-      document.getElementById('cancelManualAdd')?.addEventListener('click', () => container.remove());
-    });
-
-    document.getElementById('autoGenBtn')?.addEventListener('click', async (e) => {
-      const btn = e.currentTarget;
-      const original = btn.innerHTML;
-      btn.innerHTML = '⏳ Hazırlanıyor...';
-      btn.disabled = true;
-      try {
-        const res = await fetch('http://localhost:5000/api/shopping-list/ai', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ kullanici: user?.ad || 'Kullanıcı' })
-        });
-        const data = await res.json();
-        if (data.success && data.liste) data.liste.forEach(listeyeEkle);
-      } catch {
-        ['2 kg Domates','1 L Süt','6 adet Yumurta','500 g Un'].forEach(listeyeEkle);
-      } finally {
-        btn.innerHTML = original;
-        btn.disabled = false;
+      if (!notifs.length) {
+        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:1.5rem 0;font-size:0.9rem;">✨ Her şey yolunda, bildirim yok!</p>';
+        return;
       }
-    });
-    // ─── AKILLI TEMİZLİK BÜYÜSÜ ────────────────────────
-    setTimeout(() => {
-        const headerDiv = document.querySelector('.dash-card--inventory .dash-card__header');
-        const addBtn = document.getElementById('addInventoryBtn');
-        if (headerDiv && addBtn && !document.getElementById('smartCleanBtn')) {
-            const cleanBtn = document.createElement('button');
-            cleanBtn.id = 'smartCleanBtn';
-            cleanBtn.className = 'btn btn--ghost btn--sm';
-            cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
-            cleanBtn.style.marginRight = '10px';
-            
-            headerDiv.insertBefore(cleanBtn, addBtn);
 
-            cleanBtn.addEventListener('click', async () => {
-                cleanBtn.innerHTML = '⏳ Temizleniyor...';
-                try {
-                    const res = await fetch('http://localhost:5000/api/inventory/smart-clean', { method: 'POST' });
-                    const data = await res.json();
-                    if (data.success) {
-                        if (data.silinenler.length > 0) {
-                            alert(`🧹 Temizlik tamamlandı!\nÇöpe atılan bozuk ürünler: ${data.silinenler.join(', ')}`);
-                        } else {
-                            alert('✨ Harika! Dolapta tarihi geçmiş hiçbir ürün yok.');
-                        }
-                        verileriGetir();
-                    }
-                } catch(e) {
-                    alert('Backend\'e ulaşılamadı!');
-                } finally {
-                    cleanBtn.innerHTML = '🪄 Akıllı Temizlik';
-                }
-            });
-        }
-    }, 600);
-    // dashboard.html içindeki script bloğunun içine yapıştır
-const refreshBtn = document.getElementById('refreshRecipesBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            console.log("Butona basıldı!");
-            const container = document.getElementById('suggestionList');
-            if (container) {
-                // EĞER KUTU VARSA BU YAZI ANINDA GELMELİ:
-                container.innerHTML = '<p style="text-align:center; color:#C44B1C; font-weight:bold;">AI Şef mutfağa girdi, tarif düşünüyor... 💭</p>';
-                oneriYukle(); 
-            } else {
-                console.error("HATA: suggestionList id'li kutu sayfada bulunamadı!");
-            }
-        });
+      container.innerHTML = notifs.map(n => `
+        <div class="notif-item notif-item--${n.type === 'warn' ? 'warn' : 'info'}">
+          <span class="notif-icon">${n.icon}</span>
+          <div class="notif-text">
+            <strong>${n.title}</strong>
+            <span>${n.text}</span>
+          </div>
+        </div>`).join('');
     }
 
-    // ─── BAŞLAT ───────────────────────────────────────
-    verileriGetir();
-    kaloriGuncelle();
-    bildirimleriYukle();
-    //oneriYukle();
+    // ─── TOAST ──────────────────────────────────────────
+    function _toast(msg, type = 'info') {
+      document.getElementById('_dashToast')?.remove();
+      const el = document.createElement('div');
+      el.id = '_dashToast';
+      const bg = type === 'success' ? '#2D7A4F' : type === 'warn' ? '#D4720A' : '#1A1208';
+      el.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+        background:${bg};color:#fff;padding:0.75rem 1.5rem;border-radius:50px;
+        font-size:0.88rem;font-weight:500;z-index:99999;animation:toastIn 0.3s ease both;
+        box-shadow:0 4px 24px rgba(0,0,0,0.2);white-space:nowrap;`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    // ─── BAŞLAT ─────────────────────────────────────────
+    renderInventory();
+    renderCalorie();
+    renderShopping();
   </script>
 </body>
 </html>

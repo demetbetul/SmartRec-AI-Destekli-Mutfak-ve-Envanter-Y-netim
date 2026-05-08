@@ -1,30 +1,6 @@
 {
   "envanter": [
     {
-      "ad": "domates",
-      "miktar": 507,
-      "birim": "gr",
-      "skt": "2026-05-13"
-    },
-    {
-      "ad": "salatalık",
-      "miktar": 400,
-      "birim": "gr",
-      "skt": "2026-04-24"
-    },
-    {
-      "ad": "patates",
-      "miktar": 2000,
-      "birim": "gr",
-      "skt": "2026-05-10"
-    },
-    {
-      "ad": "soğan",
-      "miktar": 1500,
-      "birim": "gr",
-      "skt": "2026-05-20"
-    },
-    {
       "ad": "sarımsak",
       "miktar": 200,
       "birim": "gr",
@@ -35,18 +11,6 @@
       "miktar": 600,
       "birim": "gr",
       "skt": "2026-05-15"
-    },
-    {
-      "ad": "kabak",
-      "miktar": 700,
-      "birim": "gr",
-      "skt": "2026-04-23"
-    },
-    {
-      "ad": "patlıcan",
-      "miktar": 800,
-      "birim": "gr",
-      "skt": "2026-04-18"
     },
     {
       "ad": "biber yeşil",
@@ -253,12 +217,6 @@
       "skt": "2026-04-19"
     },
     {
-      "ad": "mercimek kırmızı",
-      "miktar": 1000,
-      "birim": "gr",
-      "skt": "2027-01-10"
-    },
-    {
       "ad": "mercimek yeşil",
       "miktar": 1000,
       "birim": "gr",
@@ -341,12 +299,6 @@
       "miktar": 100,
       "birim": "gr",
       "skt": "2027-09-15"
-    },
-    {
-      "ad": "kimyon",
-      "miktar": 100,
-      "birim": "gr",
-      "skt": "2027-10-01"
     },
     {
       "ad": "nane kuru",

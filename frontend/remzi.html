@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remzi AI Asistanı | SmartRec</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    .remzi-page { background: var(--clr-bg); min-height: 100vh; }
+    .remzi-main { max-width: 1100px; margin: 0 auto; padding: calc(var(--header-h) + 2.5rem) 1.5rem 5rem; }
+
+    .remzi-hero {
+      background: linear-gradient(135deg, #1A1208 0%, #3D1F0A 50%, #C44B1C 100%);
+      border-radius: var(--radius-xl); padding: 2.5rem 3rem; margin-bottom: 2.5rem;
+      display: flex; align-items: center; gap: 2rem; position: relative; overflow: hidden;
+    }
+    .remzi-hero::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .remzi-hero__avatar {
+      width: 80px; height: 80px; background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
+      flex-shrink: 0; box-shadow: 0 0 0 8px rgba(255,255,255,0.05);
+    }
+    .remzi-hero__text { flex: 1; }
+    .remzi-hero__title { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); color: #fff; margin-bottom: 0.4rem; }
+    .remzi-hero__sub { color: rgba(255,255,255,0.65); font-size: 0.95rem; }
+    .remzi-hero__badge {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9); font-size: 0.75rem; font-weight: 600;
+      padding: 0.3rem 0.85rem; border-radius: 50px;
+      display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.75rem;
+    }
+    .remzi-hero__badge::before {
+      content: ''; width: 7px; height: 7px; background: #4ade80; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .remzi-chat-section {
+      background: var(--clr-bg-card); border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); margin-bottom: 2.5rem;
+    }
+    .remzi-chat-toolbar {
+      background: var(--clr-bg-hero); border-bottom: 1.5px solid var(--clr-border);
+      padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; font-weight: 600; color: var(--clr-text-muted);
+    }
+    .live-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 0.2rem; animation: pulse 2s infinite; }
+    .remzi-chat-body {
+      height: 320px; overflow-y: auto; padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem; background: #fafaf8;
+    }
+    .rchat-msg { display: flex; gap: 0.75rem; max-width: 82%; animation: fadeInUp 0.25s ease both; }
+    .rchat-msg--user { align-self: flex-end; flex-direction: row-reverse; }
+    .rchat-msg__avatar {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--clr-accent-light);
+      display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+    }
+    .rchat-msg--user .rchat-msg__avatar { background: var(--clr-accent); color: #fff; font-size: 0.8rem; font-weight: 700; }
+    .rchat-msg__bubble { padding: 0.75rem 1rem; border-radius: 16px; font-size: 0.92rem; line-height: 1.55; }
+    .rchat-msg--bot .rchat-msg__bubble { background: #fff; border: 1.5px solid var(--clr-border); border-bottom-left-radius: 4px; }
+    .rchat-msg--user .rchat-msg__bubble { background: var(--clr-accent); color: #fff; border-bottom-right-radius: 4px; }
+    .rchat-msg__typing span { display: inline-block; width: 7px; height: 7px; background: var(--clr-text-muted); border-radius: 50%; animation: typingBounce 1.2s infinite; margin: 0 1px; }
+    .rchat-msg__typing span:nth-child(2) { animation-delay: 0.2s; }
+    .rchat-msg__typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    .quick-prompts {
+      padding: 0.85rem 1.5rem; background: var(--clr-bg-hero); border-top: 1px solid var(--clr-border);
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .quick-prompt-btn {
+      background: #fff; border: 1.5px solid var(--clr-border); border-radius: 50px;
+      padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+      color: var(--clr-text); transition: all var(--transition); white-space: nowrap;
+    }
+    .quick-prompt-btn:hover { border-color: var(--clr-accent); color: var(--clr-accent); background: #FFF5F0; }
+
+    .remzi-chat-input-row { display: flex; background: #fff; border-top: 1.5px solid var(--clr-border); }
+    .remzi-chat-input {
+      flex: 1; border: none; outline: none; padding: 1rem 1.25rem;
+      font-size: 0.95rem; background: transparent; font-family: var(--font-body);
+    }
+    .remzi-chat-input::placeholder { color: #aaa; }
+    .remzi-chat-send {
+      background: var(--clr-accent); color: #fff; border: none; padding: 0 1.5rem;
+      font-size: 1.2rem; cursor: pointer; transition: background var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .remzi-chat-send:hover { background: var(--clr-accent-dark); }
+
+    .remzi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .remzi-panel {
+      background: var(--clr-bg-card); border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .remzi-panel__header {
+      padding: 1rem 1.25rem; border-bottom: 1.5px solid var(--clr-border);
+      display: flex; align-items: center; justify-content: space-between; background: var(--clr-bg-hero);
+    }
+    .remzi-panel__header h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+    .remzi-panel__body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .menu-card-h {
+      display: flex; gap: 0.85rem; background: var(--clr-bg); border: 1.5px solid var(--clr-border);
+      border-radius: 12px; padding: 0.75rem; transition: all var(--transition); cursor: pointer;
+    }
+    .menu-card-h:hover { border-color: var(--clr-accent-light); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .menu-card-h__img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--clr-bg-hero); flex-shrink: 0; }
+    .menu-card-h__body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+    .menu-card-h__tag { font-size: 0.68rem; font-weight: 700; color: var(--clr-accent); text-transform: uppercase; letter-spacing: 0.03em; }
+    .menu-card-h__title { font-weight: 600; font-size: 0.92rem; color: var(--clr-text); }
+    .menu-card-h__meta { font-size: 0.78rem; color: var(--clr-text-muted); }
+    .menu-card-h__arrow { color: var(--clr-accent-light); font-size: 1.1rem; display: flex; align-items: center; }
+
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    .skeleton-card { display: flex; gap: 0.85rem; padding: 0.75rem; background: var(--clr-bg); border-radius: 12px; }
+
+    .remzi-gate { text-align: center; padding: 3rem 2rem; }
+    .remzi-gate__icon { font-size: 3rem; margin-bottom: 1rem; }
+    .remzi-gate__title { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .remzi-gate__text { color: var(--clr-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.7; }
+    .remzi-gate__actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      .remzi-hero { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+      .remzi-grid { grid-template-columns: 1fr; }
+      .remzi-chat-body { height: 260px; }
+    }
+    @media (max-width: 480px) {
+      .remzi-main { padding-top: calc(var(--header-h) + 1.5rem); }
+      .quick-prompts { display: none; }
+    }
+  </style>
+</head>
+<body class="remzi-page">
+  <div id="app-header"></div>
+
+  <main class="remzi-main">
+    <div class="remzi-hero">
+      <div class="remzi-hero__avatar">🤖</div>
+      <div class="remzi-hero__text">
+        <h1 class="remzi-hero__title">Remzi — AI Mutfak Asistanı</h1>
+        <p class="remzi-hero__sub">Elinizdeki malzemelere göre tarif önerir, beslenme planı yapar, sorularınızı yanıtlar.</p>
+        <span class="remzi-hero__badge">Çevrimiçi</span>
+      </div>
+    </div>
+
+    <section class="remzi-chat-section" id="remziChatSection">
+      <div class="remzi-chat-toolbar" id="chatToolbar">
+        <span class="live-dot"></span> Remzi ile sohbet edin
+      </div>
+      <div class="remzi-chat-body" id="remziChatBody">
+        <div class="rchat-msg rchat-msg--bot">
+          <div class="rchat-msg__avatar">🤖</div>
+          <div class="rchat-msg__bubble" id="remziWelcomeMsg">Merhaba! Ben Remzi 👋 Bugün ne pişirmek istersiniz?</div>
+        </div>
+      </div>
+      <div class="quick-prompts" id="quickPromptsRow">
+        <button class="quick-prompt-btn" data-q="Bugün ne pişirmeliyim?">🍽 Ne pişireyim?</button>
+        <button class="quick-prompt-btn" data-q="Sağlıklı ve hızlı bir tarif önerir misin?">🥗 Sağlıklı öneri</button>
+        <button class="quick-prompt-btn" data-q="Envanterimde neler var?">🧊 Envanterim</button>
+        <button class="quick-prompt-btn" data-q="Bugünkü kalori hedefim nedir?">🔥 Kalori hedefim</button>
+      </div>
+      <div class="remzi-chat-input-row" id="chatInputRow">
+        <input type="text" id="remziPageInput" class="remzi-chat-input" placeholder="Bir şeyler sorun… (Enter ile gönderin)" autocomplete="off" />
+        <button id="remziPageSend" class="remzi-chat-send" aria-label="Gönder">→</button>
+      </div>
+    </section>
+
+    <div class="remzi-grid">
+      <section class="remzi-panel">
+        <div class="remzi-panel__header">
+          <h3>📅 Güne Özel Menü</h3>
+          <a href="recipes.html" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; text-decoration:none;">Tümü →</a>
+        </div>
+        <div class="remzi-panel__body" id="remziDailyList">
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+        </div>
+      </section>
+      <section class="remzi-panel">
+        <div class="remzi-panel__header">
+          <h3>🧊 Envanterden Öneri</h3>
+          <button id="openInventoryBtn" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; background:none; border:none; cursor:pointer;">Düzenle →</button>
+        </div>
+        <div class="remzi-panel__body" id="remziInvList">
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="logo"><span class="logo__icon">🍽</span><span class="logo__text">SmartRec</span></div>
+      <p class="footer__copy">© 2025 SmartRec. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+  <div id="chatbot-root"></div>
+
+  <script type="module">
+    import { renderHeader, renderChatbot } from './js/header.js';
+    import { Auth, initPage } from './js/auth.js';
+    import { initRemzi, initDrawer } from './js/remzi.js';
+    import { MOCK_RECIPES } from './js/recipes.js';
+
+    document.getElementById('app-header').innerHTML = renderHeader('remzi');
+    document.getElementById('chatbot-root').innerHTML = renderChatbot();
+    initPage();
+    initRemzi();
+    initDrawer();
+
+    const isLoggedIn = Auth.isLoggedIn();
+    const user = Auth.getUser();
+    const firstName = (user?.ad || user?.name || 'Kullanıcı').trim().split(' ')[0];
+
+    if (!isLoggedIn) {
+      // Misafir modu — chat alanını gate ile değiştir
+      document.getElementById('chatToolbar').style.display = 'none';
+      document.getElementById('quickPromptsRow').style.display = 'none';
+      document.getElementById('chatInputRow').style.display = 'none';
+      const chatBody = document.getElementById('remziChatBody');
+      chatBody.style.height = 'auto';
+      chatBody.style.padding = '0';
+      chatBody.innerHTML = `
+        <div class="remzi-gate">
+          <div class="remzi-gate__icon">🔒</div>
+          <h3 class="remzi-gate__title">AI Asistana Erişim</h3>
+          <p class="remzi-gate__text">Remzi ile sohbet etmek, kişiselleştirilmiş öneriler almak<br>ve envanter özelliklerini kullanmak için giriş yapmanız gerekiyor.</p>
+          <div class="remzi-gate__actions">
+            <a href="login.html" class="btn btn--primary">Giriş Yap</a>
+            <a href="login.html?tab=register" class="btn btn--outline">Kayıt Ol — Ücretsiz</a>
+          </div>
+        </div>`;
+    } else {
+      // Giriş yapılmış — chat aktif
+      const chatBody = document.getElementById('remziChatBody');
+      const userInput = document.getElementById('remziPageInput');
+      const sendBtn = document.getElementById('remziPageSend');
+
+      function _appendMsg(text, type) {
+        const wrap = document.createElement('div');
+        wrap.className = `rchat-msg rchat-msg--${type}`;
+        const ava = type === 'user' ? `<div class="rchat-msg__avatar">${firstName.charAt(0).toUpperCase()}</div>` : `<div class="rchat-msg__avatar">🤖</div>`;
+        wrap.innerHTML = `${ava}<div class="rchat-msg__bubble">${text}</div>`;
+        chatBody.appendChild(wrap);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return wrap;
+      }
+
+      async function handleChat(msgText) {
+        const msg = msgText || userInput.value.trim();
+        if (!msg) return;
+        _appendMsg(msg, 'user');
+        if (!msgText) userInput.value = '';
+        const typingEl = document.createElement('div');
+        typingEl.className = 'rchat-msg rchat-msg--bot';
+        typingEl.innerHTML = `<div class="rchat-msg__avatar">🤖</div><div class="rchat-msg__bubble rchat-msg__typing"><span></span><span></span><span></span></div>`;
+        chatBody.appendChild(typingEl);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        try {
+          const res = await fetch('http://localhost:5000/api/ai/chat', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg, userId: user?.id })
+          });
+          const data = await res.json();
+          typingEl.remove();
+          _appendMsg(data.reply || data.cevap || 'Bir yanıt alınamadı.', 'bot');
+        } catch {
+          typingEl.remove();
+          _appendMsg('⚠️ Sunucuya şu an ulaşılamıyor. Lütfen tekrar deneyin.', 'bot');
+        }
+      }
+
+      sendBtn.onclick = () => handleChat();
+      userInput.onkeypress = (e) => { if (e.key === 'Enter') handleChat(); };
+      document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleChat(btn.dataset.q));
+      });
+    }
+
+    // Menü kartları (herkese gösterilir)
+    const createMenuCard = (recipe) => `
+      <div class="menu-card-h" onclick="window.location.href='recipes.html'">
+        <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img" onerror="this.style.display='none'" loading="lazy">
+        <div class="menu-card-h__body">
+          <span class="menu-card-h__tag">${recipe.tagLabels?.[0] || 'Öneri'}</span>
+          <div class="menu-card-h__title">${recipe.title}</div>
+          <div class="menu-card-h__meta">⏱ ${recipe.time} · 🔥 ${recipe.calories} kcal</div>
+        </div>
+        <div class="menu-card-h__arrow">›</div>
+      </div>`;
+
+    const dailyEl = document.getElementById('remziDailyList');
+    const invEl = document.getElementById('remziInvList');
+    if (dailyEl) dailyEl.innerHTML = MOCK_RECIPES.slice(0, 2).map(createMenuCard).join('');
+    if (invEl) invEl.innerHTML = MOCK_RECIPES.slice(-2).map(createMenuCard).join('');
+
+    document.getElementById('openInventoryBtn')?.addEventListener('click', () => {
+      if (!isLoggedIn) { window.location.href = 'login.html'; return; }
+      const drawer = document.getElementById('inventoryDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      drawer?.classList.add('open');
+      overlay?.classList.add('open');
+      drawer?.setAttribute('aria-hidden', 'false');
+    });
+  </script>
+</body>
+</html>
