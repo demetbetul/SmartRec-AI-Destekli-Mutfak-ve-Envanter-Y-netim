@@ -1461,3 +1461,13 @@ input, select, button, textarea { font-family: var(--font-body); }
 /* btn--success */
 .btn--success { background: #27ae60; color: #fff; }
 .btn--success:hover { background: #219a52; }
+
+#dailyCards .flavor-score, 
+#dailyCards [class*="rating"], 
+#dailyCards [class*="star"] {
+    display: none !important;
+}
+#dailyCards .recipe-card__meta {
+    justify-content: center; 
+    gap: 2rem;
+}

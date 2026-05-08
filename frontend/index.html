@@ -152,7 +152,7 @@
 
         if (data.success && data.menu.menuler) {
             const menuCards = data.menu.menuler.map(menu => {
-                // Kalori metnini sayıya çeviren yardımcı fonksiyon (örn: "315 kcal" -> 315)
+                // Kalori metnini sayıya çeviren yardımcı fonksiyon 
                 const parseCal = (val) => {
                     if (!val) return 0;
                     const num = parseInt(String(val).replace(/[^0-9]/g, ''));
