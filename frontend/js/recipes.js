@@ -410,3 +410,4 @@ function _initCardEvents(container, recipes) {
     btn.addEventListener('click', e => { e.stopPropagation(); _showAuthToast(btn.dataset.msg); });
   });
 }
+window.openRecipeDetail = openRecipeDetail;
