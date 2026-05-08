@@ -337,7 +337,7 @@ def get_recipes_from_gemini(malzemeler_metni):
     Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
     
     Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır. 
-    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt.
+    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt ve bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle.
     
     Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya açıklama yazma:
     {{
@@ -348,6 +348,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "baslangic": "1. Menü Başlangıç Yemeği",
                 "ana_yemek": "1. Menü Ana Yemek",
                 "tatli": "1. Menü Tatlı",
+                "zorluk": "Orta",
                 "eksik_malzemeler": ["malzeme1", "malzeme2"]
             }},
             {{
@@ -355,6 +356,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "baslangic": "2. Menü Başlangıç Yemeği",
                 "ana_yemek": "2. Menü Ana Yemek",
                 "tatli": "2. Menü Tatlı",
+                "zorluk": "Kolay",
                 "eksik_malzemeler": ["malzeme3", "malzeme4"]
             }},
             {{
@@ -362,6 +364,7 @@ def get_recipes_from_gemini(malzemeler_metni):
                 "baslangic": "3. Menü Başlangıç Yemeği",
                 "ana_yemek": "3. Menü Ana Yemek",
                 "tatli": "3. Menü Tatlı",
+                "zorluk": "Zor",
                 "eksik_malzemeler": ["malzeme5", "malzeme6"]
             }}
         ]
@@ -447,9 +450,22 @@ def get_recipes_from_local(malzemeler_listesi):
         "menuler": menuler
     }
 
+def gemini_kalori_tahmini(yemek_adi):
+    """Spoonacular kalori bulamazsa devreye giren yedek yapay zeka kalori hesaplayıcısı."""
+    try:
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        prompt = f"Sen bir beslenme uzmanısın. Lütfen sadece '{yemek_adi}' adlı yemeğin ortalama 1 porsiyon kalorisini tahmin et. Yanıtın SADECE sayı ve 'kcal' kelimesinden oluşsun. (Örnek: 350 kcal). Başka hiçbir metin, noktalama işareti veya açıklama yazma."
+        response = model.generate_content(prompt)
+        
+        # Gelen cevaptaki olası boşlukları temizleyip döndürüyoruz
+        return response.text.strip()
+    except Exception as e:
+        print(f"❌ Gemini Kalori Hatası: {e}")
+        return "0 kcal"
+
 def kalori_hesapla(yemek_adi):
-    """Sisteme zaten bağlı olan Spoonacular API ile kalori hesaplar."""
-    print(f"📊 {yemek_adi} için kalori hesaplanıyor (Spoonacular)...")
+    """Sisteme zaten bağlı olan Spoonacular API ile kalori hesaplar, bulamazsa Gemini'ye sorar."""
+    print(f"📊 '{yemek_adi}' için kalori hesaplanıyor (Spoonacular)...")
     
     # 1. Yemek adını İngilizceye çevir
     try:
@@ -457,29 +473,31 @@ def kalori_hesapla(yemek_adi):
     except:
         ingilizce_yemek = yemek_adi 
         
-    # 2. Spoonacular'ın Gizli Kalori Uç Noktasına (Endpoint) İstek At
+    # 2. Spoonacular'a İstek At
     url = "https://api.spoonacular.com/recipes/guessNutrition"
     params = {
         "title": ingilizce_yemek,
-        "apiKey": SPOONACULAR_API_KEY # En başta aldığımız şifreyi kullanıyoruz!
+        "apiKey": SPOONACULAR_API_KEY
     }
     
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
-            
-            # Spoonacular veriyi {"calories": {"value": 315}} şeklinde döner
-            # Biz de o "value" kısmını güvenli bir şekilde çekiyoruz
             kalori_degeri = data.get('calories', {}).get('value', 0)
             
+            # Spoonacular başarıyla bulduysa onu döndür
             if kalori_degeri > 0:
                 return f"{int(kalori_degeri)} kcal"
                 
-        return "Bilinmiyor"
+        # Eğer Spoonacular bulamadıysa veya 0 döndüyse Gemini'ye devret
+        print(f"⚠️ Spoonacular '{yemek_adi}' için kalori bulamadı. Gemini (AI) devrede!")
+        return gemini_kalori_tahmini(yemek_adi)
+        
     except Exception as e:
-        print(f"⚠️ Kalori hesaplama hatası: {e}")
-        return "Hesaplanamadı"
+        # Eğer internet koparsa veya Spoonacular çökerse yine Gemini'ye devret
+        print(f"⚠️ Spoonacular bağlantı hatası: {e}. Gemini (AI) devrede!")
+        return gemini_kalori_tahmini(yemek_adi)
 
 def akilli_menu_olustur(malzemeler_listesi):
     """Sistemin ana köprüsü. 3 farklı menüyü ve kalorileri tek bir JSON'da birleştirir."""

@@ -123,13 +123,115 @@
     initDrawer();
 
     // Tarif gridleri
-    const daily       = MOCK_RECIPES.slice(0, 3);
-    const traditional = MOCK_RECIPES.filter(r => r.tags.includes('geleneksel'));
-    const healthy     = MOCK_RECIPES.filter(r => r.tags.includes('saglikli'));
+    async function fetchDailyMenu() {
+    const container = document.getElementById('dailyCards');
+    const MENU_CACHE_KEY = 'smartrec_daily_menu_cache';
+    const today = new Date().toDateString();
 
-    renderRecipeGrid('dailyCards', daily, { showDetail: true });
-    renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
-    renderRecipeGrid('healthyCards', healthy, { showDetail: true });
+    // 1. Önce Önbelleği Kontrol Et
+    const cachedData = localStorage.getItem(MENU_CACHE_KEY);
+    if (cachedData) {
+        const parsedCache = JSON.parse(cachedData);
+        if (parsedCache.date === today) {
+            // Eğer önbellekteki veride "undefined" varsa temizlemesi için kontrol
+            if (parsedCache.menuCards && parsedCache.menuCards[0].calories !== undefined) {
+                renderRecipeGrid('dailyCards', parsedCache.menuCards, { showDetail: true });
+                return;
+            }
+        }
+    }
+
+    // 2. Yükleme Ekranı
+    container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem;">
+        <h3 id="aiLoadingText" style="color: var(--clr-accent);">👨‍🍳 Menüler Hazırlanıyor...</h3>
+    </div>`;
+
+    try {
+        const response = await fetch('http://localhost:5000/api/menu/create');
+        const data = await response.json();
+
+        if (data.success && data.menu.menuler) {
+            const menuCards = data.menu.menuler.map(menu => {
+                // Kalori metnini sayıya çeviren yardımcı fonksiyon (örn: "315 kcal" -> 315)
+                const parseCal = (val) => {
+                    if (!val) return 0;
+                    const num = parseInt(String(val).replace(/[^0-9]/g, ''));
+                    return isNaN(num) ? 0 : num;
+                };
+
+                const toplamKalori = parseCal(menu.kaloriler?.baslangic_kalori) + 
+                                    parseCal(menu.kaloriler?.ana_yemek_kalori) + 
+                                    parseCal(menu.kaloriler?.tatli_kalori);
+
+                return {
+                    id: 5000 + menu.id,
+                    title: `Menü Seçeneği ${menu.id}`, 
+                    desc: `🥣 ${menu.baslangic}<br>🥘 ${menu.ana_yemek}<br>🍰 ${menu.tatli}`,
+                    image: menu.gorseller?.ana_yemek_foto || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+                    time: "45-60 dk",
+                    difficulty: menu.zorluk || "Orta", // Backend'den gelen zorluk seviyesi
+                    calories: toplamKalori || 0,
+                    kalori: toplamKalori || 0, // recipes.js'in beklediği anahtar
+                    tags: ["Tam Menü", `Kaynak: ${data.menu.kaynak}`],
+                    emoji: "✨",
+                    ingredients: menu.eksik_malzemeler || []
+                };
+            });
+
+            // 3. Yeni Veriyi Önbelleğe Al
+            localStorage.setItem(MENU_CACHE_KEY, JSON.stringify({
+                date: today,
+                menuCards: menuCards
+            }));
+
+            renderRecipeGrid('dailyCards', menuCards, { showDetail: true });
+            
+        }
+    } catch (error) {
+        console.error("API Hatası:", error);
+        // Hata durumunda mock verileri göster
+        const fallback = MOCK_RECIPES.slice(0, 3);
+        renderRecipeGrid('dailyCards', fallback, { showDetail: true });
+    }
+}
+
+fetchDailyMenu();
+
+    // ─── GÜNLÜK DEĞİŞEN TARİF SEÇİMİ FONKSİYONU ───
+function getDailyDiscovery(tag, count, cacheKey) {
+    const today = new Date().toDateString();
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.date === today) {
+            return parsed.recipes;
+        }
+    }
+
+    // Bugün için yeni seçim yap
+    const filtered = MOCK_RECIPES.filter(r => r.tags.includes(tag));
+    // Listeyi rastgele karıştır (Fisher-Yates Shuffle)
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    const selection = shuffled.slice(0, count);
+
+    // Hafızaya kaydet
+    localStorage.setItem(cacheKey, JSON.stringify({
+        date: today,
+        recipes: selection
+    }));
+
+    return selection;
+}
+
+// ─── DİĞER TARİF KARTLARINI BAŞLAT ───
+// Geleneksel tariflerden bugün için 3 tane seç
+const traditional = getDailyDiscovery('geleneksel', 8, 'smartrec_traditional_daily');
+// Sağlıklı tariflerden bugün için 3 tane seç
+const healthy = getDailyDiscovery('saglikli', 8, 'smartrec_healthy_daily');
+
+renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
+renderRecipeGrid('healthyCards', healthy, { showDetail: true });
 
     // Arama
     document.getElementById('searchBtn')?.addEventListener('click', () => {
