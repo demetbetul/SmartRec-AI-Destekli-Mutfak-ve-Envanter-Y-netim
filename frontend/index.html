@@ -51,7 +51,6 @@
             <p class="section-subtitle">Bugün için özel seçilmiş tarifler</p>
           </div>
         </div>
-        <a href="recipes.html" class="btn btn--ghost">Tümünü Gör ↗</a>
       </div>
       <div class="card-grid" id="dailyCards"></div>
     </section>
@@ -268,13 +267,14 @@
       }
 
       // Adım Adım Tarif butonu → /api/menu/detail endpoint'ine bağlı
+      // Adım Adım Tarif butonu
       document.getElementById('menuDetailRecipeBtn')?.addEventListener('click', async () => {
         const btn        = document.getElementById('menuDetailRecipeBtn');
         const stepsWrap  = document.getElementById('menuDetailRecipeSteps');
         const content    = document.getElementById('menuDetailRecipeContent');
         const yemekAdi   = btn.dataset.yemek || menu.title;
 
-        // Zaten yüklendiyse toggle yap (göster/gizle)
+        // Zaten DOM'da açıksa göster/gizle yap
         if (stepsWrap.dataset.loaded === 'true') {
           const visible = stepsWrap.style.display !== 'none';
           stepsWrap.style.display = visible ? 'none' : 'block';
@@ -282,11 +282,49 @@
           return;
         }
 
+        // --- 1. HAFIZA (CACHE) KONTROLÜ ---
+        const cacheKey = 'smartrec_tarif_' + yemekAdi.replace(/\s+/g, '').toLowerCase();
+        const cachedTarif = localStorage.getItem(cacheKey);
+
+        // Ekrana basma işlemini ortak bir fonksiyon yapalım (kod kalabalığını önlemek için)
+        const ekranaBas = (d) => {
+          const malzemelerHtml = (d.kullanilan_malzemeler || []).map(m => `<li style="padding:0.2rem 0;">${m}</li>`).join('');
+          const adimlarHtml = (d.adimlar || []).map((a, i) => `
+              <div style="display:flex;gap:0.75rem;margin-bottom:0.85rem;">
+                <span style="width:24px;height:24px;border-radius:50%;background:var(--clr-accent);color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">${i+1}</span>
+                <span>${a.replace(/^\d+\.\s*/, '')}</span>
+              </div>`).join('');
+
+          content.innerHTML = `
+            <div style="background:#faf9f7;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:var(--clr-text-muted);">
+              ⏱ ${d.hazirlik_suresi || '—'} &nbsp;·&nbsp; 🍽 ${d.porsiyon || '—'}
+            </div>
+            ${malzemelerHtml ? `
+              <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.5rem;">Malzemeler</h4>
+              <ul style="list-style:disc;padding-left:1.2rem;margin-bottom:1.25rem;">${malzemelerHtml}</ul>` : ''}
+            <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.75rem;">Yapılışı</h4>
+            ${adimlarHtml}`;
+
+          stepsWrap.dataset.loaded = 'true';
+          stepsWrap.style.display  = 'block';
+          btn.textContent = '🙈 Tarifi Gizle';
+          btn.disabled    = false;
+        };
+
+        // Eğer hafızada varsa hiç API'ye gitme, direkt bas ve çık!
+        if (cachedTarif) {
+            console.log("⚡ Tarif hafızadan (cache) yüklendi!");
+            ekranaBas(JSON.parse(cachedTarif));
+            return;
+        }
+
+        // --- 2. HAFIZADA YOKSA API'DEN ÇEK ---
         btn.textContent = '⏳ Yükleniyor...';
         btn.disabled = true;
 
         try {
-          const res  = await fetch('http://localhost:5000/api/menu/detail', {
+          // Önemli Not: app.py dosyasındaki adres /api/recipe/details olduğu için adresi de güncelledim
+          const res  = await fetch('http://localhost:5000/api/recipe/details', {
             method : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body   : JSON.stringify({ yemek_adi: yemekAdi })
@@ -295,30 +333,11 @@
           const d    = json.detay || json.data;
 
           if (json.success && d) {
-            const malzemelerHtml = (d.kullanilan_malzemeler || [])
-              .map(m => `<li style="padding:0.2rem 0;">${m}</li>`).join('');
-
-            const adimlarHtml = (d.adimlar || [])
-              .map((a, i) => `
-                <div style="display:flex;gap:0.75rem;margin-bottom:0.85rem;">
-                  <span style="width:24px;height:24px;border-radius:50%;background:var(--clr-accent);color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">${i+1}</span>
-                  <span>${a.replace(/^\d+\.\s*/, '')}</span>
-                </div>`).join('');
-
-            content.innerHTML = `
-              <div style="background:#faf9f7;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:var(--clr-text-muted);">
-                ⏱ ${d.hazirlik_suresi || '—'} &nbsp;·&nbsp; 🍽 ${d.porsiyon || '—'}
-              </div>
-              ${malzemelerHtml ? `
-                <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.5rem;">Malzemeler</h4>
-                <ul style="list-style:disc;padding-left:1.2rem;margin-bottom:1.25rem;">${malzemelerHtml}</ul>` : ''}
-              <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.75rem;">Yapılışı</h4>
-              ${adimlarHtml}`;
-
-            stepsWrap.dataset.loaded = 'true';
-            stepsWrap.style.display  = 'block';
-            btn.textContent = '🙈 Tarifi Gizle';
-            btn.disabled    = false;
+            // Çekilen veriyi hafızaya kaydet
+            localStorage.setItem(cacheKey, JSON.stringify(d));
+            
+            // Ekrana bas
+            ekranaBas(d);
           } else {
             throw new Error(json.error || 'Bilinmeyen hata');
           }
