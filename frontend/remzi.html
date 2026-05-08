@@ -177,8 +177,11 @@
     <div class="remzi-grid">
       <section class="remzi-panel">
         <div class="remzi-panel__header">
-          <h3>📅 Güne Özel Menü</h3>
-          <a href="recipes.html" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; text-decoration:none;">Tümü →</a>
+          <h3>🧊 Envanterden Öneri</h3>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <button id="refreshInvBtn" style="font-size:0.8rem; color:var(--clr-text-muted); font-weight:600; background:none; border:none; cursor:pointer;" title="Yeni tarifler üret">🔄 Yenile</button>
+            <button id="openInventoryBtn" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; background:none; border:none; cursor:pointer;">Düzenle →</button>
+          </div>
         </div>
         <div class="remzi-panel__body" id="remziDailyList">
           <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
@@ -310,8 +313,66 @@
 
     const dailyEl = document.getElementById('remziDailyList');
     const invEl = document.getElementById('remziInvList');
+    
     if (dailyEl) dailyEl.innerHTML = MOCK_RECIPES.slice(0, 2).map(createMenuCard).join('');
-    if (invEl) invEl.innerHTML = MOCK_RECIPES.slice(-2).map(createMenuCard).join('');
+
+    // Ekrana kartları çizen yardımcı fonksiyon
+    function renderInventoryCards(recipes) {
+      invEl.innerHTML = recipes.map(recipe => `
+        <div class="menu-card-h" onclick="askRemziForRecipe('${recipe.title}')">
+          <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c'" loading="lazy">
+          <div class="menu-card-h__body">
+            <span class="menu-card-h__tag">${recipe.tagLabels?.[0] || 'ENVANTER ÖNERİSİ'}</span>
+            <div class="menu-card-h__title">${recipe.title}</div>
+            <div class="menu-card-h__meta">⏱ ${recipe.time} · 🔥 ${recipe.calories} kcal</div>
+          </div>
+          <div class="menu-card-h__arrow">›</div>
+        </div>
+      `).join('');
+    }
+
+    // --- AKILLI VE HAFIZALI AI BAĞLANTISI ---
+    async function fetchInventorySuggestions(forceRefresh = false) {
+      if (!invEl || !isLoggedIn) return;
+      
+      const cacheKey = 'smartrec_ai_suggestions_cache';
+
+      // 1. Eğer zorla yenileme istenmediyse, önce hafızaya (localStorage) bak
+      if (!forceRefresh) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          renderInventoryCards(JSON.parse(cached));
+          return; // Hafızada varsa API'ye gitme, burada dur!
+        }
+      }
+
+      // 2. API'den veri çekerken ekranda bekleme yazısı göster
+      invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Şef Remzi dolabınıza bakıp tarif üretiyor... 👨‍🍳⏳</p>';
+      
+      try {
+        const res = await fetch('http://localhost:5000/api/inventory/strict-suggestions');
+        const data = await res.json();
+        
+        if (data.success && data.data.length > 0) {
+          // 3. Gelen yeni veriyi hemen hafızaya kaydet ve ekrana bas
+          localStorage.setItem(cacheKey, JSON.stringify(data.data));
+          renderInventoryCards(data.data);
+        } else {
+          invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;">Dolabınızda tarif üretecek kadar malzeme bulunamadı.</p>';
+        }
+      } catch (err) {
+        console.error("AI Önerileri çekilemedi:", err);
+        invEl.innerHTML = '<p style="padding:1rem;color:#C0392B;font-size:0.9rem;">Öneriler şu an yüklenemedi (Backend kapalı olabilir).</p>';
+      }
+    }
+
+    // Yenile butonuna tıklanınca zorla (forceRefresh = true) çalıştır
+    document.getElementById('refreshInvBtn')?.addEventListener('click', () => {
+      fetchInventorySuggestions(true);
+    });
+
+    // Sayfa açıldığında normal çalıştır (Hafızada varsa oradan çeker)
+    fetchInventorySuggestions();
 
     document.getElementById('openInventoryBtn')?.addEventListener('click', () => {
       if (!isLoggedIn) { window.location.href = 'login.html'; return; }
@@ -321,6 +382,25 @@
       overlay?.classList.add('open');
       drawer?.setAttribute('aria-hidden', 'false');
     });
+
+    // --- KARTLARA TIKLAYINCA REMZİ'YE TARİF SORDURAN FONKSİYON ---
+    window.askRemziForRecipe = function(yemekAdi) {
+        const input = document.getElementById('remziPageInput');
+        const sendBtn = document.getElementById('remziPageSend');
+        const chatSection = document.getElementById('remziChatSection');
+        
+        if (input && sendBtn) {
+            // Remzi'ye soruyu otomatik yazdırıyoruz
+            input.value = `Lütfen bana "${yemekAdi}" tarifini tam ölçüleriyle ve adım adım anlatır mısın?`;
+            
+            // Gönder butonuna otomatik tıklatıyoruz
+            sendBtn.click();
+            
+            // Ekranı havalı bir şekilde yukarı, Remzi'nin sohbetine kaydırıyoruz
+            chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
   </script>
 </body>
 </html>

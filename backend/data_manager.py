@@ -917,6 +917,55 @@ def bugunku_kaloriyi_getir():
         print(f"Kalori hesaplama hatası: {e}")
         return 0    
     
+# data_manager.py dosyasının en altına ekle:
+
+def sifir_ekstra_malzemeli_oneri():
+    """Dolaptaki malzemeler dışında HİÇBİR ŞEY kullanmadan 2 tarif önerir."""
+    print("🧊 Envanterden Sıfır Ekstra Malzemeli Öneri İsteniyor...")
+    
+    malzemeler_listesi = ai_icin_malzeme_listesi_hazirla()
+    if not malzemeler_listesi:
+        # Dolap boşsa varsayılan döndür
+        return []
+
+    malzemeler_metni = ", ".join(malzemeler_listesi)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    
+    prompt = f"""
+    Sen pratik bir şefsin. Kullanıcının KESİNLİKLE ve SADECE şu malzemeleri var: {malzemeler_metni}.
+    
+    Lütfen dışarıdan HİÇBİR ekstra malzeme (tuz, sıvı yağ, su gibi temel şeyler hariç) gerektirmeyen, tamamen eldeki malzemelerle yapılacak 2 farklı, yaratıcı tarif öner.
+    
+    Yanıtını SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin yazma:
+    [
+        {{
+            "title": "Tarif Adı 1",
+            "tagLabels": ["ANA YEMEK"],
+            "time": "20 dk",
+            "calories": 350
+        }},
+        {{
+            "title": "Tarif Adı 2",
+            "tagLabels": ["ATIŞTIRMALIK"],
+            "time": "15 dk",
+            "calories": 200
+        }}
+    ]
+    """
+    
+    try:
+        response = model.generate_content(prompt, generation_config=genai.GenerationConfig(response_mime_type="application/json"))
+        tarifler = json.loads(response.text)
+        
+        # Üretilen tarifler için otomatik fotoğraf bulalım
+        for t in tarifler:
+            t["image"] = yemek_fotografi_bul(t["title"])
+            
+        return tarifler
+    except Exception as e:
+        print(f"❌ Sıfır Ekstra Malzeme Hatası: {e}")
+        return []
+    
 if __name__ == "__main__":
     # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
     kullanici_dolabi = ["kıyma", "soğan", "sarımsak", "domates salçası", "makarna"]

@@ -349,6 +349,26 @@ def get_chatbot_recipe():
             "error": str(e)
         }), 500
     
+# app.py içine ekle (örneğin 200. satır civarına, mevcut rotaların arasına):
+
+@app.route('/api/inventory/strict-suggestions', methods=['GET'])
+def strict_inventory_suggestions():
+    """Dolaptaki malzemelerle 0 dış alım gerektiren 2 tarif döndürür"""
+    try:
+        # data_manager'dan fonksiyonumuzu import edip çağırıyoruz
+        from data_manager import sifir_ekstra_malzemeli_oneri
+        tarifler = sifir_ekstra_malzemeli_oneri()
+        
+        return jsonify({
+            "success": True,
+            "data": tarifler
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    
 @app.route('/api/recipe/details', methods=['POST'])
 def get_recipe_details():
     """Tıklanan yemeğin detaylı tarifini getirir"""
