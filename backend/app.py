@@ -370,11 +370,21 @@ def strict_inventory_suggestions():
         }), 500
     
 @app.route('/api/recipe/details', methods=['POST'])
+@app.route('/api/menu/detail', methods=['POST'])   # index.html AI menü kartı detay paneli buraya bağlı
 def get_recipe_details():
-    """Tıklanan yemeğin detaylı tarifini getirir"""
+    """Tıklanan yemeğin detaylı tarifini getirir.
+    
+    İki URL'den çağrılabilir:
+      - /api/recipe/details  → recipes.html gibi diğer sayfalar
+      - /api/menu/detail     → index.html AI menü kartı 'Adım Adım Tarif' butonu
+    
+    Body: { "yemek_adi": "Mercimek Çorbası" }
+    Döner: { "success": true, "data": { "yemek_adi", "hazirlik_suresi",
+                                         "porsiyon", "kullanilan_malzemeler", "adimlar" } }
+    """
     try:
         data = request.get_json()
-        yemek_adi = data.get('yemek_adi')
+        yemek_adi = data.get('yemek_adi', '').strip()
         
         if not yemek_adi:
              return jsonify({"success": False, "error": "Yemek adı belirtilmedi!"}), 400
@@ -385,7 +395,8 @@ def get_recipe_details():
         
         return jsonify({
             "success": True,
-            "data": tarif_detayi
+            "data": tarif_detayi,
+            "detay": tarif_detayi   # index.html data.detay olarak okuyor, her iki anahtar da dönüyor
         }), 200
     except Exception as e:
         return jsonify({
