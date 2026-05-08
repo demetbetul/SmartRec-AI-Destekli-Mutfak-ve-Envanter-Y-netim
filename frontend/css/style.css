@@ -1471,3 +1471,52 @@ input, select, button, textarea { font-family: var(--font-body); }
     justify-content: center; 
     gap: 2rem;
 }
+.smartfilter__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Tek satıra yayar */
+  background: #fff;
+  border: 1.5px solid var(--clr-border);
+  border-radius: 50px; /* Daha yuvarlak, modern hatlar */
+  padding: 0.5rem 1.5rem;
+  gap: 1rem;
+}
+
+.select-modern {
+  background: #F8F4F0;
+  border: 1.5px solid transparent;
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--clr-text);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.select-modern:hover {
+  background: #FFF3EC;
+  border-color: var(--clr-accent-light);
+}
+
+.select-modern:focus {
+  border-color: var(--clr-accent);
+  background: #fff;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 992px) {
+  .smartfilter__bar {
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 1rem;
+  }
+  .smartfilter__group {
+    width: 100%;
+    justify-content: center;
+    border: none !important;
+  }
+  .select-modern { width: 100%; }
+}

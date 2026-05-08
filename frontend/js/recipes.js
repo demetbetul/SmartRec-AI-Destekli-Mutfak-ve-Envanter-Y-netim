@@ -221,25 +221,25 @@ export function logCalories(recipeId) {
 }
 
 function _showAuthToast(message = 'Bu özellik için giriş yapmanız gerekiyor.') {
-  document.getElementById('_authToast')?.remove();
-  const toast = document.createElement('div');
-  toast.id = '_authToast';
-  toast.style.cssText = `
-    position:fixed; bottom:2rem; left:50%; transform:translateX(-50%);
-    background:#1A1208; color:#fff; padding:0.85rem 1.5rem; border-radius:50px;
-    font-size:0.88rem; font-weight:500; z-index:99999; display:flex; align-items:center; gap:0.75rem;
-    box-shadow:0 4px 24px rgba(0,0,0,0.25); animation:fadeInUp 0.3s ease both;
-    max-width:calc(100vw - 2rem); text-align:center;
-  `;
-  toast.innerHTML = `
-    <span>🔒 ${message}</span>
-    <a href="login.html" style="color:#E8C5B0; font-weight:700; white-space:nowrap; text-decoration:none;">Giriş Yap →</a>
-  `;
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = 'fadeIn 0.3s ease reverse both';
-    setTimeout(() => toast.remove(), 350);
-  }, 3500);
+  if (typeof window.srToast === 'function') {
+    window.srToast({
+      type: 'auth',
+      icon: '🔒',
+      title: 'Giriş Gerekli',
+      sub: message,
+      duration: 4000,
+      action: { href: 'login.html', label: 'Giriş Yap →' }
+    });
+  } else {
+    // Fallback: recipes.js bağımsız kullanıldığında
+    document.getElementById('_authToast')?.remove();
+    const toast = document.createElement('div');
+    toast.id = '_authToast';
+    toast.style.cssText = `position:fixed;bottom:1.75rem;right:1.5rem;background:#2A1A0E;color:#F5E6D0;padding:1rem 1.1rem;border-radius:16px;font-size:0.875rem;font-family:'DM Sans',sans-serif;z-index:99999;display:flex;align-items:flex-start;gap:0.7rem;box-shadow:0 8px 32px rgba(0,0,0,0.18);width:min(300px,calc(100vw - 2rem));border:1px solid rgba(255,255,255,0.07);`;
+    toast.innerHTML = `<span style="font-size:1.1rem">🔒</span><div style="flex:1"><div style="font-weight:700;font-size:0.875rem;margin-bottom:3px">Giriş Gerekli</div><div style="font-size:0.78rem;opacity:0.72">${message}</div><a href="login.html" style="display:inline-block;margin-top:0.5rem;background:#E8A06A;color:#1A1208;font-size:0.77rem;font-weight:700;padding:0.28rem 0.85rem;border-radius:50px;text-decoration:none">Giriş Yap →</a></div>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
 }
 
 function _ensureDetailPanel() {
@@ -391,6 +391,7 @@ function _initCardEvents(container, recipes) {
       btn.textContent = nowFav ? '♥' : '♡';
       btn.style.color = nowFav ? '#C44B1C' : '';
       btn.classList.toggle('fav-btn--active', nowFav);
+      // Toast recipes.html'deki event listener'ı tetikler (smartrec:fav-change)
     });
   });
   container.querySelectorAll('.missing-btn').forEach(btn => {

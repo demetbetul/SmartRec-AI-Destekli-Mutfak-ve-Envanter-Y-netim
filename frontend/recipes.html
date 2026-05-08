@@ -8,81 +8,404 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    .filter-section {
+
+    /* ═══════════════════════════════════════════════
+       SMARTREC TOAST / BİLDİRİM SİSTEMİ
+    ═══════════════════════════════════════════════ */
+    @keyframes sr-toast-in {
+      from { opacity: 0; transform: translateY(20px) scale(0.92); }
+      to   { opacity: 1; transform: translateY(0)     scale(1);    }
+    }
+    @keyframes sr-toast-out {
+      from { opacity: 1; transform: translateY(0)    scale(1);    }
+      to   { opacity: 0; transform: translateY(10px) scale(0.94); }
+    }
+    @keyframes sr-bar-shrink {
+      from { transform: scaleX(1); }
+      to   { transform: scaleX(0); }
+    }
+
+    #sr-toast-container {
+      position: fixed;
+      bottom: 1.75rem;
+      right: 1.5rem;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      gap: 0.55rem;
+      pointer-events: none;
+    }
+
+    .sr-toast {
+      pointer-events: auto;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      padding: 0.85rem 1rem 1rem 0.85rem;
+      border-radius: 16px;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.08);
+      animation: sr-toast-in 0.35s cubic-bezier(0.34,1.28,0.64,1) both;
+      width: min(320px, calc(100vw - 2rem));
+      line-height: 1.45;
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+    .sr-toast.hiding {
+      animation: sr-toast-out 0.28s ease both;
+    }
+
+    /* İkon kutusu */
+    .sr-toast__icon-box {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      margin-top: 1px;
+    }
+
+    .sr-toast__body { flex: 1; min-width: 0; }
+    .sr-toast__title { font-weight: 700; font-size: 0.875rem; margin-bottom: 2px; }
+    .sr-toast__sub   { font-size: 0.78rem; opacity: 0.72; line-height: 1.4; }
+
+    /* Kapatma butonu */
+    .sr-toast__close {
+      background: none; border: none;
+      font-size: 0.9rem; cursor: pointer;
+      opacity: 0.45; padding: 2px 4px; border-radius: 6px;
+      transition: opacity 0.15s, background 0.15s;
+      flex-shrink: 0; align-self: flex-start; margin-top: 1px;
+      line-height: 1;
+    }
+    .sr-toast__close:hover { opacity: 0.9; background: rgba(255,255,255,0.12); }
+
+    /* Progress bar */
+    .sr-toast__bar {
+      position: absolute;
+      left: 0; bottom: 0; right: 0; height: 3px;
+      transform-origin: left;
+    }
+
+    /* ── Türler ── */
+    .sr-toast--success {
+      background: linear-gradient(135deg, #1B3D2A 0%, #1C4A32 100%);
+      color: #CCF0DC;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .sr-toast--success .sr-toast__icon-box { background: rgba(255,255,255,0.1); }
+    .sr-toast--success .sr-toast__bar { background: rgba(100,220,140,0.4); }
+
+    .sr-toast--fav {
+      background: linear-gradient(135deg, #3D1B1B 0%, #5C1E1E 100%);
+      color: #FFDBD5;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .sr-toast--fav .sr-toast__icon-box { background: rgba(255,255,255,0.1); }
+    .sr-toast--fav .sr-toast__bar { background: rgba(255,120,100,0.45); }
+
+    .sr-toast--info {
+      background: linear-gradient(135deg, #1A1208 0%, #2A1E10 100%);
+      color: #F5E8D0;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .sr-toast--info .sr-toast__icon-box { background: rgba(255,255,255,0.09); }
+    .sr-toast--info .sr-toast__bar { background: rgba(232,160,106,0.4); }
+
+    .sr-toast--error {
+      background: linear-gradient(135deg, #3D1010 0%, #4A1C1C 100%);
+      color: #FFD4D4;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .sr-toast--error .sr-toast__icon-box { background: rgba(255,255,255,0.1); }
+    .sr-toast--error .sr-toast__bar { background: rgba(255,100,100,0.4); }
+
+    .sr-toast--auth {
+      background: linear-gradient(135deg, #1E1410 0%, #2A1A0E 100%);
+      color: #F5E6D0;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .sr-toast--auth .sr-toast__icon-box { background: rgba(255,255,255,0.09); }
+    .sr-toast--auth .sr-toast__bar { background: rgba(232,160,106,0.35); }
+    .sr-toast--auth .sr-toast__action {
+      display: inline-block;
+      margin-top: 0.55rem;
+      background: #E8A06A;
+      color: #1A1208;
+      font-size: 0.77rem;
+      font-weight: 700;
+      padding: 0.28rem 0.85rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .sr-toast--auth .sr-toast__action:hover { opacity: 0.85; }
+
+    /* ═══════════════════════════════════════════════
+       YENİ KOMPAKT FİLTRE ÇUBUĞU
+    ═══════════════════════════════════════════════ */
+    .smartfilter {
       max-width: 1280px;
-      margin: 0 auto 1.5rem;
+      margin: 0 auto 1.75rem;
       padding: 0 2rem;
     }
-    .filter-group {
+
+    /* Ana tek satır çubuk */
+    .smartfilter__bar {
       background: #fff;
       border: 1.5px solid var(--clr-border);
-      border-radius: var(--radius-md);
-      padding: 1rem 1.25rem;
-      margin-bottom: 0.75rem;
+      border-radius: 20px;
+      padding: 0.45rem 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      overflow: visible;
+      position: relative;
     }
-    .filter-group__label {
-      font-size: 0.72rem;
+
+    /* Dikey bölücü */
+    .sf-divider {
+      width: 1.5px;
+      height: 22px;
+      background: var(--clr-border);
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin: 0 0.2rem;
+    }
+
+    /* Normal chip butonları (Ana Yemek, Çorba, vb.) */
+    .sf-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.22rem;
+      padding: 0.32rem 0.7rem;
+      border-radius: 50px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--clr-text-muted);
+      cursor: pointer;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .sf-chip:hover {
+      background: #FFF3EC;
+      color: var(--clr-text);
+    }
+    .sf-chip.is-active {
+      background: var(--clr-accent);
+      color: #fff;
+      border-color: var(--clr-accent);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(196,75,28,0.28);
+    }
+
+    /* ─── Dropdown buton ─── */
+    .sf-dropdown {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .sf-dropdown__trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.32rem 0.75rem;
+      border-radius: 50px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--clr-text-muted);
+      cursor: pointer;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+    }
+    .sf-dropdown__trigger:hover,
+    .sf-dropdown.is-open .sf-dropdown__trigger {
+      background: #FFF3EC;
+      color: var(--clr-text);
+    }
+    .sf-dropdown__trigger.has-active {
+      background: #1C4A32;
+      color: #CCF0DC;
+      border-color: #1C4A32;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(28,74,50,0.25);
+    }
+    .sf-dropdown__arrow {
+      font-size: 0.6rem;
+      transition: transform 0.2s;
+      opacity: 0.6;
+    }
+    .sf-dropdown.is-open .sf-dropdown__arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Dropdown panel */
+    .sf-dropdown__panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #fff;
+      border: 1.5px solid var(--clr-border);
+      border-radius: 16px;
+      padding: 0.45rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      min-width: 180px;
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .sf-dropdown.is-open .sf-dropdown__panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Dropdown içindeki chip'ler */
+    .sf-dropdown__panel .sf-chip {
+      display: flex;
+      width: 100%;
+      border-radius: 10px;
+      padding: 0.42rem 0.75rem;
+      color: var(--clr-text);
+      font-size: 0.82rem;
+    }
+    .sf-dropdown__panel .sf-chip:hover {
+      background: #FFF3EC;
+      color: var(--clr-text);
+    }
+    .sf-dropdown__panel .sf-chip.is-active {
+      background: #1C4A32;
+      color: #CCF0DC;
+      border-color: #1C4A32;
+      box-shadow: none;
+    }
+    .sf-dropdown__panel-label {
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: var(--clr-text-muted);
-      margin-bottom: 0.65rem;
-      display: block;
+      padding: 0.2rem 0.65rem 0.35rem;
     }
-    .filter-group__tags {
+
+    /* Popüler / sort dropdown */
+    .sf-sort-dropdown .sf-dropdown__panel {
+      right: 0; left: auto;
+      transform: translateY(-6px);
+    }
+    .sf-sort-dropdown.is-open .sf-dropdown__panel {
+      transform: translateY(0);
+    }
+    .sf-sort-item {
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 0.5rem;
+      width: 100%;
+      padding: 0.42rem 0.75rem;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      font-size: 0.82rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--clr-text);
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.14s;
     }
-    .filter-bar-bottom {
-      max-width: 1280px;
-      margin: 0 auto 1.5rem;
-      padding: 0 2rem;
+    .sf-sort-item:hover { background: #FFF3EC; }
+    .sf-sort-item.is-active {
+      background: var(--clr-accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Sıralama trigger sağa hizalı */
+    .sf-sort-trigger-wrap {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ─── Aktif filtreler satırı ─── */
+    .smartfilter__active {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-    .active-filters {
-      display: flex;
-      flex-wrap: wrap;
       gap: 0.4rem;
-      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.6rem;
+      min-height: 26px;
     }
-    .active-filter-chip {
+    .smartfilter__active-label {
+      font-size: 0.78rem;
+      color: var(--clr-text-muted);
+      font-weight: 500;
+    }
+    .sf-active-chip {
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      padding: 0.3rem 0.7rem;
+      padding: 0.22rem 0.5rem 0.22rem 0.65rem;
       background: var(--clr-accent);
       color: #fff;
       border-radius: 50px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-    .active-filter-chip button {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.8);
-      cursor: pointer;
       font-size: 0.75rem;
-      padding: 0;
-      line-height: 1;
-    }
-    .active-filter-chip button:hover { color: #fff; }
-    .clear-all-btn {
-      background: none;
-      border: none;
-      color: var(--clr-accent);
-      font-size: 0.82rem;
       font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
+      animation: sr-toast-in 0.22s cubic-bezier(0.34,1.3,0.64,1) both;
+    }
+    .sf-active-chip--diet { background: #1C4A32; }
+    .sf-active-chip__remove {
+      background: none; border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer; font-size: 0.7rem;
+      padding: 0; line-height: 1;
+      display: flex; align-items: center;
+    }
+    .sf-active-chip__remove:hover { color: #fff; }
+    .sf-clear-all {
+      background: none; border: none;
+      color: var(--clr-accent); font-size: 0.78rem;
+      font-weight: 600; cursor: pointer;
+      text-decoration: underline; padding: 0;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .smartfilter__results {
+      font-size: 0.82rem; color: var(--clr-text-muted);
+      font-weight: 500; margin-left: auto;
+    }
+
+    /* ─── Mobil ─── */
+    @media (max-width: 720px) {
+      .smartfilter { padding: 0 1rem; }
+      .smartfilter__bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        border-radius: 14px;
+        padding: 0.4rem 0.5rem;
+        gap: 0.1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .smartfilter__bar::-webkit-scrollbar { display: none; }
+      .sf-divider { display: none; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Toast container (tüm bildirimler buraya eklenir) -->
+  <div id="sr-toast-container"></div>
 
   <div id="app-header"></div>
 
@@ -92,48 +415,68 @@
       <p class="page-desc">500'den fazla tarif arasından size en uygununu bulun</p>
     </div>
 
-    <!-- Kategori Filtresi -->
-    <div class="filter-section">
-      <div class="filter-group">
-        <span class="filter-group__label">📂 Kategori</span>
-        <div class="filter-group__tags">
-          <button class="filter-btn filter-btn--active" data-group="cat" data-filter="all">Tümü</button>
-          <button class="filter-btn" data-group="cat" data-filter="ana-menu">🍽 Ana Menü</button>
-          <button class="filter-btn" data-group="cat" data-filter="corba">🍲 Çorba</button>
-          <button class="filter-btn" data-group="cat" data-filter="salata">🥗 Salata</button>
-          <button class="filter-btn" data-group="cat" data-filter="tatli">🍮 Tatlı</button>
-          <button class="filter-btn" data-group="cat" data-filter="geleneksel">🫕 Geleneksel</button>
-          <button class="filter-btn" data-group="cat" data-filter="kolay">⚡ Kolay</button>
+    <!-- ═══ AKILLI FİLTRE ÇUBUĞU ═══ -->
+    <div class="smartfilter">
+      <div class="smartfilter__bar">
+
+        <!-- Tümü -->
+        <button class="sf-chip is-active" data-group="cat" data-filter="all">Tümü</button>
+
+        <div class="sf-divider"></div>
+
+        <!-- Ana Yemek -->
+        <button class="sf-chip" data-group="cat" data-filter="ana-menu">🍽 Ana Yemek</button>
+
+        <!-- Çorba -->
+        <button class="sf-chip" data-group="cat" data-filter="corba">🍲 Çorba</button>
+
+        <!-- Salata -->
+        <button class="sf-chip" data-group="cat" data-filter="salata">🥗 Salata</button>
+
+        <!-- Tatlı -->
+        <button class="sf-chip" data-group="cat" data-filter="tatli">🍮 Tatlı</button>
+
+        <div class="sf-divider"></div>
+
+        <!-- Kategoriler dropdown (Diyet) -->
+        <div class="sf-dropdown" id="dietDropdown">
+          <button class="sf-dropdown__trigger" id="dietTrigger">
+            🌿 Kategoriler <span class="sf-dropdown__arrow">▼</span>
+          </button>
+          <div class="sf-dropdown__panel" id="dietPanel">
+            <div class="sf-dropdown__panel-label">Diyet & Yaşam Tarzı</div>
+            <button class="sf-chip sf-chip--diet" data-group="diet" data-filter="vejetaryen">🌿 Vejetaryen</button>
+            <button class="sf-chip sf-chip--diet" data-group="diet" data-filter="vegan">🌱 Vegan</button>
+            <button class="sf-chip sf-chip--diet" data-group="diet" data-filter="glutensiz">🚫🌾 Glutensiz</button>
+            <button class="sf-chip sf-chip--diet" data-group="diet" data-filter="saglikli">💚 Sağlıklı</button>
+            <button class="sf-chip sf-chip--diet" data-group="diet" data-filter="sportif">💪 Sportif</button>
+          </div>
         </div>
+
+        <div class="sf-divider"></div>
+
+        <!-- Popüler / Sıralama dropdown -->
+        <div class="sf-dropdown sf-sort-dropdown sf-sort-trigger-wrap" id="sortDropdown">
+          <button class="sf-dropdown__trigger" id="sortTrigger">
+            <span id="sortLabel">🔥 Popüler</span> <span class="sf-dropdown__arrow">▼</span>
+          </button>
+          <div class="sf-dropdown__panel" id="sortPanel">
+            <div class="sf-dropdown__panel-label">Sıralama</div>
+            <button class="sf-sort-item is-active" data-sort="popular">🔥 Popüler</button>
+            <button class="sf-sort-item" data-sort="newest">🆕 En Yeni</button>
+            <button class="sf-sort-item" data-sort="calories-asc">🥗 Kalori (Az → Çok)</button>
+            <button class="sf-sort-item" data-sort="calories-desc">🍰 Kalori (Çok → Az)</button>
+            <button class="sf-sort-item" data-sort="time-asc">⏱ Süre (Az → Çok)</button>
+            <button class="sf-sort-item" data-sort="score-desc">★ Puan (Yüksek → Düşük)</button>
+          </div>
+        </div>
+
       </div>
 
-      <div class="filter-group">
-        <span class="filter-group__label">🌿 Diyet & Yaşam Tarzı</span>
-        <div class="filter-group__tags">
-          <button class="filter-btn" data-group="diet" data-filter="vejetaryen">🌿 Vejetaryen</button>
-          <button class="filter-btn" data-group="diet" data-filter="vegan">🌱 Vegan</button>
-          <button class="filter-btn" data-group="diet" data-filter="glutensiz">🚫🌾 Glutensiz</button>
-          <button class="filter-btn" data-group="diet" data-filter="saglikli">💚 Sağlıklı</button>
-          <button class="filter-btn" data-group="diet" data-filter="sportif">💪 Sportif</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Alt Filtre Çubuğu (aktif filtreler + sıralama) -->
-    <div class="filter-bar-bottom">
-      <div class="active-filters" id="activeFiltersWrap">
-        <span style="font-size:0.82rem; color:var(--clr-text-muted);" id="activeFiltersLabel">Filtre seçilmedi</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:0.75rem;">
-        <p class="results-info" id="resultsInfo" style="margin:0;">Yükleniyor...</p>
-        <select class="select" id="sortSelect">
-          <option value="popular">En Popüler</option>
-          <option value="newest">En Yeni</option>
-          <option value="calories-asc">Kalori (Az→Çok)</option>
-          <option value="calories-desc">Kalori (Çok→Az)</option>
-          <option value="time-asc">Süre (Az→Çok)</option>
-          <option value="score-desc">Puan (Yüksek→Düşük)</option>
-        </select>
+      <!-- Aktif filtreler + sonuç sayısı -->
+      <div class="smartfilter__active" id="activeFiltersWrap">
+        <span class="smartfilter__active-label" id="activeFiltersLabel">Tüm tarifler gösteriliyor</span>
+        <span class="smartfilter__results" id="resultsInfo"></span>
       </div>
     </div>
 
@@ -165,21 +508,129 @@
     initRemzi();
     initDrawer();
 
-    // Aktif filtreler
+    // ══════════════════════════════════════════════
+    //  TOAST SİSTEMİ (görsel bildirimler)
+    // ══════════════════════════════════════════════
+    window.srToast = function({ type = 'info', icon = 'ℹ️', title, sub, duration = 3800, action }) {
+      const container = document.getElementById('sr-toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `sr-toast sr-toast--${type}`;
+      toast.innerHTML = `
+        <div class="sr-toast__icon-box">${icon}</div>
+        <div class="sr-toast__body">
+          <div class="sr-toast__title">${title}</div>
+          ${sub ? `<div class="sr-toast__sub">${sub}</div>` : ''}
+          ${action ? `<a href="${action.href}" class="sr-toast__action">${action.label}</a>` : ''}
+        </div>
+        <button class="sr-toast__close" aria-label="Kapat">✕</button>
+        <div class="sr-toast__bar" style="animation: sr-bar-shrink ${duration}ms linear forwards;"></div>
+      `;
+
+      toast.querySelector('.sr-toast__close').onclick = () => dismiss(toast);
+      container.appendChild(toast);
+
+      const timer = setTimeout(() => dismiss(toast), duration);
+      toast._timer = timer;
+
+      function dismiss(t) {
+        clearTimeout(t._timer);
+        t.classList.add('hiding');
+        setTimeout(() => t.remove(), 300);
+      }
+    };
+
+    // ── Aktif filtreler
     let activeFilters = { cat: 'all', diet: null };
+    let activeSort = 'popular';
 
     const params = new URLSearchParams(location.search);
     const urlCat = params.get('cat');
     const urlQ   = params.get('q');
     if (urlCat) activeFilters.cat = urlCat;
 
-    // Filtre butonlarını başlat
     if (urlCat) {
       document.querySelectorAll('[data-group="cat"]').forEach(btn => {
-        btn.classList.toggle('filter-btn--active', btn.dataset.filter === urlCat);
+        btn.classList.toggle('is-active', btn.dataset.filter === urlCat);
       });
     }
 
+    // ══════════════════════════════════════════════
+    //  DROPDOWN MANTIĞI
+    // ══════════════════════════════════════════════
+    function setupDropdown(dropdownId) {
+      const dd = document.getElementById(dropdownId);
+      if (!dd) return;
+      const trigger = dd.querySelector('.sf-dropdown__trigger');
+      trigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Diğer açık dropdown'ları kapat
+        document.querySelectorAll('.sf-dropdown.is-open').forEach(other => {
+          if (other !== dd) other.classList.remove('is-open');
+        });
+        dd.classList.toggle('is-open');
+      });
+    }
+    setupDropdown('dietDropdown');
+    setupDropdown('sortDropdown');
+
+    // Dışarı tıklanınca kapat
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.sf-dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
+    });
+
+    // ── Kategori chip tıklaması (ana çubuk + "Geleneksel" / "Kolay" artık dropdown içinde değil)
+    document.querySelectorAll('[data-group="cat"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        activeFilters.cat = btn.dataset.filter;
+        renderCards();
+      });
+    });
+
+    // ── Diyet chip tıklaması (dropdown içinde)
+    document.querySelectorAll('[data-group="diet"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = btn.classList.contains('is-active');
+        document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('is-active'));
+        if (!isActive) {
+          btn.classList.add('is-active');
+          activeFilters.diet = btn.dataset.filter;
+        } else {
+          activeFilters.diet = null;
+        }
+        // Trigger görünümünü güncelle
+        const trigger = document.getElementById('dietTrigger');
+        if (activeFilters.diet) {
+          trigger.classList.add('has-active');
+          const label = btn.textContent.trim();
+          trigger.innerHTML = `${label} <span class="sf-dropdown__arrow">▼</span>`;
+        } else {
+          trigger.classList.remove('has-active');
+          trigger.innerHTML = `🌿 Kategoriler <span class="sf-dropdown__arrow">▼</span>`;
+        }
+        document.getElementById('dietDropdown').classList.remove('is-open');
+        renderCards();
+      });
+    });
+
+    // ── Sıralama tıklaması
+    document.querySelectorAll('.sf-sort-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.sf-sort-item').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        activeSort = btn.dataset.sort;
+        document.getElementById('sortLabel').textContent = btn.textContent.trim();
+        document.getElementById('sortDropdown').classList.remove('is-open');
+        renderCards();
+      });
+    });
+
+    // ── Kart render
     function renderCards() {
       const grid = document.getElementById('recipeCards');
       const info = document.getElementById('resultsInfo');
@@ -187,115 +638,136 @@
 
       let recipes = [...MOCK_RECIPES];
 
-      // URL arama
       if (urlQ) {
         const q = urlQ.toLowerCase();
         recipes = recipes.filter(r => r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
       }
-
-      // Kategori filtresi
       if (activeFilters.cat && activeFilters.cat !== 'all') {
         recipes = recipes.filter(r => r.tags.includes(activeFilters.cat));
       }
-
-      // Diyet filtresi
       if (activeFilters.diet) {
         recipes = recipes.filter(r => r.tags.includes(activeFilters.diet));
       }
 
-      // Sıralama
-      const sort = document.getElementById('sortSelect')?.value || 'popular';
-      if (sort === 'calories-asc')  recipes.sort((a, b) => a.calories - b.calories);
-      else if (sort === 'calories-desc') recipes.sort((a, b) => b.calories - a.calories);
-      else if (sort === 'time-asc') recipes.sort((a, b) => parseInt(a.time) - parseInt(b.time));
-      else if (sort === 'score-desc') recipes.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+      if (activeSort === 'calories-asc')   recipes.sort((a, b) => a.calories - b.calories);
+      else if (activeSort === 'calories-desc') recipes.sort((a, b) => b.calories - a.calories);
+      else if (activeSort === 'time-asc')  recipes.sort((a, b) => parseInt(a.time) - parseInt(b.time));
+      else if (activeSort === 'score-desc') recipes.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
 
       grid.innerHTML = recipes.length
         ? recipes.map(r => createRecipeCard(r, { showDetail: true, showMissing: true, showCooked: true })).join('')
         : `<div style="grid-column:1/-1; text-align:center; padding:4rem 1rem; color:var(--clr-text-muted);">
             <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
             <p style="font-size:1.1rem; font-weight:600;">Bu filtre kombinasyonuna uygun tarif bulunamadı.</p>
-            <button class="btn btn--outline" style="margin-top:1rem;" onclick="clearAllFilters()">Filtreleri Temizle</button>
+            <button class="btn btn--outline" style="margin-top:1rem;" onclick="window.clearAllFilters()">Filtreleri Temizle</button>
            </div>`;
-      if (info) info.textContent = `${recipes.length} tarif gösteriliyor`;
 
+      if (info) info.textContent = `${recipes.length} tarif`;
       initRecipeCardEvents(grid, recipes);
       updateActiveFilterChips();
     }
 
+    // ── Aktif chip'leri güncelle
     function updateActiveFilterChips() {
       const wrap = document.getElementById('activeFiltersWrap');
-      const label = document.getElementById('activeFiltersLabel');
       if (!wrap) return;
-      wrap.innerHTML = '';
-      const chips = [];
 
+      wrap.querySelectorAll('.sf-active-chip, .sf-clear-all, .smartfilter__active-label').forEach(el => el.remove());
+
+      const chips = [];
       if (activeFilters.cat && activeFilters.cat !== 'all') {
         const btn = document.querySelector(`[data-group="cat"][data-filter="${activeFilters.cat}"]`);
-        if (btn) chips.push({ label: btn.textContent, key: 'cat' });
+        if (btn) chips.push({ label: btn.textContent.trim(), key: 'cat', diet: false });
       }
       if (activeFilters.diet) {
         const btn = document.querySelector(`[data-group="diet"][data-filter="${activeFilters.diet}"]`);
-        if (btn) chips.push({ label: btn.textContent, key: 'diet' });
+        if (btn) chips.push({ label: btn.textContent.trim(), key: 'diet', diet: true });
       }
-      if (urlQ) chips.push({ label: `🔍 "${urlQ}"`, key: 'q' });
+      if (urlQ) chips.push({ label: `🔍 "${urlQ}"`, key: 'q', diet: false });
+
+      const resultsSpan = wrap.querySelector('#resultsInfo');
 
       if (chips.length === 0) {
-        wrap.innerHTML = '<span style="font-size:0.82rem; color:var(--clr-text-muted);">Filtre seçilmedi</span>';
+        const lbl = document.createElement('span');
+        lbl.className = 'smartfilter__active-label';
+        lbl.textContent = 'Tüm tarifler gösteriliyor';
+        wrap.insertBefore(lbl, resultsSpan);
       } else {
         chips.forEach(chip => {
           const el = document.createElement('span');
-          el.className = 'active-filter-chip';
-          el.innerHTML = `${chip.label} <button onclick="removeFilter('${chip.key}')" title="Kaldır">✕</button>`;
-          wrap.appendChild(el);
+          el.className = 'sf-active-chip' + (chip.diet ? ' sf-active-chip--diet' : '');
+          el.innerHTML = `${chip.label}<button class="sf-active-chip__remove" title="Kaldır">✕</button>`;
+          el.querySelector('button').onclick = () => removeFilter(chip.key);
+          wrap.insertBefore(el, resultsSpan);
         });
         const clearBtn = document.createElement('button');
-        clearBtn.className = 'clear-all-btn';
+        clearBtn.className = 'sf-clear-all';
         clearBtn.textContent = 'Tümünü Temizle';
         clearBtn.onclick = clearAllFilters;
-        wrap.appendChild(clearBtn);
+        wrap.insertBefore(clearBtn, resultsSpan);
       }
     }
 
-    window.removeFilter = function(key) {
-      if (key === 'cat') { activeFilters.cat = 'all'; document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.toggle('filter-btn--active', b.dataset.filter === 'all')); }
-      if (key === 'diet') { activeFilters.diet = null; document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active')); }
+    function removeFilter(key) {
+      if (key === 'cat') {
+        activeFilters.cat = 'all';
+        document.querySelectorAll('[data-group="cat"]').forEach(b =>
+          b.classList.toggle('is-active', b.dataset.filter === 'all'));
+      }
+      if (key === 'diet') {
+        activeFilters.diet = null;
+        document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('is-active'));
+        const trigger = document.getElementById('dietTrigger');
+        if (trigger) {
+          trigger.classList.remove('has-active');
+          trigger.innerHTML = `🌿 Kategoriler <span class="sf-dropdown__arrow">▼</span>`;
+        }
+      }
       if (key === 'q') { window.location.href = 'recipes.html'; return; }
       renderCards();
-    };
+    }
 
-    window.clearAllFilters = function() {
+    function clearAllFilters() {
       activeFilters = { cat: 'all', diet: null };
-      document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.toggle('filter-btn--active', b.dataset.filter === 'all'));
-      document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active'));
+      document.querySelectorAll('[data-group="cat"]').forEach(b =>
+        b.classList.toggle('is-active', b.dataset.filter === 'all'));
+      document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('is-active'));
+      const trigger = document.getElementById('dietTrigger');
+      if (trigger) {
+        trigger.classList.remove('has-active');
+        trigger.innerHTML = `🌿 Kategoriler <span class="sf-dropdown__arrow">▼</span>`;
+      }
       renderCards();
-    };
+    }
+    window.clearAllFilters = clearAllFilters;
+    window.removeFilter    = removeFilter;
 
-    // Filtre buton olayları
-    document.querySelectorAll('[data-group="cat"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-group="cat"]').forEach(b => b.classList.remove('filter-btn--active'));
-        btn.classList.add('filter-btn--active');
-        activeFilters.cat = btn.dataset.filter;
-        renderCards();
+    // ── Favori toast (recipes.js'deki fav event'ini dinle)
+    window.addEventListener('smartrec:fav-change', (e) => {
+      const { id, favs } = e.detail;
+      const recipe = MOCK_RECIPES.find(r => r.id === id);
+      if (!recipe) return;
+      const isNowFav = favs.includes(id);
+      srToast({
+        type: isNowFav ? 'fav' : 'info',
+        icon: isNowFav ? '♥' : '♡',
+        title: isNowFav ? 'Favorilere eklendi!' : 'Favorilerden çıkarıldı',
+        sub: recipe.title,
+        duration: 2800
       });
     });
 
-    document.querySelectorAll('[data-group="diet"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const isActive = btn.classList.contains('filter-btn--active');
-        document.querySelectorAll('[data-group="diet"]').forEach(b => b.classList.remove('filter-btn--active'));
-        if (!isActive) {
-          btn.classList.add('filter-btn--active');
-          activeFilters.diet = btn.dataset.filter;
-        } else {
-          activeFilters.diet = null;
-        }
-        renderCards();
+    // ── Kalori kaydı toast
+    window.addEventListener('smartrec:calorie-logged', (e) => {
+      const { recipe } = e.detail;
+      srToast({
+        type: 'success',
+        icon: '✅',
+        title: 'Kalori kaydedildi!',
+        sub: `${recipe.title} · ${recipe.calories} kcal`,
+        duration: 3500
       });
     });
-
-    document.getElementById('sortSelect')?.addEventListener('change', () => renderCards());
 
     document.getElementById('loadMoreBtn')?.addEventListener('click', e => {
       e.target.textContent = 'Tümü Yüklendi';
