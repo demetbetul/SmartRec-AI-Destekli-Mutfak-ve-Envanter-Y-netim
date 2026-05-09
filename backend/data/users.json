@@ -18,5 +18,15 @@
     "ad": "demet mutaf",
     "email": "demet1@gmail.com",
     "password": "scrypt:32768:8:1$hVlt4L96hkzq84wK$51f468f8c3fec1e8ffb789b32208fde52f43d181e5c0355eb78e4541c694ea9b0137c8f0a0140b112109f779ca919665df9f2ee9bee8923a6ec8c0149ee10cda"
+  },
+  {
+    "ad": "duygu güldali",
+    "email": "guldaliduygu123@gmail.com",
+    "password": "scrypt:32768:8:1$jNaUk7p6r8n4ARlr$671135aa6288ef733a3d14523618f9e863a4b72840969b1d3dc93e3d4c23496af12347c6965014a4bba824ccad9d6096f3c10be932bf76d395a4bee58f81c5d2"
+  },
+  {
+    "ad": "Esmanur Muşlu",
+    "email": "esmanurmuslu68@gmail.com",
+    "password": "scrypt:32768:8:1$Vzmpj7Qw6VCm6ICQ$a32df3f8433839725ca924c598c08c29f97042524f220ae4b1060e7d86557ac2af0326d74a79aed62f08c679dcec9fc00fd8b66b0d2352db984202f948465c98"
   }
 ]
