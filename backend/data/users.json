@@ -1,3 +1,7 @@
 [
- 
+  {
+    "ad": "Duygu Güldali",
+    "email": "guldaliduygu123@gmail.com",
+    "password": "scrypt:32768:8:1$RcyzwSeULcSVEbld$58c78374e778c79e586f6299f1ddfb2e65991e8fb827b78be89a948391c2181e50687e15ca5fb7a76f173bfa7e762bdb60f468acf808bdbca09cb5444b20aa1c"
+  }
 ]
