@@ -1,23 +1,38 @@
 /**
- * SmartRec — remzi.js  (v7)
- * ✅ initRemzi   — FAB + modal chatbot
- * ✅ initDrawer  — envanter & alışveriş sağ panel
- * ✅ addMissingToShopping — recipes.js tarafından çağrılır
- * ✅ getInventory — remzi.html envanter önerileri için
- * ✅ SKT uyarısı (3 günden az → turuncu, geçmiş → kırmızı)
+ * SmartRec — remzi.js  (v8 — Multi-User)
+ *
+ * DÜZELTMELER:
+ *  ✅ Envanter localStorage anahtarı kullanıcı mailine göre izole edildi
+ *     (smartrec_inventory → smartrec_inventory_mail@example_com)
+ *  ✅ Alışveriş listesi anahtarı kullanıcı mailine göre izole edildi
+ *  ✅ Chat fetch'ine user email eklendi
+ *  ✅ getInventory() oturumu kapalı misafirler için ortak anahtar kullanmaya devam eder
+ *  ✅ _userKey() — anahtarı hesaplayan merkezi yardımcı
  */
+
 import { Auth } from './auth.js';
 
-const LS_INV  = 'smartrec_inventory';
-const LS_SHOP = 'smartrec_shopping';
+// ─── localStorage anahtar yönetimi ───────────────────────────────────────────
+/**
+ * Aktif kullanıcının mail adresini alıp anahtar son ekine dönüştürür.
+ * Giriş yapılmamışsa boş string döner → genel "misafir" anahtarı kullanılır.
+ * Örnek: "ahmet@gmail.com" → "_ahmet_at_gmail_com"
+ */
+function _userSuffix() {
+  const user = Auth.getUser();
+  if (!user?.email) return '';
+  return '_' + user.email.replace('@', '_at_').replace(/\./g, '_');
+}
 
-// ─── Toast yardımcısı (recipes.html'in srToast'ını çağırır; yoksa inline) ────
+function _invKey()  { return `smartrec_inventory${_userSuffix()}`; }
+function _shopKey() { return `smartrec_shopping${_userSuffix()}`; }
+
+// ─── Toast yardımcısı ─────────────────────────────────────────────────────────
 function _srToast({ type = 'info', icon = 'ℹ️', title = '', sub = '' } = {}) {
   if (typeof window.srToast === 'function') {
     window.srToast({ type, icon, title, sub });
     return;
   }
-  // Fallback: srToast henüz yüklenmemişse hafif inline toast oluştur
   const container = document.getElementById('sr-toast-container') || (() => {
     const el = document.createElement('div');
     el.id = 'sr-toast-container';
@@ -37,7 +52,10 @@ function _srToast({ type = 'info', icon = 'ℹ️', title = '', sub = '' } = {})
   `;
   toast.innerHTML = `<span style="font-size:1.1rem">${icon}</span><div><div style="font-weight:700">${title}</div>${sub ? `<div style="opacity:0.75;font-size:0.78rem;margin-top:2px">${sub}</div>` : ''}</div>`;
   container.appendChild(toast);
-  setTimeout(() => { toast.style.animation = 'toastOut 0.25s ease forwards'; setTimeout(() => toast.remove(), 280); }, 3800);
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.25s ease forwards';
+    setTimeout(() => toast.remove(), 280);
+  }, 3800);
 }
 
 // ─── Chatbot ──────────────────────────────────────────────────────────────────
@@ -51,8 +69,8 @@ export function initRemzi() {
 
   if (!modal || !fab) return;
 
-  const openModal  = () => { modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); input?.focus(); };
-  const closeModal = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); };
+  const openModal  = () => { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); input?.focus(); };
+  const closeModal = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); };
   const isOpen     = () => modal.classList.contains('open');
 
   fab.addEventListener('click',    () => isOpen() ? closeModal() : openModal());
@@ -60,10 +78,9 @@ export function initRemzi() {
   closeBtn?.addEventListener('click', closeModal);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen()) closeModal(); });
 
-  // Nav AI Asistanı linki (index.html'de — kendi sayfasında değil)
   if (!window.location.pathname.endsWith('remzi.html')) {
     document.getElementById('navRemzi')?.addEventListener('click', e => {
-      if (!Auth.isLoggedIn()) return; // auth-only zaten gizli
+      if (!Auth.isLoggedIn()) return;
       e.preventDefault();
       openModal();
     });
@@ -75,20 +92,23 @@ export function initRemzi() {
     _appendMsg(body, text, 'user');
     input.value = '';
     body.scrollTop = body.scrollHeight;
-    let fabChatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al. SADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. \n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
 
     const loadId = `load-${Date.now()}`;
     _appendMsg(body, 'Remzi düşünüyor... 💭', 'bot', loadId);
     body.scrollTop = body.scrollHeight;
-    fabChatContext += "Kullanıcı: " + text + "\n";
 
     try {
+      // DÜZELTİLDİ: user.email backend'e gönderiliyor
       const user = Auth.getUser();
-      const inv  = getInventory().map(i => i.ad).join(', ');
       const res  = await fetch('http://localhost:5000/api/ai/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ mesaj: text, kullanici: user?.ad || 'Misafir', envanter: inv })
+        body   : JSON.stringify({
+          mesaj    : text,
+          kullanici: user?.ad || 'Misafir',
+          email    : user?.email || '',   // ← Eklendi
+          envanter : getInventory().map(i => i.ad).join(', ')
+        })
       });
       const data = await res.json();
       const el = document.getElementById(loadId);
@@ -120,17 +140,14 @@ export function initDrawer() {
 
   if (!drawer) return;
 
-  const openDrawer  = () => { drawer.classList.add('open'); overlay?.classList.add('open'); drawer.setAttribute('aria-hidden','false'); };
-  const closeDrawer = () => { drawer.classList.remove('open'); overlay?.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); };
+  const openDrawer  = () => { drawer.classList.add('open'); overlay?.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); };
+  const closeDrawer = () => { drawer.classList.remove('open'); overlay?.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); };
 
-  // inventoryToggle kaldırıldı — artık dropdown üzerinden açılıyor
-  // ama eğer başka bir yerde #inventoryToggle varsa yine de çalışsın
   document.getElementById('inventoryToggle')?.addEventListener('click', openDrawer);
   closeBtn?.addEventListener('click', closeDrawer);
   overlay?.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
-  // Tab geçişi
   drawer.querySelectorAll('.drawer__tab').forEach(tab => {
     tab.addEventListener('click', () => {
       drawer.querySelectorAll('.drawer__tab').forEach(t => t.classList.remove('drawer__tab--active'));
@@ -151,11 +168,31 @@ export function initDrawer() {
     const expiryEl = document.getElementById('invItemExpiry');
     const name = nameEl?.value.trim();
     if (!name) { nameEl?.focus(); return; }
+
+    const user = Auth.getUser();
+    const newItem = { id: Date.now(), ad: name, miktar: Number(qtyEl?.value) || 1, skt: expiryEl?.value || '' };
+
+    // DÜZELTİLDİ: Önce localStorage'a yaz (anında tepki için)
     const items = getInventory();
-    items.push({ id: Date.now(), ad: name, miktar: Number(qtyEl?.value) || 1, skt: expiryEl?.value || '' });
+    items.push(newItem);
     _saveInventory(items);
     _renderInventory();
     _dispatchInventoryChange();
+
+    // Sonra backend'e de gönder (oturum açıksa)
+    if (user?.email) {
+      fetch('http://localhost:5000/api/inventory/add', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({
+          email          : user.email,
+          ad             : name,
+          miktar         : Number(qtyEl?.value) || 1,
+          tuketim_suresi : expiryEl?.value ? null : 7  // SKT seçildiyse backend hesaplar
+        })
+      }).catch(() => {}); // backend kapalıysa sessiz kal
+    }
+
     if (nameEl)   nameEl.value   = '';
     if (qtyEl)    qtyEl.value    = '';
     if (expiryEl) expiryEl.value = '';
@@ -172,34 +209,18 @@ export function initDrawer() {
     _renderShopping();
   });
 }
-// ─── MİGROS BUTONUNU OTOMATİK EKLEME KODU ───
-  const clearBtn = document.getElementById('clearCheckedBtn');
-  
-  // Eğer temizle butonu varsa ve Migros butonu henüz eklenmemişse ekle
-  if (clearBtn && !document.getElementById('migrosSiparisBtn')) {
-    const migrosBtn = document.createElement('button');
-    migrosBtn.id = 'migrosSiparisBtn';
-    migrosBtn.className = 'btn';
-    migrosBtn.innerHTML = '🛒 Migros Sanal Market\'e Git';
-    
-    // Butonun şık turuncu tasarımı
-    migrosBtn.style.cssText = 'width: 100%; margin-top: 12px; background-color: #FF7F00; color: white; border: none; font-weight: 600; padding: 0.6rem; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;';
-    
-    // Tıklanınca Migros'u yeni sekmede aç
-    migrosBtn.addEventListener('click', () => {
-      window.open('https://www.migros.com.tr', '_blank');
-    });
 
-    // Butonu "Temizle" butonunun hemen altına yerleştir
-    clearBtn.parentNode.insertBefore(migrosBtn, clearBtn.nextSibling);
-  }
-  // ────────────────────────────────────────────
 // ─── Envanter CRUD ────────────────────────────────────────────────────────────
+// DÜZELTİLDİ: Tüm okuma/yazma işlemleri _invKey() ile kullanıcıya özel anahtar kullanıyor.
 export function getInventory() {
-  try { return JSON.parse(localStorage.getItem(LS_INV) || '[]'); }
+  try { return JSON.parse(localStorage.getItem(_invKey()) || '[]'); }
   catch { return []; }
 }
-function _saveInventory(items) { localStorage.setItem(LS_INV, JSON.stringify(items)); }
+
+function _saveInventory(items) {
+  localStorage.setItem(_invKey(), JSON.stringify(items));
+}
+
 function _dispatchInventoryChange() {
   window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
 }
@@ -219,7 +240,7 @@ function _renderInventory() {
     let badge = '';
     if (item.skt) {
       const diff = Math.ceil((new Date(item.skt) - new Date(today)) / 86400000);
-      if (diff < 0)     badge = `<span style="color:#e74c3c;font-size:.72rem;margin-left:.3rem">⚠️ SKT geçmiş</span>`;
+      if (diff < 0)       badge = `<span style="color:#e74c3c;font-size:.72rem;margin-left:.3rem">⚠️ SKT geçmiş</span>`;
       else if (diff <= 3) badge = `<span style="color:#e67e22;font-size:.72rem;margin-left:.3rem">⏳ ${diff}g kaldı</span>`;
     }
     return `
@@ -232,19 +253,35 @@ function _renderInventory() {
 
   list.querySelectorAll('.drawer__item-del').forEach(btn => {
     btn.addEventListener('click', () => {
-      _saveInventory(getInventory().filter(i => String(i.id) !== btn.dataset.id));
+      const updated = getInventory().filter(i => String(i.id) !== btn.dataset.id);
+      _saveInventory(updated);
       _renderInventory();
       _dispatchInventoryChange();
+
+      // Backend'den de sil
+      const user = Auth.getUser();
+      if (user?.email) {
+        const item = getInventory().find(i => String(i.id) === btn.dataset.id);
+        if (item) {
+          fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
+            method: 'DELETE'
+          }).catch(() => {});
+        }
+      }
     });
   });
 }
 
 // ─── Alışveriş CRUD ───────────────────────────────────────────────────────────
+// DÜZELTİLDİ: _shopKey() ile kullanıcıya özel anahtar kullanılıyor.
 function _getShopping() {
-  try { return JSON.parse(localStorage.getItem(LS_SHOP) || '[]'); }
+  try { return JSON.parse(localStorage.getItem(_shopKey()) || '[]'); }
   catch { return []; }
 }
-function _saveShopping(items) { localStorage.setItem(LS_SHOP, JSON.stringify(items)); }
+
+function _saveShopping(items) {
+  localStorage.setItem(_shopKey(), JSON.stringify(items));
+}
 
 function _addShopItem() {
   const input = document.getElementById('shopItemName');
@@ -290,24 +327,15 @@ function _renderShopping() {
     });
   }
 
-  // ─── %100 GARANTİLİ MİGROS BUTONU EKLEME KODU ───
+  // Migros butonu (tekrar eklenmeyi önle)
   const clearBtn = document.getElementById('clearCheckedBtn');
-  
   if (clearBtn && !document.getElementById('migrosSiparisBtn')) {
     const migrosBtn = document.createElement('button');
     migrosBtn.id = 'migrosSiparisBtn';
     migrosBtn.className = 'btn';
     migrosBtn.innerHTML = '🛒 Migros Sanal Market\'e Git';
-    
-    // Buton Tasarımı
-    migrosBtn.style.cssText = 'width: 100%; margin-top: 12px; background-color: #FF7F00; color: white; border: none; font-weight: 600; padding: 0.6rem; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(255, 127, 0, 0.25);';
-    
-    // Tıklayınca Migros'a git
-    migrosBtn.addEventListener('click', () => {
-      window.open('https://www.migros.com.tr', '_blank');
-    });
-
-    // İşaretlileri Temizle butonunun hemen altına yapıştır
+    migrosBtn.style.cssText = 'width:100%;margin-top:12px;background-color:#FF7F00;color:white;border:none;font-weight:600;padding:0.6rem;border-radius:8px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,127,0,0.25);';
+    migrosBtn.addEventListener('click', () => window.open('https://www.migros.com.tr', '_blank'));
     clearBtn.parentNode.insertBefore(migrosBtn, clearBtn.nextSibling);
   }
 }
@@ -330,7 +358,6 @@ export function addMissingToShopping(recipeMaterials) {
   _saveShopping(items);
   _renderShopping();
 
-  // Drawer'ı aç, Alışveriş sekmesine geç
   const drawer  = document.getElementById('inventoryDrawer');
   const overlay = document.getElementById('drawerOverlay');
   if (drawer) {
@@ -344,5 +371,9 @@ export function addMissingToShopping(recipeMaterials) {
     document.getElementById('tabShopping')?.classList.remove('hidden');
   }
 
-  _srToast({ type: 'info', icon: '🛒', title: 'Malzemeler Listeye Eklendi', sub: `${missing.length} eksik malzeme alışveriş listesine eklendi.` });
+  _srToast({
+    type: 'info', icon: '🛒',
+    title: 'Malzemeler Listeye Eklendi',
+    sub: `${missing.length} eksik malzeme alışveriş listesine eklendi.`
+  });
 }

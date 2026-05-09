@@ -8,5 +8,15 @@
     "ad": "betty",
     "email": "betty@gmail.com",
     "password": "123456"
+  },
+  {
+    "ad": "betty",
+    "email": "betty1@gmail.com",
+    "password": "scrypt:32768:8:1$DiAtiumQHSIgQR2J$13fda53be546dcbb23003c061e46860258fd19ca1674ddef034cadb3a8fe888be5252c6f358c0e901616ba26a50e6941c09b89852500ec165d0d548dbf36a8d9"
+  },
+  {
+    "ad": "demet mutaf",
+    "email": "demet1@gmail.com",
+    "password": "scrypt:32768:8:1$hVlt4L96hkzq84wK$51f468f8c3fec1e8ffb789b32208fde52f43d181e5c0355eb78e4541c694ea9b0137c8f0a0140b112109f779ca919665df9f2ee9bee8923a6ec8c0149ee10cda"
   }
 ]
