@@ -1,1 +1,10 @@
-{"envanter": []}
+{
+  "envanter": [
+    {
+      "ad": "domates",
+      "miktar": 7,
+      "birim": "Adet",
+      "skt": "2026-05-16"
+    }
+  ]
+}
