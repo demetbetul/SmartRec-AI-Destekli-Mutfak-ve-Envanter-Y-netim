@@ -5,8 +5,14 @@
     "password": "scrypt:32768:8:1$RcyzwSeULcSVEbld$58c78374e778c79e586f6299f1ddfb2e65991e8fb827b78be89a948391c2181e50687e15ca5fb7a76f173bfa7e762bdb60f468acf808bdbca09cb5444b20aa1c"
   },
   {
+<<<<<<< HEAD
     "ad": "yeliz güldali",
     "email": "yelvty@gmail.com",
     "password": "scrypt:32768:8:1$hTGAgZCQuhAFT3c4$f092f9edbd3b6d719576aa5e0f5d27a7b00013b8c1902a27eb87cc27ecc5fdbb3ef9a438822a2afcfd9b7ac6d7c745d4f725d3c7e958ee60dce96ec2a18e30a8"
+=======
+    "ad": "Esmanur Muşlu",
+    "email": "esmanurmuslu68@gmail.com",
+    "password": "scrypt:32768:8:1$92601PC675ZhenAN$c3768a0d16d9375325c523f277651addd53744d4d30662023244d58ed4750eaf825a26741cd8430963f8deaf95908ada876edb375395f3dc815de46c136e9401"
+>>>>>>> 94f7e607ad042df17f3e47d9d65bb18b0f70c0a3
   }
 ]
