@@ -46,15 +46,17 @@ export function initRemzi() {
     _appendMsg(body, text, 'user');
     input.value = '';
     body.scrollTop = body.scrollHeight;
+    let fabChatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al. SADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. \n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
 
     const loadId = `load-${Date.now()}`;
     _appendMsg(body, 'Remzi düşünüyor... 💭', 'bot', loadId);
     body.scrollTop = body.scrollHeight;
+    fabChatContext += "Kullanıcı: " + text + "\n";
 
     try {
       const user = Auth.getUser();
       const inv  = getInventory().map(i => i.ad).join(', ');
-      const res  = await fetch('http://localhost:5000/api/chat', {
+      const res  = await fetch('http://localhost:5000/api/ai/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({ mesaj: text, kullanici: user?.ad || 'Misafir', envanter: inv })
