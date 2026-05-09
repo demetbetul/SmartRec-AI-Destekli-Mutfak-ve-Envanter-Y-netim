@@ -141,7 +141,28 @@ export function initDrawer() {
     _renderShopping();
   });
 }
+// ─── MİGROS BUTONUNU OTOMATİK EKLEME KODU ───
+  const clearBtn = document.getElementById('clearCheckedBtn');
+  
+  // Eğer temizle butonu varsa ve Migros butonu henüz eklenmemişse ekle
+  if (clearBtn && !document.getElementById('migrosSiparisBtn')) {
+    const migrosBtn = document.createElement('button');
+    migrosBtn.id = 'migrosSiparisBtn';
+    migrosBtn.className = 'btn';
+    migrosBtn.innerHTML = '🛒 Migros Sanal Market\'e Git';
+    
+    // Butonun şık turuncu tasarımı
+    migrosBtn.style.cssText = 'width: 100%; margin-top: 12px; background-color: #FF7F00; color: white; border: none; font-weight: 600; padding: 0.6rem; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;';
+    
+    // Tıklanınca Migros'u yeni sekmede aç
+    migrosBtn.addEventListener('click', () => {
+      window.open('https://www.migros.com.tr', '_blank');
+    });
 
+    // Butonu "Temizle" butonunun hemen altına yerleştir
+    clearBtn.parentNode.insertBefore(migrosBtn, clearBtn.nextSibling);
+  }
+  // ────────────────────────────────────────────
 // ─── Envanter CRUD ────────────────────────────────────────────────────────────
 export function getInventory() {
   try { return JSON.parse(localStorage.getItem(LS_INV) || '[]'); }
@@ -212,32 +233,52 @@ function _renderShopping() {
 
   if (!items.length) {
     list.innerHTML = '<li class="drawer__empty">Liste boş.</li>';
-    return;
-  }
-
-  list.innerHTML = items.map(item => `
+  } else {
+    list.innerHTML = items.map(item => `
 <li class="drawer__item drawer__item--shop${item.checked ? ' checked' : ''}" data-id="${item.id}">
   <input type="checkbox" class="shop-check" data-id="${item.id}" ${item.checked ? 'checked' : ''} />
   <span class="drawer__item-name">${item.ad}</span>
   <button class="drawer__item-del" data-id="${item.id}" aria-label="Sil">✕</button>
 </li>`).join('');
 
-  list.querySelectorAll('.shop-check').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const all  = _getShopping();
-      const item = all.find(i => String(i.id) === cb.dataset.id);
-      if (item) item.checked = cb.checked;
-      _saveShopping(all);
-      _renderShopping();
+    list.querySelectorAll('.shop-check').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const all  = _getShopping();
+        const item = all.find(i => String(i.id) === cb.dataset.id);
+        if (item) item.checked = cb.checked;
+        _saveShopping(all);
+        _renderShopping();
+      });
     });
-  });
 
-  list.querySelectorAll('.drawer__item-del').forEach(btn => {
-    btn.addEventListener('click', () => {
-      _saveShopping(_getShopping().filter(i => String(i.id) !== btn.dataset.id));
-      _renderShopping();
+    list.querySelectorAll('.drawer__item-del').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _saveShopping(_getShopping().filter(i => String(i.id) !== btn.dataset.id));
+        _renderShopping();
+      });
     });
-  });
+  }
+
+  // ─── %100 GARANTİLİ MİGROS BUTONU EKLEME KODU ───
+  const clearBtn = document.getElementById('clearCheckedBtn');
+  
+  if (clearBtn && !document.getElementById('migrosSiparisBtn')) {
+    const migrosBtn = document.createElement('button');
+    migrosBtn.id = 'migrosSiparisBtn';
+    migrosBtn.className = 'btn';
+    migrosBtn.innerHTML = '🛒 Migros Sanal Market\'e Git';
+    
+    // Buton Tasarımı
+    migrosBtn.style.cssText = 'width: 100%; margin-top: 12px; background-color: #FF7F00; color: white; border: none; font-weight: 600; padding: 0.6rem; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(255, 127, 0, 0.25);';
+    
+    // Tıklayınca Migros'a git
+    migrosBtn.addEventListener('click', () => {
+      window.open('https://www.migros.com.tr', '_blank');
+    });
+
+    // İşaretlileri Temizle butonunun hemen altına yapıştır
+    clearBtn.parentNode.insertBefore(migrosBtn, clearBtn.nextSibling);
+  }
 }
 
 // ─── Eksikleri Alışveriş'e Ekle ──────────────────────────────────────────────
