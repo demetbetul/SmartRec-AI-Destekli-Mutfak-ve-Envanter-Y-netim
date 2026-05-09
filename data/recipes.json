@@ -1146,7 +1146,7 @@
   },
   {
     "id": 27,
-    "ad": "ayran",
+    "ad": "Ayran",
     "slug": "ayran",
     "kategori": "içecek",
     "mutfak": "Türk",
@@ -1185,7 +1185,7 @@
   },
   {
     "id": 28,
-    "ad": "kazandibi",
+    "ad": "Kazandibi",
     "slug": "kazandibi",
     "kategori": "tatlı",
     "mutfak": "Osmanlı",
@@ -1227,7 +1227,7 @@
   },
   {
     "id": 29,
-    "ad": "lokma tatlısı",
+    "ad": "Lokma tatlısı",
     "slug": "lokma-tatlisi",
     "kategori": "tatlı",
     "mutfak": "Türk",
@@ -1273,7 +1273,7 @@
   },
   {
     "id": 30,
-    "ad": "fırın tavuk",
+    "ad": "Fırında Tavuk",
     "slug": "firin-tavuk",
     "kategori": "ana yemek",
     "mutfak": "Türk",
@@ -1319,7 +1319,7 @@
   
   {
       "id": 31, 
-      "ad": "arabaşı çorbası",
+      "ad": "Arabaşı Çorbası",
       "slug": "arabasi-corbasi",
       "kategori": "çorba",
       "mutfak": "İç Anadolu",
@@ -1363,7 +1363,7 @@
     },
   {
     "id": 32,
-    "ad": "adana kebap",
+    "ad": "Adana Kebap",
     "slug": "adana-kebap",
     "kategori": "ana yemek",
     "mutfak": "Güneydoğu",
@@ -1400,12 +1400,12 @@
       "İsot biber olmadan gerçek Adana tadı yakalanmaz."
     ],
     "servis_onerisi": "Lavaş, sumak soğan ve közlenmiş domates ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1544025162-d76538b2a921?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/03/15/adana-kebap.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1544025162-d76538b2a921?w=400&q=80"
   },
   {
     "id": 33,
-    "ad": "cacık",
+    "ad": "Cacık",
     "slug": "cacik",
     "kategori": "meze",
     "mutfak": "Türk",
@@ -1442,12 +1442,12 @@
       "Servis öncesi buzdolabında soğutun."
     ],
     "servis_onerisi": "Soğuk olarak ekmek ve kebap yanında servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80",
+    "resim_url": "https://cdn.kisikatesakademi.com.tr/image-cache/cache/recipe_main_image_large/https---cdn.kisikatesakademi.com.tr/recipe-media/47909dc8c0c5a9bc8cd52840a341b20957f4f5e0.jpeg.webp",
     "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
   },
   {
     "id": 34,
-    "ad": "patlıcan silkme",
+    "ad": "Patlıcan Silkme",
     "slug": "patlican-silkme",
     "kategori": "ana yemek",
     "mutfak": "Karadeniz",
@@ -1483,12 +1483,12 @@
       "Taze fesleğen eklemek aromasını güzelleştirir."
     ],
     "servis_onerisi": "Ekmek ve yoğurt ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=80",
+    "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2020/04/patlican_silkme2-600x450.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
   },
   {
     "id": 35,
-    "ad": "hünkâr beğendi",
+    "ad": "Hünkâr Beğendi",
     "slug": "hunkar-begendi",
     "kategori": "ana yemek",
     "mutfak": "Osmanlı",
@@ -1528,12 +1528,12 @@
       "Kaşar peyniri beğendiye kremsi doku verir."
     ],
     "servis_onerisi": "Pilavla servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2024/04/15/hunkar-begendi-yapimi-videolu.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80"
   },
   {
     "id": 36,
-    "ad": "trileçe",
+    "ad": "Trileçe",
     "slug": "trilece",
     "kategori": "tatlı",
     "mutfak": "Türk",
@@ -1574,7 +1574,7 @@
       "En az 2 saat buzdolabında beklemek gerekir."
     ],
     "servis_onerisi": "Üzerine karamel sosu gezdirerek servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2023/03/31/buyuk-borcamda-trilece.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
   },
   {
@@ -1617,7 +1617,7 @@
       "Şeker domatesteki asitliği dengeler."
     ],
     "servis_onerisi": "Ekmek ve yoğurt ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2014/06/taze-fasulye-tarif-fotografi.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
   },
   {
@@ -1661,7 +1661,7 @@
       "Sumak serpmek geleneksel lezzetini tamamlar."
     ],
     "servis_onerisi": "Limon dilimi ve ayranla servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80",
+    "resim_url": "https://imgrosetta.mynet.com.tr/file/19806227/19806227-1200x675.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=80"
   },
   {
@@ -1706,7 +1706,7 @@
       "Çıkınca tereyağı sürmek pidenin ömrünü uzatır."
     ],
     "servis_onerisi": "Sıcak, ayran veya çorba ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80",
+    "resim_url": "https://turkishfoodie.com/wp-content/uploads/2019/01/Pide-500x500.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
   },
   {
@@ -1750,7 +1750,7 @@
       "Bayat ekmek kıvam sağlar."
     ],
     "servis_onerisi": "Ekmek ve taze sebzelerle servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80",
+    "resim_url": "https://i.tmgrup.com.tr/sfr/2025/09/22/havuc-tarator-1758544124907.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80"
   },
   {
@@ -1794,7 +1794,7 @@
       "Limon suyu servis öncesi tazelik katar."
     ],
     "servis_onerisi": "Limon dilimi ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/01/18/havuclu-ve-tel-sehriyeli-tavuk-corbasi.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80"
   },
   {
@@ -1839,7 +1839,7 @@
       "Şerbet soğuk, künefe sıcak olmalı."
     ],
     "servis_onerisi": "Sıcak servis edin, üzerine fıstık serpin.",
-    "resim_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=800&q=80",
+    "resim_url": "https://turkishfoodie.com/wp-content/uploads/2018/06/Kunefe-500x375.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80"
   },
   {
@@ -1882,7 +1882,7 @@
       "Hamur kıvamı krep hamuru gibi olmalı."
     ],
     "servis_onerisi": "Tarator sos ve limon ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80",
+    "resim_url": "https://img.elele.com.tr/rcman/Cw780h439q95gc/storage/files/images/2021/11/01/midye-tava-nasil-yapilir-SYyZ_cover.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=80"
   },
   {
@@ -1926,7 +1926,7 @@
       "Yumurtayı çukur bir kapta kırıp suya bırakmak kolaylaştırır."
     ],
     "servis_onerisi": "Sıcak taze ekmekle servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=800&q=80",
+    "resim_url": "https://img-s1.onedio.com/id-647711aae62e6cdd469b2116/rev-0/w-600/h-750/f-jpg/s-f4d7d08f67d0599e659abde616e4a4f940802690.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80"
   },
   {
@@ -1968,7 +1968,7 @@
       "Kıyılmış ceviz eklemek farklı bir lezzet katar."
     ],
     "servis_onerisi": "Yoğurt veya ayran ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1536304993881-ff86e0c9b24b?w=800&q=80",
+    "resim_url": "https://i.nefisyemektarifleri.com/2018/09/06/bulgur-pilavi-tarifi-7.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1536304993881-ff86e0c9b24b?w=400&q=80"
   },
   {
@@ -2012,7 +2012,7 @@
       "Çok soğuk servis edilmesi lezzetini artırır."
     ],
     "servis_onerisi": "Dondurma ve nar ekşisiyle servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge/haytali-tarifi-69caf12b-99ea-443f-8f8a-9a3614750fe8",
     "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
   },
   {
@@ -2056,7 +2056,7 @@
       "Sızma zeytinyağı aroması güçlendirir."
     ],
     "servis_onerisi": "Sıcak ekmekle servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=800&q=80",
+    "resim_url": "https://www.diyetkolik.com/_next/image?url=https%3A%2F%2Fwww.diyetkolik.com%2Fsite_media%2Fmedia%2Ffoodrecipe_images%2FAdobeStock_516416358.jpg&w=828&q=75",
     "thumbnail_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80"
   },
   {
@@ -2100,7 +2100,7 @@
       "Kürdan batırınca temiz çıkıyorsa pişmiştir."
     ],
     "servis_onerisi": "Çay yanında ince dilimler halinde servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=800&q=80",
+    "resim_url": "https://i.ytimg.com/vi/59AlT9lT-14/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB_5tVG3wqH91lVzmborJIX4MtfZw",
     "thumbnail_url": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=80"
   },
   {
@@ -2144,7 +2144,7 @@
       "Soğuk servis edilmesi gelenekseldir."
     ],
     "servis_onerisi": "Soğuk olarak roka ve limonla servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&q=80",
+    "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/8d2c0ef1-3983-4efb-85e4-e7e5ac973eb4/Derivates/cfd419b0-bd9b-4305-8436-7a49cfbf697c.jpg",
     "thumbnail_url": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&q=80"
   },
   {
@@ -2186,7 +2186,7 @@
       "Piyasadaki hazır şalgam da kullanılabilir."
     ],
     "servis_onerisi": "Buz ve pul biber ile servis edin.",
-    "resim_url": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&q=80",
+    "resim_url": "https://media.medipol.com.tr/assets/s3fs-public/styles/just_webp/public/2025-10/Salgam.jpg.webp?VersionId=cefbbe36-c0d5-4fda-9cf8-f785576b5424&itok=IP7qwD60",
     "thumbnail_url": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=80"
   },
   {
@@ -2252,12 +2252,12 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.ardaninmutfagi.com/wp-content/uploads/2025/03/yayla-corbasi-t.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
       "id": 52,
-      "ad": "iskender kebap",
+      "ad": "İskender kebap",
       "slug": "iskender-kebap",
       "kategori": "ana yemek",
       "mutfak": "Bursa",
@@ -2320,7 +2320,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.dergibursa.com.tr/wp-content/uploads/2015/08/iskender-kebap.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2387,7 +2387,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/zeytinyagli_sarma.webp",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2454,7 +2454,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/e9964c08-1177-4cb9-880a-185e1eeee576/Derivates/22085e12-5a3b-4b0b-bf0e-5ad1c9a05017.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2521,7 +2521,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/fava-876.webp",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2587,7 +2587,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2019/11/04/babagannus-tarifi-6.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2654,7 +2654,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2021/06/14/pacanga-boregi-nasil-yapilir-10.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2721,7 +2721,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.ytimg.com/vi/GpEbL48uw70/maxresdefault.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2788,7 +2788,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.alaybeyi.com.tr/blog/wp-content/uploads/2023/06/etli-ekmek-nasil-yapilir.webp",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2855,7 +2855,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6hMuwJzEfh1z1Yl7deMolkb0aGc3yX_LEdQ&s",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2922,7 +2922,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2024/03/25/ali-nazik-kebabi-7.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -2989,7 +2989,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2013/11/orman_kebabi1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3056,7 +3056,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2017/08/30/tas-kebabi-lokanta-usulu-7.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3123,7 +3123,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://static.ticimax.cloud/cdn-cgi/image/width=-,quality=85/43437/uploads/urunresimleri/buyuk/tepsi-kebabi-eb3c8f.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3190,7 +3190,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2021/03/belen_tava1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3257,7 +3257,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/87ecfb3768fe6500eb5f6b41bc825554/Derivates/3c9709786de5d8b950f57b04dd18fd56aa96a981.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3324,7 +3324,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge/dugun-corbasi-60d8ea53-c378-4774-aa05-0ef1ccf4c028",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3391,7 +3391,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://static.daktilo.com/sites/1271/uploads/2023/12/06/large/58052276-5a99-4401-bde6-cad7c1276cd1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3458,7 +3458,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://image.hurimg.com/i/hurriyet/90/0x0/5d4951702269a224a8dd6279.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3525,7 +3525,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2012/07/ayran_asi_corbasi1-1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3592,7 +3592,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2014/02/nohutlu_bamya_yemegi1-2.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3659,7 +3659,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2018/02/bulgurlu_kapuska1-2-600x450.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3726,7 +3726,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2014/09/firinda-patlican-musakka-resimli-yemek-tarifi(15).jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3793,7 +3793,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2014/08/guvecte_etli_turlu1-1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3860,7 +3860,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2018/03/09/karnabahar-graten-videolu.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3927,7 +3927,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2011/12/zeytinyagli_kereviz1-2.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -3994,7 +3994,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2019/12/pirincli-pirasa-yemegi-resimli-yemek-tarifi(9).jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4060,7 +4060,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/deniz_borulcesi_salatasi-c82c5aaf-c763-43c6-a193-f76127c4d695.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4127,7 +4127,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2012/09/mucver3-600x450.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4194,7 +4194,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/ykv_web_site_8959.webp",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4261,7 +4261,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/izgara-lufer-020a9943-1490-4724-b578-8826109c22c7.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4328,7 +4328,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2021/06/kalamar_tava1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4395,7 +4395,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://gastrotarifler.com/wp-content/uploads/2025/09/Karides-Guvec-servis-sunum1-1024x1024.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4462,7 +4462,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2022/12/02/sekerpare-tatlisi-tarifi-7.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4529,7 +4529,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2022/04/01/gullac-tarifi.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4596,7 +4596,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2020/05/06/sutlu-nuriye.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4663,7 +4663,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/kemalpasa_tatlisi-2c9bc9ca-651e-41d2-ba96-a22acae972a8.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4730,7 +4730,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://image.hurimg.com/i/hurriyet/90/0x0/69d9fc3f0c50728add7edb88.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4797,7 +4797,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/glutensiz-supangle-edc65949-8e93-4955-9590-4a29445df83f.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4864,7 +4864,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.refikaninmutfagi.com/profiterol-tarifi-1277-cikolatali-tatlilar-profiterol-tarifi-1306-12-B.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -4931,75 +4931,49 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.ytimg.com/vi/HKCAPKSHxR0/maxresdefault.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
       "id": 92,
-      "ad": "fırın sütlaç",
-      "slug": "firin-sutlac",
+      "ad": "aşure",
+      "slug": "asure",
       "kategori": "tatlı",
-      "mutfak": "Türk",
-      "zorluk": "kolay",
-      "kac_kisilik": 4,
-      "hazirlanma_suresi": "20 dk",
-      "pisirme_suresi": "30 dk",
-      "toplam_sure": "50 dk",
-      "kalori": 320,
-      "protein_g": 15,
-      "karbonhidrat_g": 40,
-      "yag_g": 18,
-      "etiketler": [
-        "sütlü",
-        "fırın",
-        "geleneksel"
-      ],
-      "mevsim": [
-        "ilkbahar",
-        "yaz",
-        "sonbahar",
-        "kış"
-      ],
-      "aciklama": "Geleneksel Türk mutfağının vazgeçilmezi, lezzetli fırın sütlaç tarifi.",
+      "mutfak": "Osmanlı",
+      "zorluk": "zor",
+      "kac_kisilik": 10,
+      "hazirlanma_suresi": "30 dk",
+      "pisirme_suresi": "60 dk",
+      "toplam_sure": "90 dk",
+      "kalori": 380,
+      "protein_g": 8,
+      "karbonhidrat_g": 75,
+      "yag_g": 6,
+      "etiketler": ["tatlı", "geleneksel", "vegan", "meyveli"],
+      "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+      "aciklama": "Türk mutfağının bereket simgesi, bakliyat ve kuru meyvelerin muhteşem uyumuyla hazırlanan şifalı tatlısı.",
       "malzemeler": [
-        {
-          "miktar": "1",
-          "birim": "litre",
-          "isim": "süt"
-        },
-        {
-          "miktar": "0.5",
-          "birim": "su",
-          "isim": "bardağı pirinç"
-        },
-        {
-          "miktar": "1",
-          "birim": "su",
-          "isim": "bardağı şeker"
-        },
-        {
-          "miktar": "2",
-          "birim": "yemek",
-          "isim": "kaşığı nişasta"
-        },
-        {
-          "miktar": "1",
-          "birim": "paket",
-          "isim": "vanilya"
-        }
+        {"miktar": "2", "birim": "su bardağı", "isim": "aşurelik buğday"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "haşlanmış nohut"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "haşlanmış kuru fasulye"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "doğranmış kuru incir ve kayısı"},
+        {"miktar": "0.5", "birim": "su bardağı", "isim": "kuru üzüm"},
+        {"miktar": "3", "birim": "su bardağı", "isim": "şeker"}
       ],
       "hazirlanis": [
-        "Pirinci haşlayıp sütün içine ekleyin.",
-        "Şeker ve nişastayı ilave edip kıvam alana dek pişirin.",
-        "Kaselere döküp fırında üstü yanana kadar pişirin."
+        "Geceden ıslatılmış buğdayı iyice yumuşayana kadar haşlayın.",
+        "İçine önceden haşlanmış nohut ve kuru fasulyeyi ilave edin.",
+        "Yıkanıp doğranmış kuru meyveleri ekleyip 20 dakika daha kaynatın.",
+        "Şekeri ekleyin ve kıvam alana kadar yaklaşık 15 dakika daha pişirin.",
+        "Ocaktan alıp kaselere paylaştırın ve soğumaya bırakın."
       ],
       "ipuclari": [
-        "Malzemelerin taze olmasına özen gösterin.",
-        "Kısık ateşte pişirmek lezzetini artırır."
+        "Kuru inciri en son eklerseniz aşurenin rengi kararmaz.",
+        "Şekeri baştan eklerseniz bakliyatlar sert kalır."
       ],
-      "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
-      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+      "servis_onerisi": "Üzerini nar taneleri, ceviz, fındık ve tarçınla bolca süsleyerek soğuk servis edin.",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-secondary/asure-tarifleri-dc577792-f4a0-44c3-b5b7-8ec2553b2ded",
+      "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80"
     },
     {
       "id": 93,
@@ -5065,7 +5039,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.hacibekirkunc.com/upload/keskul-1-9914.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5132,7 +5106,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://cahidesultan.com/wp-content/uploads/2023/10/d45b2-am-yakn1.png",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5199,7 +5173,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/tulumba-tatls.webp",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5266,7 +5240,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2021/12/narli-ayva-tatlisi-resimli-yemek-tarifi(10).jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5333,7 +5307,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/air-fryerda-kabak-tatlisi-c6f765c0-8659-4459-bf6d-efd9badfbb99.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5400,7 +5374,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2013/07/dondurmali_irmik_helvasi3-600x450.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5467,7 +5441,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://i.nefisyemektarifleri.com/2016/06/16/un-helvasi-tam-kivaminda-7.jpeg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     },
     {
@@ -5534,7 +5508,7 @@
         "Kısık ateşte pişirmek lezzetini artırır."
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
-      "resim_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2011/11/icli_kofte1-1.jpg",
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
     }
   ]
