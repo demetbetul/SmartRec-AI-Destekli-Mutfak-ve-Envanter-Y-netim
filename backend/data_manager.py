@@ -49,19 +49,36 @@ logging.basicConfig(
 # ─── Dosya yolu ────────────────────────────────────────────────────────────────
 # DÜZELTİLDİ: Tek ve doğru tanım. Önceki kodda üç kez tanımlanmıştı;
 # Python son tanımı geçerli sayar, ama bu kafa karıştırıcıydı.
-def dosya_yolu_getir(dosya_adi, user_email=None):
-    if user_email:
-        klasor_adi  = user_email.replace("@", "_at_").replace(".", "_")
-        user_folder = os.path.join(DATA_DIR, "users", klasor_adi)
-        os.makedirs(user_folder, exist_ok=True)
-        # Yeni kullanıcı için varsayılan inventory.json oluştur
-        default_inv = os.path.join(user_folder, "inventory.json")
-        if not os.path.exists(default_inv):
-            with open(default_inv, 'w', encoding='utf-8') as f:
+def dosya_yolu_getir(dosya_adi, email=None):
+    """
+    Eğer email verilmişse, dosyayı kişiye özel hale getirir.
+    Örn: inventory.json -> inventory_ahmet@gmail.com.json
+    recipes.json (genel tarifler) herkese ortaktır, değişmez.
+    """
+    import os
+    
+    # Ortak olması gereken (herkese aynı görünen) dosyalar
+    ortak_dosyalar = ["recipes.json", "nutrition.json"]
+    
+    if email and dosya_adi not in ortak_dosyalar:
+        isim, uzanti = os.path.splitext(dosya_adi)
+        # Mail adresindeki geçersiz karakterleri temizle
+        guvenli_email = email.replace('@', '_at_').replace('.', '_')
+        dosya_adi = f"{isim}_{guvenli_email}{uzanti}"
+        
+    yol = os.path.join(DATA_DIR, dosya_adi)
+    
+    # Eğer bu kişiye özel dosya henüz yoksa, otomatik olarak boş bir tane oluştur
+    if not os.path.exists(yol) and dosya_adi not in ortak_dosyalar:
+        with open(yol, 'w', encoding='utf-8') as f:
+            if "inventory" in dosya_adi:
                 json.dump({"envanter": []}, f)
-        return os.path.join(user_folder, dosya_adi)
-    # Genel dosyalar (recipes.json vb.)
-    return os.path.join(DATA_DIR, dosya_adi)
+            elif "daily_log" in dosya_adi:
+                json.dump({"gunluk_kayitlar": []}, f)
+            else:
+                json.dump({}, f)
+                
+    return yol
 
 def veri_dogrula(veri, tip):
     if tip == "envanter":
