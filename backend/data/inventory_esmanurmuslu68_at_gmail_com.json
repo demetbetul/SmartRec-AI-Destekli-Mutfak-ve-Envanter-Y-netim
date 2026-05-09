@@ -23,6 +23,18 @@
       "miktar": 5,
       "birim": "Adet",
       "skt": "2026-05-17"
+    },
+    {
+      "ad": "mandalina",
+      "miktar": 6,
+      "birim": "Adet",
+      "skt": "2026-05-17"
+    },
+    {
+      "ad": "tuz",
+      "miktar": 1,
+      "birim": "Adet",
+      "skt": "2026-05-17"
     }
   ]
 }

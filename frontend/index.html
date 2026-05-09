@@ -277,12 +277,44 @@
       document.getElementById('menuDetailBackBtn')?.addEventListener('click', closeMenuDetail);
       overlay.addEventListener('click', closeMenuDetail);
 
-      if (isLoggedIn) {
-        document.getElementById('menuDetailMissingBtn')?.addEventListener('click', () => {
-          if (!missing.length) return;
+    if (isLoggedIn) {
+        document.getElementById('menuDetailMissingBtn')?.addEventListener('click', async () => {
           const btn = document.getElementById('menuDetailMissingBtn');
           btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
-          try { addMissingToShopping(missing); btn.textContent = '✅ Eklendi!'; }
+          
+          try {
+            // Gerçek ve doğru malzemeleri garantilemek için cache kontrolü yapıyoruz
+            const cacheKey = 'smartrec_tarif_' + tumMenuAdi.replace(/\s+/g, '').toLowerCase();
+            const cachedTarif = localStorage.getItem(cacheKey);
+            let gercekEksikler = missing; 
+            
+            if (cachedTarif) {
+                const d = JSON.parse(cachedTarif);
+                if (d.kullanilan_malzemeler) gercekEksikler = filterMissing(d.kullanilan_malzemeler);
+            } else {
+                // Tarif henüz açılmadıysa arkaplanda hızlıca çekip en doğru malzemeleri buluyoruz
+                const res = await fetch('http://localhost:5000/api/recipe/details', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ yemek_adi: tumMenuAdi })
+                });
+                const json = await res.json();
+                const d = json.detay || json.data;
+                if (d && d.kullanilan_malzemeler) {
+                    localStorage.setItem(cacheKey, JSON.stringify(d));
+                    gercekEksikler = filterMissing(d.kullanilan_malzemeler);
+                    missing = gercekEksikler; // Ekrandaki listeyi de güncelliyoruz
+                    document.getElementById('menuDetailMissingArea').innerHTML = renderMissing(missing);
+                }
+            }
+
+            if (!gercekEksikler.length) {
+                btn.textContent = '✅ Eksik Yok!';
+                return;
+            }
+
+            addMissingToShopping(gercekEksikler); 
+            btn.textContent = '✅ Eklendi!'; 
+          }
           catch { btn.textContent = '⚠️ Hata'; btn.disabled = false; }
         });
       }
@@ -382,7 +414,36 @@
           btn.disabled    = false;
         }
       });
-
+// Paneli açar açmaz doğru malzemeleri arkaplanda sessizce çekip ekrandaki listeyi günceller
+      setTimeout(async () => {
+          const cacheKey = 'smartrec_tarif_' + tumMenuAdi.replace(/\s+/g, '').toLowerCase();
+          if (!localStorage.getItem(cacheKey)) {
+              try {
+                  const res = await fetch('http://localhost:5000/api/recipe/details', {
+                      method: 'POST', headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ yemek_adi: tumMenuAdi })
+                  });
+                  const json = await res.json();
+                  const d = json.detay || json.data;
+                  if (d && d.kullanilan_malzemeler) {
+                      localStorage.setItem(cacheKey, JSON.stringify(d));
+                      missing = filterMissing(d.kullanilan_malzemeler);
+                      document.getElementById('menuDetailMissingArea').innerHTML = renderMissing(missing);
+                      const mBtn = document.getElementById('menuDetailMissingBtn');
+                      if (mBtn) mBtn.disabled = !missing.length;
+                  }
+              } catch (e) {}
+          } else {
+              // Zaten cache'de (hafızada) varsa API'ye gitmeden direkt listeyi günceller
+              const d = JSON.parse(localStorage.getItem(cacheKey));
+              if (d.kullanilan_malzemeler) {
+                  missing = filterMissing(d.kullanilan_malzemeler);
+                  document.getElementById('menuDetailMissingArea').innerHTML = renderMissing(missing);
+                  const mBtn = document.getElementById('menuDetailMissingBtn');
+                  if (mBtn) mBtn.disabled = !missing.length;
+              }
+          }
+      }, 100);
       panel.style.right = '0'; panel.setAttribute('aria-hidden','false');
       overlay.style.opacity = '1'; overlay.style.pointerEvents = 'all';
       document.body.style.overflow = 'hidden';
