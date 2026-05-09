@@ -483,7 +483,7 @@ def rastgele_chatbot_tarifi(user_email):
     
 # ─── AI tarif detayı ──────────────────────────────────────────────────────────
 # DÜZELTİLDİ: user_email parametresi eklendi.
-def ai_tarif_detayi_getir(yemek_adi, user_email):
+def ai_tarif_detayi_getir(yemek_adi, user_email=None):
     envanter_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
     malzemeler_metni = (", ".join(envanter_listesi)
                         if envanter_listesi else "temel ev malzemeleri")

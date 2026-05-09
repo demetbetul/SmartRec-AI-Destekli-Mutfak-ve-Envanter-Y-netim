@@ -351,14 +351,12 @@ def get_recipe_details():
     # DÜZELTİLDİ: user_email alınıp ai_tarif_detayi_getir'e iletildi.
     data       = request.get_json()
     yemek_adi  = data.get('yemek_adi', '').strip()
-    user_email = data.get('email', '').strip()
 
     if not yemek_adi:
         return jsonify({"success": False, "error": "Yemek adı belirtilmedi!"}), 400
-    if not user_email:
-        return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    tarif_detayi = ai_tarif_detayi_getir(yemek_adi, user_email)
+
+    tarif_detayi = ai_tarif_detayi_getir(yemek_adi)
     return jsonify({
         "success": True,
         "data": tarif_detayi,
