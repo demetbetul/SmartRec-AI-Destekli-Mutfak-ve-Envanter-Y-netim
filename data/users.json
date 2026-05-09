@@ -1,17 +1,7 @@
 [
   {
-    "ad": "esmanur muşlu",
-    "email": "esmanurmuslu68@gmail.com",
-    "password": "1234"
-  },
-  {
-    "ad": "duygu",
+    "ad": "Duygu Güldali",
     "email": "guldaliduygu123@gmail.com",
-    "password": "1111"
-  },
-  {
-    "ad": "sali",
-    "email": "sali@gmail.com",
-    "password": "2s3m5e7a61"
+    "password": "scrypt:32768:8:1$B9Joq5eyDKns289y$f423fdc8a1c1c4f303da2eb75d21dc20ea37de35971308c2e33a9ced0dddbad42ce8bb88cb01c4aa47e9ac464428da1ee3f8f635032abf0c7b57d129c95d9385"
   }
 ]

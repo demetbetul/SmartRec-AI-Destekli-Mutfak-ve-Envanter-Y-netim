@@ -9,6 +9,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 from data_manager import (
     veriyi_yukle,
     dosya_yolu_getir,
@@ -491,7 +492,8 @@ def register():
         if any(u['email'] == email for u in users):
             return jsonify({"success": False, "message": "Bu e-posta zaten kayıtlı!"}), 400
 
-        yeni_kullanici = {"ad": ad, "email": email, "password": password}
+        hashed_password = generate_password_hash(password)
+        yeni_kullanici = {"ad": ad, "email": email, "password": hashed_password}
         users.append(yeni_kullanici)
 
         # Dosya yolunu al ve yazmayı dene
@@ -516,9 +518,9 @@ def login():
 
     users = kullanicilari_yukle()
     # Karşılaştırma yaparken de strip kullanmak eşleşme şansını artırır
-    user = next((u for u in users if u['email'].strip() == email and u['password'].strip() == password), None)
+    user = next((u for u in users if u['email'].strip() == email), None)
 
-    if user:
+    if user and check_password_hash(user['password'], password):
         return jsonify({
             "success": True, 
             "message": "Giriş başarılı!",
