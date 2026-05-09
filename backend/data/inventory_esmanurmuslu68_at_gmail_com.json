@@ -5,6 +5,24 @@
       "miktar": 2,
       "birim": "Adet",
       "skt": "2026-05-16"
+    },
+    {
+      "ad": "kırmızı mercimek",
+      "miktar": 100,
+      "birim": "Adet",
+      "skt": "2026-05-17"
+    },
+    {
+      "ad": "sarımsak",
+      "miktar": 4,
+      "birim": "Adet",
+      "skt": "2026-05-17"
+    },
+    {
+      "ad": "süt",
+      "miktar": 5,
+      "birim": "Adet",
+      "skt": "2026-05-17"
     }
   ]
 }

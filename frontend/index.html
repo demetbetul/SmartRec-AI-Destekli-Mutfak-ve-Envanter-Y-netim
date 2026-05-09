@@ -159,7 +159,10 @@
       const overlay = document.getElementById('menuDetailOverlay');
       const isLoggedIn = Auth.isLoggedIn();
 
-      // Menü bileşenleri
+      const log = JSON.parse(localStorage.getItem('smartrec_calories_log') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+      const isAlreadyCooked = log.some(item => item.date === today && item.recipeId === (5000 + menu.id));
+
       const courses = menu._raw || null;
       const parseCal = (val) => {
         if (!val) return null;
@@ -167,7 +170,6 @@
         return isNaN(num) ? null : num;
       };
 
-      // Kurs satırı oluşturucu
       const courseRow = (icon, label, name, kalori, foto) => `
         <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:#faf9f7;border-radius:14px;margin-bottom:0.75rem;">
           ${foto ? `<img src="${foto}" alt="${name}" style="width:70px;height:70px;border-radius:10px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : `<div style="width:70px;height:70px;border-radius:10px;background:var(--clr-accent-light);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;">${icon}</div>`}
@@ -178,30 +180,52 @@
           </div>
         </div>`;
 
-      // Eksik malzeme listesi
-      const missing = menu.ingredients || [];
-      const missingHtml = missing.length
-        ? `<div style="margin-top:1.25rem;">
+      // --- [DÜZELTME] DOĞRUDAN VE AKILLI ENVANTER KONTROLÜ ---
+      // Kullanıcının anlık envanterini doğrudan localStorage'dan okuyan fonksiyon
+      const getLocalInventory = () => {
+        const user = Auth.getUser();
+        let suffix = '';
+        if (user && user.email) {
+            suffix = '_' + user.email.replace('@', '_at_').replace(/\./g, '_');
+        }
+        try { return JSON.parse(localStorage.getItem('smartrec_inventory' + suffix) || '[]'); } 
+        catch { return []; }
+      };
+
+      let missing = menu.ingredients ? [...menu.ingredients] : [];
+      
+      const filterMissing = (ingredients) => {
+        if (!isLoggedIn) return ingredients;
+        const userInv = getLocalInventory().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
+        return ingredients.filter(ing => {
+          const lowerIng = ing.toLocaleLowerCase('tr-TR');
+          // Envanterdeki ürün tarifteki malzemenin içinde geçiyorsa eksik değildir
+          // (Örn: "domates" envanterde var, tarifte "2 adet domates" yazıyor -> eşleşir)
+          return !userInv.some(invItem => invItem.length > 2 && lowerIng.includes(invItem));
+        });
+      };
+      
+      // İlk açılışta karttaki kaba bilgiyle hesapla
+      missing = filterMissing(missing);
+
+      const renderMissing = (items) => {
+        if (!items || !items.length) return '';
+        return `
+          <div style="margin-top:1.25rem;">
             <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.6rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">🛒 Eksik Malzemeler</h3>
             <ul style="list-style:none;padding:0;margin:0 0 1rem;">
-              ${missing.map(m => `<li style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f5f5f5;font-size:0.88rem;"><span style="width:7px;height:7px;border-radius:50%;background:var(--clr-accent);flex-shrink:0;"></span>${m}</li>`).join('')}
+              ${items.map(m => `<li style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #f5f5f5;font-size:0.88rem;"><span style="width:7px;height:7px;border-radius:50%;background:var(--clr-accent);flex-shrink:0;"></span>${m}</li>`).join('')}
             </ul>
-           </div>` : '';
-
-      // Aksiyon butonları
-      const missingBtnHtml = isLoggedIn
-        ? `<button id="menuDetailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;" ${!missing.length ? 'disabled' : ''}>🛒 Eksikleri Ekle</button>`
-        : `<button class="btn btn--outline btn--sm" style="flex:1;opacity:.7;" onclick="_showMenuAuthToast()">🛒 Eksikleri Ekle</button>`;
+          </div>`;
+      };
 
       const tumMenuAdi = courses ? `${courses.baslangic}, ${courses.ana_yemek} ve ${courses.tatli} Menüsü` : menu.title;
-      const recipeBtnHtml = `<button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${tumMenuAdi}">👨‍🍳 Tüm Menünün Tarifi</button>`;
 
-      // Panel içeriği
       panel.innerHTML = `
         <div style="position:relative;flex-shrink:0;">
           <img src="${menu.image}" alt="${menu.title}" style="width:100%;height:220px;object-fit:cover;display:block;" onerror="this.style.display='none'">
           <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);"></div>
-          <button onclick="closeMenuDetail()" aria-label="Geri" style="position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,0.92);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);">←</button>
+          <button id="menuDetailBackBtn" aria-label="Geri" style="position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,0.92);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);">←</button>
           <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;">
             <span style="display:inline-block;background:var(--clr-accent);color:#fff;border-radius:50px;padding:0.25rem 0.8rem;font-size:0.72rem;font-weight:700;letter-spacing:.04em;margin-bottom:0.4rem;">✨ AI Günlük Menü</span>
             <h2 style="font-family:var(--font-display);font-size:1.5rem;color:#fff;margin:0;text-shadow:0 1px 4px rgba(0,0,0,0.3);">${menu.title}</h2>
@@ -209,8 +233,6 @@
         </div>
 
         <div style="padding:1.5rem;flex:1;overflow-y:auto;">
-
-          <!-- Kalori özeti -->
           <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;">
             <div style="background:#fef6f0;border:1.5px solid var(--clr-accent-light);border-radius:12px;padding:0.7rem 1rem;text-align:center;flex:1;min-width:80px;">
               <div style="font-size:1rem;margin-bottom:2px;">🔥</div>
@@ -222,14 +244,8 @@
               <div style="font-size:0.72rem;color:var(--clr-text-muted);">Süre</div>
               <div style="font-size:0.92rem;font-weight:700;">${menu.time}</div>
             </div>
-            <div style="background:#faf9f7;border:1.5px solid var(--clr-border);border-radius:12px;padding:0.7rem 1rem;text-align:center;flex:1;min-width:80px;">
-              <div style="font-size:1rem;margin-bottom:2px;">📊</div>
-              <div style="font-size:0.72rem;color:var(--clr-text-muted);">Zorluk</div>
-              <div style="font-size:0.92rem;font-weight:700;">${menu.difficulty}</div>
-            </div>
           </div>
 
-          <!-- Kurslar -->
           <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.85rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">🍽 Menü İçeriği</h3>
           ${courses
             ? courseRow('🥣','Başlangıç', courses.baslangic, parseCal(courses.kaloriler?.baslangic_kalori), courses.gorseller?.baslangic_foto)
@@ -238,15 +254,17 @@
             : `<p style="color:var(--clr-text-muted);font-size:0.88rem;">${menu.desc.replace(/<br>/g, ' — ')}</p>`
           }
 
-          ${missingHtml}
-
-          <!-- Aksiyonlar -->
-          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-top:1rem;border-top:1.5px solid var(--clr-border);margin-top:0.5rem;">
-            ${missingBtnHtml}
-            ${recipeBtnHtml}
+          <div id="menuDetailMissingArea">
+            ${renderMissing(missing)}
           </div>
 
-          <!-- Tarif adımları (başta gizli, butona basınca açılır) -->
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-top:1rem;border-top:1.5px solid var(--clr-border);margin-top:0.5rem;">
+            ${isLoggedIn 
+              ? `<button id="menuDetailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;" ${!missing.length ? 'disabled' : ''}>🛒 Eksikleri Ekle</button>`
+              : `<button class="btn btn--outline btn--sm" style="flex:1;opacity:.7;" onclick="_showMenuAuthToast()">🛒 Eksikleri Ekle</button>`}
+            <button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${tumMenuAdi}">👨‍🍳 Tüm Menünün Tarifi</button>
+          </div>
+
           <div id="menuDetailRecipeSteps" style="display:none;margin-top:1.25rem;">
             <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.85rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">👨‍🍳 Adım Adım Tarif</h3>
             <div id="menuDetailRecipeContent" style="font-size:0.88rem;color:var(--clr-text);line-height:1.7;"></div>
@@ -255,9 +273,13 @@
           ${!isLoggedIn ? `<div style="margin-top:1rem;background:#FFF5F0;border:1.5px solid var(--clr-accent-light);border-radius:12px;padding:1rem;text-align:center;"><p style="font-size:0.85rem;color:var(--clr-text-muted);margin-bottom:0.6rem;">Alışveriş listesi ve kalori takibi için üye olun.</p><div style="display:flex;gap:0.5rem;justify-content:center;"><a href="login.html" class="btn btn--primary btn--sm">Giriş Yap</a><a href="login.html?tab=register" class="btn btn--outline btn--sm">Kayıt Ol</a></div></div>` : ''}
         </div>`;
 
-      // Eksikleri Ekle butonu
-      if (isLoggedIn && missing.length) {
+      // --- EVENT LİSTENER BAĞLAMALARI ---
+      document.getElementById('menuDetailBackBtn')?.addEventListener('click', closeMenuDetail);
+      overlay.addEventListener('click', closeMenuDetail);
+
+      if (isLoggedIn) {
         document.getElementById('menuDetailMissingBtn')?.addEventListener('click', () => {
+          if (!missing.length) return;
           const btn = document.getElementById('menuDetailMissingBtn');
           btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
           try { addMissingToShopping(missing); btn.textContent = '✅ Eklendi!'; }
@@ -265,28 +287,31 @@
         });
       }
 
-      // Adım Adım Tarif butonu → /api/menu/detail endpoint'ine bağlı
-      // Adım Adım Tarif butonu
       document.getElementById('menuDetailRecipeBtn')?.addEventListener('click', async () => {
         const btn        = document.getElementById('menuDetailRecipeBtn');
         const stepsWrap  = document.getElementById('menuDetailRecipeSteps');
         const content    = document.getElementById('menuDetailRecipeContent');
         const yemekAdi   = btn.dataset.yemek || menu.title;
 
-        // Zaten DOM'da açıksa göster/gizle yap
         if (stepsWrap.dataset.loaded === 'true') {
           const visible = stepsWrap.style.display !== 'none';
           stepsWrap.style.display = visible ? 'none' : 'block';
-          btn.textContent = visible ? '👨‍🍳 Adım Adım Tarif' : '🙈 Tarifi Gizle';
+          btn.textContent = visible ? '👨‍🍳 Tüm Menünün Tarifi' : '🙈 Tarifi Gizle';
           return;
         }
 
-        // --- 1. HAFIZA (CACHE) KONTROLÜ ---
         const cacheKey = 'smartrec_tarif_' + yemekAdi.replace(/\s+/g, '').toLowerCase();
         const cachedTarif = localStorage.getItem(cacheKey);
 
-        // Ekrana basma işlemini ortak bir fonksiyon yapalım (kod kalabalığını önlemek için)
         const ekranaBas = (d) => {
+          // Gerçek tarif verisi geldiğinde eksikleri yeniden filtrele
+          if (d.kullanilan_malzemeler && d.kullanilan_malzemeler.length > 0) {
+              missing = filterMissing(d.kullanilan_malzemeler);
+              document.getElementById('menuDetailMissingArea').innerHTML = renderMissing(missing);
+              const mBtn = document.getElementById('menuDetailMissingBtn');
+              if (mBtn) mBtn.disabled = !missing.length;
+          }
+
           const malzemelerHtml = (d.kullanilan_malzemeler || []).map(m => `<li style="padding:0.2rem 0;">${m}</li>`).join('');
           const adimlarHtml = (d.adimlar || []).map((a, i) => `
               <div style="display:flex;gap:0.75rem;margin-bottom:0.85rem;">
@@ -294,45 +319,50 @@
                 <span>${a.replace(/^\d+\.\s*/, '')}</span>
               </div>`).join('');
 
+          const isCookedNow = JSON.parse(localStorage.getItem('smartrec_calories_log') || '[]')
+                              .some(item => item.date === new Date().toISOString().split('T')[0] && item.recipeId === (5000 + menu.id));
+
           content.innerHTML = `
             <div style="background:#faf9f7;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:var(--clr-text-muted);">
               ⏱ ${d.hazirlik_suresi || '—'} &nbsp;·&nbsp; 🍽 ${d.porsiyon || '—'}
             </div>
-            ${malzemelerHtml ? `
-              <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.5rem;">Malzemeler</h4>
-              <ul style="list-style:disc;padding-left:1.2rem;margin-bottom:1.25rem;">${malzemelerHtml}</ul>` : ''}
+            ${malzemelerHtml ? `<h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.5rem;">Malzemeler</h4><ul style="list-style:disc;padding-left:1.2rem;margin-bottom:1.25rem;">${malzemelerHtml}</ul>` : ''}
             <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.75rem;">Yapılışı</h4>
             ${adimlarHtml}
-            ${isLoggedIn ? `
-            <div style="margin-top:1.5rem;padding-top:1rem;border-top:1.5px solid var(--clr-border);">
-              <button id="menuDetailCookedBtn" class="btn btn--success" style="width:100%;padding:0.8rem 1rem;font-size:0.95rem;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                ✅ Pişirdim — Kaloriyi Kaydet
-              </button>
-            </div>` : ''}
-            `;
+            
+            <div id="cookedActionContainer">
+              ${isLoggedIn 
+                 ? (isCookedNow 
+                    ? `<div style="margin-top:1.5rem;padding-top:1rem;border-top:1.5px solid var(--clr-border);">
+                         <div style="background:#2D7A4F; color:#fff; padding:0.8rem 1rem; border-radius:12px; text-align:center; font-weight:700;">
+                           ✨ Bu menüyü bugün pişirdiniz!
+                         </div>
+                       </div>`
+                    : `<div style="margin-top:1.5rem;padding-top:1rem;border-top:1.5px solid var(--clr-border);">
+                         <button id="menuDetailCookedBtn" class="btn btn--success" style="width:100%;padding:0.8rem 1rem;font-size:0.95rem;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                           ✅ Pişirdim — Kaloriyi Kaydet
+                         </button>
+                       </div>`
+                   )
+                 : ''}
+            </div>`;
 
           stepsWrap.dataset.loaded = 'true';
           stepsWrap.style.display  = 'block';
           btn.textContent = '🙈 Tarifi Gizle';
           btn.disabled    = false;
 
-          // Pişirdim butonuna event listener ekle
-          _attachCookedBtn(menu);
+          if (isLoggedIn && !isCookedNow) {
+              _attachCookedBtn(menu);
+          }
         };
 
-        // Eğer hafızada varsa hiç API'ye gitme, direkt bas ve çık!
-        if (cachedTarif) {
-            console.log("⚡ Tarif hafızadan (cache) yüklendi!");
-            ekranaBas(JSON.parse(cachedTarif));
-            return;
-        }
+        if (cachedTarif) { ekranaBas(JSON.parse(cachedTarif)); return; }
 
-        // --- 2. HAFIZADA YOKSA API'DEN ÇEK ---
         btn.textContent = '⏳ Yükleniyor...';
         btn.disabled = true;
 
         try {
-          // Önemli Not: app.py dosyasındaki adres /api/recipe/details olduğu için adresi de güncelledim
           const res  = await fetch('http://localhost:5000/api/recipe/details', {
             method : 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -342,16 +372,12 @@
           const d    = json.detay || json.data;
 
           if (json.success && d) {
-            // Çekilen veriyi hafızaya kaydet
             localStorage.setItem(cacheKey, JSON.stringify(d));
-            
-            // Ekrana bas
             ekranaBas(d);
           } else {
             throw new Error(json.error || 'Bilinmeyen hata');
           }
         } catch (err) {
-          console.error('Tarif yükleme hatası:', err);
           btn.textContent = '⚠️ Tekrar Dene';
           btn.disabled    = false;
         }
@@ -362,39 +388,40 @@
       document.body.style.overflow = 'hidden';
     }
 
-    window.closeMenuDetail = closeMenuDetail;
-    window.openMenuDetail  = openMenuDetail;
-
-    // ─── Pişirdim butonu yardımcısı ─────────────────────────────────────────────
     function _attachCookedBtn(menu) {
       const cookedBtn = document.getElementById('menuDetailCookedBtn');
       if (!cookedBtn) return;
-      cookedBtn.addEventListener('click', () => {
-        // MOCK_RECIPES'ten eşleşen tarifi bul (kalori kaydı için)
-        const matched = MOCK_RECIPES.find(r =>
-          r.title.toLowerCase() === (menu.title || '').toLowerCase() || r.id === menu.id
-        );
-        if (matched) {
-          logCalories(matched.id);
-        } else {
-          // MOCK_RECIPES'te yoksa manuel localStorage'a yaz
-          const key   = 'smartrec_calories_log';
-          const log   = JSON.parse(localStorage.getItem(key) || '[]');
-          const today = new Date().toISOString().split('T')[0];
-          log.push({ date: today, recipeId: menu.id || 0, title: menu.title, calories: menu.calories || 0, ts: Date.now() });
-          localStorage.setItem(key, JSON.stringify(log));
-          window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe: menu } }));
+      cookedBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-          // Backend'e de gönder
-          fetch('http://localhost:5000/api/calories/log', {
+        const key   = 'smartrec_calories_log';
+        const log   = JSON.parse(localStorage.getItem(key) || '[]');
+        const today = new Date().toISOString().split('T')[0];
+        
+        log.push({ 
+          date: today, 
+          recipeId: 5000 + menu.id, 
+          title: menu.title, 
+          calories: menu.calories || 0, 
+          ts: Date.now() 
+        });
+        localStorage.setItem(key, JSON.stringify(log));
+        
+        document.getElementById('cookedActionContainer').innerHTML = `
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top:1.5px solid var(--clr-border);">
+            <div style="background:#2D7A4F; color:#fff; padding:0.8rem 1rem; border-radius:12px; text-align:center; font-weight:700; animation: fadeIn 0.3s;">
+              ✨ Bu menüyü bugün pişirdiniz!
+            </div>
+          </div>`;
+
+        window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe: menu } }));
+
+        fetch('http://localhost:5000/api/calories/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: menu.title, calories: menu.calories || 0, date: today })
-          }).catch(() => {});
-        }
-        cookedBtn.textContent = '✅ Kaydedildi!';
-        cookedBtn.disabled = true;
-        cookedBtn.style.background = '#2D7A4F';
+            body: JSON.stringify({ email: Auth.getUser()?.email, yemek: menu.title, kalori: menu.calories || 0 })
+        }).catch(() => {});
       });
     }
 
