@@ -156,63 +156,86 @@ def eksik_malzemeleri_getir_api(recipe_id):
     }), 200
 
 # ==================== ENVANTER API'ları ====================
+from flask import Flask, request, jsonify
+# ... (diğer importlar aynı kalıyor)
+
+# ==================== ENVANTER LİSTELEME API'Sİ ====================
 @app.route('/api/inventory', methods=['GET'])
 def get_inventory():
-    """Tüm envanteri getir"""
+    # Frontend'den email bilgisini alıyoruz
+    user_email = request.args.get('email')
+    
+    if not user_email:
+        return jsonify({"success": False, "error": "Email parametresi gerekli!"}), 400
+
     try:
-        path = dosya_yolu_getir('inventory.json')
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        # veriyi_yukle fonksiyonuna artık user_email gönderiyoruz
+        data = veriyi_yukle('inventory.json', user_email)
         
         return jsonify({
             "success": True,
-            "count": len(data.get("envanter", [])),
-            "envanter": data.get("envanter", [])
+            "count": len(data.get("enventer", [])), # data_manager'daki anahtar ismine dikkat (enventer/envanter)
+            "envanter": data.get("enventer", [])
         }), 200
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
+# ==================== MALZEME EKLEME API'Sİ ====================
 @app.route('/api/inventory/add', methods=['POST'])
 def add_to_inventory():
-    """Envantera yeni malzeme ekle"""
     try:
-        data = request.get_json()
-        ad = data.get('ad')
-        miktar = data.get('miktar', 1)
-        birim = data.get('birim', 'Adet')
-        raf_omru_gun = data.get('raf_omru_gun', 7)
+        data = request.json
+        user_email = data.get('email') # POST gövdesinden email'i alıyoruz
         
-        if not ad:
-            return jsonify({
-                "success": False,
-                "error": "Ürün adı gerekli"
-            }), 400
+        if not user_email:
+            return jsonify({"success": False, "error": "Email bilgisi eksik!"}), 400
+
+        # envanter_malzeme_ekle fonksiyonuna user_email parametresini ekliyoruz
+        basari, mesaj = envanter_malzeme_ekle(
+            user_email=user_email,
+            ad=data.get('ad'),
+            miktar=data.get('miktar'),
+            birim=data.get('birim'),
+            kategori=data.get('kategori'),
+            tuketim_suresi=data.get('tuketim_suresi')
+        )
         
-        envanter_malzeme_ekle(ad, miktar, birim, raf_omru_gun)
+        return jsonify({
+            "success": basari,
+            "message": mesaj
+        }), 200 if basari else 400
         
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ==================== TARİF ÖNERİ API'Sİ ====================
+@app.route('/api/recipes/smart', methods=['GET'])
+def get_smart_recipes():
+    user_email = request.args.get('email')
+    
+    if not user_email:
+        return jsonify({"success": False, "error": "Email gerekli"}), 400
+
+    try:
+        # Akıllı menü oluştururken kullanıcının malzemelerini baz alıyoruz
+        tarifler = akilli_menu_olustur(user_email)
         return jsonify({
             "success": True,
-            "message": f"{ad} başarıyla eklendi",
-            "urun": {
-                "ad": ad,
-                "miktar": miktar,
-                "birim": birim
-            }
-        }), 201
+            "recipes": tarifler
+        }), 200
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/inventory/remove/<urun_id>', methods=['DELETE'])
 def remove_from_inventory(urun_id):
-    """Envanterden malzeme çıkar"""
+    user_email = request.args.get('email') # Email'i al
+    if not user_email:
+        return jsonify({"success": False, "error": "Email gerekli"}), 400
+        
     try:
-        path = dosya_yolu_getir('inventory.json')
+        # dosya_yolu_getir'e email'i gönder
+        path = dosya_yolu_getir('inventory.json', user_email) 
+        # ... geri kalan silme mantığı ...
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -245,6 +268,8 @@ def remove_from_inventory(urun_id):
 @app.route('/api/inventory/stats', methods=['GET'])
 def get_inventory_stats():
     """Envanter istatistiklerini getir"""
+    user_email = request.args.get('email') # Email'i al 
+    path = dosya_yolu_getir('inventory.json', user_email) # Email'i ekle
     try:
         path = dosya_yolu_getir('inventory.json')
         with open(path, 'r', encoding='utf-8') as f:
@@ -675,13 +700,25 @@ def generate_ai_shopping_list():
 # ==================== MİKTAR VE AKILLI TEMİZLİK API'leri ====================
 @app.route('/api/inventory/qty/<urun_ad>', methods=['POST'])
 def update_qty(urun_ad):
+    # Frontend'den email'i alıyoruz
+    user_email = request.args.get('email')
     degisim = int(request.args.get('degisim', 0))
-    basari, mesaj = miktar_guncelle(urun_ad, degisim)
+    
+    if not user_email:
+        return jsonify({"success": False, "message": "Email eksik!"}), 400
+
+    # manager'a email ile birlikte gönderiyoruz
+    basari, mesaj = miktar_guncelle(user_email, urun_ad, degisim)
     return jsonify({"success": basari, "message": mesaj})
 
 @app.route('/api/inventory/smart-clean', methods=['POST'])
 def smart_clean():
-    basari, silinenler = akilli_temizlik_yap()
+    user_email = request.args.get('email')
+    
+    if not user_email:
+        return jsonify({"success": False, "message": "Email eksik!"}), 400
+
+    basari, silinenler = akilli_temizlik_yap(user_email)
     return jsonify({"success": basari, "silinenler": silinenler})
 
 if __name__ == '__main__':
