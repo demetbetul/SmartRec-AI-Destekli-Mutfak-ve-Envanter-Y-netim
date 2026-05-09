@@ -320,8 +320,8 @@
 
     // ─── SOL KART: Sana Özel Menü (AI YOK — DB'den rastgele, günlük sabit) ────
     const dailyEl = document.getElementById('remziDailyList');
-    const DAILY_CACHE_KEY    = 'smartrec_daily_menu_cache';
-    const DAILY_CACHE_DATE   = 'smartrec_daily_menu_date';
+    const DAILY_CACHE_KEY    = 'smartrec_remzi_daily_cache';
+    const DAILY_CACHE_DATE   = 'smartrec_remzi_daily_date';
 
     function _todayStr() {
       return new Date().toISOString().split('T')[0]; // "2025-05-09"
@@ -352,67 +352,72 @@
     }
 
     function renderDailyMenu(forceRefresh = false) {
-      if (!dailyEl || !MOCK_RECIPES.length) return;
+      if (!dailyEl) return;
 
-      // Önce cache'e bak — aynı gün ise yeniden render etme
+      // Cache varsa MOCK_RECIPES beklenmeden aninda render
       if (!forceRefresh) {
         const cachedDate = localStorage.getItem(DAILY_CACHE_DATE);
         const cachedData = localStorage.getItem(DAILY_CACHE_KEY);
         if (cachedDate === _todayStr() && cachedData) {
           try {
-            const ids = JSON.parse(cachedData); // [anaId, corbaId, tatliId]
-            const [anaId, corbaId, tatliId] = ids;
-            const ana   = MOCK_RECIPES.find(r => r.id === anaId)   || null;
-            const corba = MOCK_RECIPES.find(r => r.id === corbaId) || null;
-            const tatli = MOCK_RECIPES.find(r => r.id === tatliId) || null;
-            const cards = [
-              ana   ? createMenuCard(ana,   '🍽️ Ana Yemek') : null,
-              corba ? createMenuCard(corba, '🍲 Çorba')     : null,
-              tatli ? createMenuCard(tatli, '🍮 Tatlı')     : null,
-            ].filter(Boolean);
-            if (cards.length) {
-              dailyEl.innerHTML = cards.join('');
+            const recipes = JSON.parse(cachedData); // tam obje: [{recipe, label}, ...]
+            if (recipes.length) {
+              dailyEl.innerHTML = recipes.map(r => createMenuCard(r.recipe, r.label)).join('');
               _attachDailyClicks();
-              return;
+              return; // MOCK_RECIPES beklenmez
             }
-          } catch { /* cache bozuksa yeniden üret */ }
+          } catch { /* bozuksa devam */ }
         }
       }
 
-      // Cache yok veya forceRefresh — seeded random ile üret
+      // MOCK_RECIPES henuz dolmamissa polling ile bekle
+      if (!MOCK_RECIPES.length) {
+        let attempts = 0;
+        const poll = setInterval(() => {
+          attempts++;
+          if (MOCK_RECIPES.length)  { clearInterval(poll); _buildAndCacheDailyMenu(forceRefresh); }
+          else if (attempts >= 50)  { clearInterval(poll); dailyEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Tarifler yuklenemedi.</p>'; }
+        }, 100);
+        return;
+      }
+
+      _buildAndCacheDailyMenu(forceRefresh);
+    }
+
+    function _buildAndCacheDailyMenu(forceRefresh = false) {
+      if (!dailyEl || !MOCK_RECIPES.length) return;
+
       const anaYemekler = MOCK_RECIPES.filter(r => r.tags.includes('ana-menu'));
       const corbalar    = MOCK_RECIPES.filter(r => r.tags.includes('corba'));
       const tatlilar    = MOCK_RECIPES.filter(r => r.tags.includes('tatli'));
 
-      // forceRefresh ise bugünkü seed'e bir timestamp ekle ki gerçekten farklı olsun
       const refreshSalt = forceRefresh ? String(Date.now()) : '';
-      const ana   = _pickSeeded(anaYemekler, [],                                       'ana'   + refreshSalt);
-      const corba = _pickSeeded(corbalar,    ana   ? [ana.id]   : [],                  'corba' + refreshSalt);
-      const tatli = _pickSeeded(tatlilar,    [ana?.id, corba?.id].filter(Boolean),     'tatli' + refreshSalt);
+      const ana   = _pickSeeded(anaYemekler, [],                                   'ana'   + refreshSalt);
+      const corba = _pickSeeded(corbalar,    ana   ? [ana.id]   : [],              'corba' + refreshSalt);
+      const tatli = _pickSeeded(tatlilar,    [ana?.id, corba?.id].filter(Boolean), 'tatli' + refreshSalt);
 
-      // Kaydet (gün + id listesi)
-      const ids = [ana?.id ?? null, corba?.id ?? null, tatli?.id ?? null];
-      localStorage.setItem(DAILY_CACHE_KEY,  JSON.stringify(ids));
-      localStorage.setItem(DAILY_CACHE_DATE, _todayStr());
-
-      const cards = [
-        ana   ? createMenuCard(ana,   '🍽️ Ana Yemek') : null,
-        corba ? createMenuCard(corba, '🍲 Çorba')     : null,
-        tatli ? createMenuCard(tatli, '🍮 Tatlı')     : null,
+      // Cache'e TAM OBJELERI kaydet — sonraki yukleme MOCK_RECIPES beklemez
+      const toCache = [
+        ana   ? { recipe: ana,   label: '🍽️ Ana Yemek' } : null,
+        corba ? { recipe: corba, label: '🍲 Çorba'       } : null,
+        tatli ? { recipe: tatli, label: '🍮 Tatlı'       } : null,
       ].filter(Boolean);
 
-      dailyEl.innerHTML = cards.length
-        ? cards.join('')
-        : '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Tarifler yüklenemedi.</p>';
+      localStorage.setItem(DAILY_CACHE_KEY,  JSON.stringify(toCache));
+      localStorage.setItem(DAILY_CACHE_DATE, _todayStr());
+
+      dailyEl.innerHTML = toCache.length
+        ? toCache.map(r => createMenuCard(r.recipe, r.label)).join('')
+        : '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Tarifler yuklenemedi.</p>';
 
       _attachDailyClicks();
     }
 
-    // Yenile butonu: manuel güncelleme (forceRefresh=true)
+    // Yenile butonu: manuel guncelleme (forceRefresh=true)
     document.getElementById('refreshDailyBtn')?.addEventListener('click', () => renderDailyMenu(true));
 
-    // Tarifler yüklendikten sonra çalıştır (MOCK_RECIPES async fetch)
-    setTimeout(() => renderDailyMenu(false), 800);
+    // Sayfa yuklenince hemen calistir — cache varsa aninda, yoksa MOCK_RECIPES bekler
+    renderDailyMenu(false);
 
     // ─── SAĞ KART: Envantere Özel Menü (günlük cache + mock fallback) ──────────
     const invEl = document.getElementById('remziInvList');

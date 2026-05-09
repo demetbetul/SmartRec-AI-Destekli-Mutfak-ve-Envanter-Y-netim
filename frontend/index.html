@@ -193,9 +193,8 @@
         ? `<button id="menuDetailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;" ${!missing.length ? 'disabled' : ''}>🛒 Eksikleri Ekle</button>`
         : `<button class="btn btn--outline btn--sm" style="flex:1;opacity:.7;" onclick="_showMenuAuthToast()">🛒 Eksikleri Ekle</button>`;
 
-      // "Adım Adım Tarif" butonu — ana yemeğin tarifini API'den çeker
-      const anaYemekAdi = (courses && courses.ana_yemek) ? courses.ana_yemek : menu.title;
-      const recipeBtnHtml = `<button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${anaYemekAdi}">👨‍🍳 Adım Adım Tarif</button>`;
+      const tumMenuAdi = courses ? `${courses.baslangic}, ${courses.ana_yemek} ve ${courses.tatli} Menüsü` : menu.title;
+      const recipeBtnHtml = `<button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${tumMenuAdi}">👨‍🍳 Tüm Menünün Tarifi</button>`;
 
       // Panel içeriği
       panel.innerHTML = `
@@ -447,7 +446,7 @@
     // ─── AI Günlük Menü Yükle ───────────────────────────────────────────────────
     async function fetchDailyMenu() {
       const container = document.getElementById('dailyCards');
-      const MENU_CACHE_KEY = 'smartrec_daily_menu_cache';
+      const MENU_CACHE_KEY = 'smartrec_ai_menu_cache';
       const today = new Date().toDateString();
 
       // 1. Önbellek kontrolü
@@ -455,7 +454,7 @@
       if (cachedData) {
         try {
           const parsedCache = JSON.parse(cachedData);
-          if (parsedCache.date === today && parsedCache.menuCards?.length && parsedCache.menuCards[0].calories !== undefined) {
+          if (parsedCache.date === today && Array.isArray(parsedCache.menuCards) && parsedCache.menuCards.length > 0) {
             window._aiMenuCards = parsedCache.menuCards;
             renderMenuGrid('dailyCards', parsedCache.menuCards);
             return;
