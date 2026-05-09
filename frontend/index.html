@@ -443,10 +443,17 @@
       });
     }
 
+    function _menuScore(id) {
+      const seed = (id * 2654435761) >>> 0;
+      return (8.5 + (seed % 1000) / 1000 * 1.4).toFixed(1);
+}
+
+
+
     // ─── AI Günlük Menü Yükle ───────────────────────────────────────────────────
     async function fetchDailyMenu() {
       const container = document.getElementById('dailyCards');
-      const MENU_CACHE_KEY = 'smartrec_ai_menu_cache';
+      const MENU_CACHE_KEY = 'smartrec_ai_menu_cache_v2';
       const today = new Date().toDateString();
 
       // 1. Önbellek kontrolü
@@ -492,6 +499,7 @@
               time: menu.hazirlik_suresi || "45 dk",
               difficulty: menu.zorluk || 'Orta',
               calories: toplamKalori || 0,
+              score: _menuScore(menu.id),
               tags: ['Tam Menü'],
               emoji: '✨',
               ingredients: menu.eksik_malzemeler || [],
