@@ -27,9 +27,9 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # Dosyanın bulunduğu klasörü ana dizin olarak belirle
+# data_manager.py dosyasının başındaki yolu böyle güncelle:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Data klasörüne giden yolu dinamik yap
-DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
+DATA_DIR = os.path.join(BASE_DIR, 'data') # Eğer data klasörü app.py ile aynı yerdeyse
 BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
 
 # Eğer backups klasörü yoksa otomatik oluştur
@@ -44,7 +44,19 @@ logging.basicConfig(
     encoding='utf-8'
 )
 
-def dosya_yolu_getir(dosya_adi):
+# data_manager.py içindeki ilgili kısmı bununla değiştir:
+
+def dosya_yolu_getir(dosya_adi, user_email=None):
+    if user_email:
+        # Email'i klasör dostu yap: deniz@gmail.com -> deniz_at_gmail_com
+        klasor_adi = user_email.replace("@", "_at_").replace(".", "_")
+        user_folder = os.path.join(DATA_DIR, "users", klasor_adi)
+        
+        # Burası kritik: Klasör yoksa oluştur!
+        os.makedirs(user_folder, exist_ok=True)
+        
+        return os.path.join(user_folder, dosya_adi)
+    
     return os.path.join(DATA_DIR, dosya_adi)
 
 def veri_dogrula(veri, tip):
@@ -73,33 +85,68 @@ def veri_temizle(metin):
         return metin.strip().lower()
     return metin
 
-def veriyi_yukle():
-    path = dosya_yolu_getir('recipes.json')
+# 1. Dosya yolu oluşturma fonksiyonunu güncelle
+def dosya_yolu_getir(dosya_adi, user_email=None):
+    if user_email:
+        # Email adresini klasör ismine uygun hale getir (nokta ve @ işaretini temizle)
+        klasor_adi = user_email.replace("@", "_at_").replace(".", "_")
+        user_folder = os.path.join(DATA_DIR, "users", klasor_adi)
+        
+        # Eğer bu kullanıcıya özel klasör yoksa oluştur
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+            # Yeni kullanıcı için boş bir inventory.json oluştur
+            default_path = os.path.join(user_folder, "inventory.json")
+            if not os.path.exists(default_path):
+                with open(default_path, 'w', encoding='utf-8') as f:
+                    json.dump({"envanter": []}, f)
+                    
+        return os.path.join(user_folder, dosya_adi)
+    
+    # Genel dosyalar (recipes.json vb.) için eski yol
+    return os.path.join(DATA_DIR, dosya_adi)
+
+# 2. Veri yükleme fonksiyonuna user_email ekle
+def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
+    path = dosya_yolu_getir(dosya_adi, user_email)
     try:
+        if not os.path.exists(path):
+            return [] if "recipes" in dosya_adi else {"envanter": []}
+            
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
-            # --- VERİ TEMİZLEME DOKUNUŞU ---
-            # Her tarifin adını ve malzemelerini daha yüklerken temizleyelim
-            for tarif in data.get("tarifler", []):
-                tarif["ad"] = veri_temizle(tarif["ad"])
-                tarif["malzemeler"] = [veri_temizle(m) for m in tarif["malzemeler"]]
-            
-            durum, mesaj = veri_dogrula(data, "tarif")
-            if not durum:
-                logging.error(f"Doğrulama hatası: {mesaj}")
-                return []
-            
-        return data["tarifler"]
-    except FileNotFoundError:
-        logging.error(f"❌ Hata: {path} dosyası bulunamadı! Lütfen veri yollarını kontrol et.")
-        return []
-    except json.JSONDecodeError:
-        logging.error(f"❌ Hata: JSON dosyasının formatı bozuk (virgül veya parantez hatası olabilir).")
-        return []
+        return data
     except Exception as e:
-        logging.error(f"Yükleme hatası: {e}")
+        logging.error(f"Yükleme hatası ({dosya_adi}): {e}")
         return []
+
+# 3. Envanter ekleme fonksiyonunu güncelle
+def envanter_malzeme_ekle(user_email, ad, miktar, birim="Adet", raf_omru_gun=7):
+    try:
+        # SADECE bu kullanıcıya ait yolu alıyoruz
+        path = dosya_yolu_getir('inventory.json', user_email)
+        data = veriyi_yukle('inventory.json', user_email)
+        
+        temiz_ad = veri_temizle(ad)
+        skt = (datetime.now() + timedelta(days=raf_omru_gun)).strftime("%Y-%m-%d")
+        
+        # Mevcut ürünü kontrol et
+        mevcut = next((item for item in data["envanter"] if veri_temizle(item["ad"]) == temiz_ad), None)
+        
+        if mevcut:
+            mevcut["miktar"] += int(miktar)
+            mevcut["skt"] = skt
+        else:
+            yeni_urun = {"ad": temiz_ad, "miktar": int(miktar), "birim": birim, "skt": skt}
+            data["envanter"].append(yeni_urun)
+        
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return True, f"{temiz_ad} eklendi."
+            
+    except Exception as e:
+        logging.error(f"Ekleme hatası: {e}")
+        return False, str(e)
 
 
 def akilli_tarif_filtrele(etiket=None, zorluk_seviyesi=None):
@@ -297,36 +344,68 @@ def envanter_istatistikleri():
         logging.error(f"SKT Analiz hatası: {e}")
         
         
-def envanter_malzeme_ekle(ad, miktar, birim="Adet", raf_omru_gun=7):
-    """
-    Veri Yönetim Uzmanı Dokunuşu: 
-    Malzemeyi eklerken bugünün tarihine raf ömrünü ekleyerek SKT oluşturur.
-    """
+# 1. Dosya yolu oluşturma fonksiyonunu güncelle
+def dosya_yolu_getir(dosya_adi, user_email=None):
+    if user_email:
+        # Email adresini klasör ismine uygun hale getir (nokta ve @ işaretini temizle)
+        klasor_adi = user_email.replace("@", "_at_").replace(".", "_")
+        user_folder = os.path.join(DATA_DIR, "users", klasor_adi)
+        
+        # Eğer bu kullanıcıya özel klasör yoksa oluştur
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder)
+            # Yeni kullanıcı için boş bir inventory.json oluştur
+            default_path = os.path.join(user_folder, "inventory.json")
+            if not os.path.exists(default_path):
+                with open(default_path, 'w', encoding='utf-8') as f:
+                    json.dump({"envanter": []}, f)
+                    
+        return os.path.join(user_folder, dosya_adi)
+    
+    # Genel dosyalar (recipes.json vb.) için eski yol
+    return os.path.join(DATA_DIR, dosya_adi)
+
+# 2. Veri yükleme fonksiyonuna user_email ekle
+def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
+    path = dosya_yolu_getir(dosya_adi, user_email)
     try:
-        path = dosya_yolu_getir('inventory.json')
+        if not os.path.exists(path):
+            return [] if "recipes" in dosya_adi else {"envanter": []}
+            
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+        return data
+    except Exception as e:
+        logging.error(f"Yükleme hatası ({dosya_adi}): {e}")
+        return []
+
+# 3. Envanter ekleme fonksiyonunu güncelle
+def envanter_malzeme_ekle(user_email, ad, miktar, birim="Adet", raf_omru_gun=7):
+    try:
+        # SADECE bu kullanıcıya ait yolu alıyoruz
+        path = dosya_yolu_getir('inventory.json', user_email)
+        data = veriyi_yukle('inventory.json', user_email)
         
         temiz_ad = veri_temizle(ad)
-        # SKT Hesaplama: Bugün + Raf Ömrü
         skt = (datetime.now() + timedelta(days=raf_omru_gun)).strftime("%Y-%m-%d")
         
+        # Mevcut ürünü kontrol et
         mevcut = next((item for item in data["envanter"] if veri_temizle(item["ad"]) == temiz_ad), None)
         
         if mevcut:
-            mevcut["miktar"] += miktar
-            mevcut["skt"] = skt # Tarihi de güncellemiş olalım
-            print(f"🔄 GÜNCELLEME: {temiz_ad} güncellendi. Yeni SKT: {skt}")
+            mevcut["miktar"] += int(miktar)
+            mevcut["skt"] = skt
         else:
-            yeni_urun = {"ad": temiz_ad, "miktar": miktar, "birim": birim, "skt": skt}
+            yeni_urun = {"ad": temiz_ad, "miktar": int(miktar), "birim": birim, "skt": skt}
             data["envanter"].append(yeni_urun)
-            print(f"✨ YENİ ÜRÜN: {temiz_ad} (SKT: {skt}) eklendi.")
         
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+        return True, f"{temiz_ad} eklendi."
             
     except Exception as e:
-        logging.error(f"SKT'li veri ekleme hatası: {e}")
+        logging.error(f"Ekleme hatası: {e}")
+        return False, str(e)
 
 
 def get_recipes_from_gemini(malzemeler_metni):
@@ -852,56 +931,58 @@ def ai_alisveris_listesi_olustur():
         print(f"❌ Alışveriş listesi AI hatası: {e}")
         return ["⚠️ Sistem hatası oluştu.", "Lütfen tekrar deneyin."]     
 
-def miktar_guncelle(urun_ad, degisim):
-    """Ürün miktarını artırır veya azaltır. Sıfır olursa siler."""
+def miktar_guncelle(user_email, urun_ad, degisim): # user_email eklendi
     try:
-        path = dosya_yolu_getir('inventory.json')
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        # Dosya yolunu kullanıcıya özel alıyoruz
+        path = dosya_yolu_getir('inventory.json', user_email)
+        
+        # Sadece bu kullanıcının verisini yüklüyoruz
+        data = veriyi_yukle('inventory.json', user_email)
         
         temiz_ad = veri_temizle(urun_ad)
-        mevcut = next((item for item in data.get("envanter", []) if veri_temizle(item["ad"]) == temiz_ad), None)
+        envanter_listesi = data.get("enventer", []) # Dosyadaki anahtar ismine dikkat
+        
+        mevcut = next((item for item in envanter_listesi if veri_temizle(item["ad"]) == temiz_ad), None)
         
         if mevcut:
             mevcut["miktar"] += degisim
             if mevcut["miktar"] <= 0:
-                data["envanter"].remove(mevcut)  # Sıfırlandıysa çöpe at
+                envanter_listesi.remove(mevcut)
             
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             return True, "Güncellendi"
-        return False, "Bulunamadı"
+        return False, "Ürün bulunamadı"
     except Exception as e:
         return False, str(e)
 
-def akilli_temizlik_yap():
-    """Tarihi geçmiş tüm ürünleri tek seferde dolaptan atar."""
+def akilli_temizlik_yap(user_email): # user_email eklendi
     try:
-        path = dosya_yolu_getir('inventory.json')
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        path = dosya_yolu_getir('inventory.json', user_email)
+        data = veriyi_yukle('inventory.json', user_email)
         
         bugun = datetime.now()
-        silinenler = []
         kalanlar = []
+        silinenler = []
         
-        for item in data.get("envanter", []):
+        for item in data.get("enventer", []):
             try:
                 skt = datetime.strptime(item["skt"], "%Y-%m-%d")
                 if skt < bugun:
-                    silinenler.append(item["ad"]) # Bozuk! Çöpe...
+                    silinenler.append(item["ad"])
                 else:
-                    kalanlar.append(item) # Sağlam! Dolapta kalsın...
+                    kalanlar.append(item)
             except:
                 kalanlar.append(item)
         
-        data["envanter"] = kalanlar
+        data["enventer"] = kalanlar
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
             
         return True, silinenler
     except Exception as e:
-        return False, []
+        return False, [] 
+    
 def bugunku_kaloriyi_getir():
     """Bugün yenilen yemeklerin toplam kalorisini hesaplar."""
     log_dosyasi = dosya_yolu_getir('daily_log.json')
