@@ -413,7 +413,7 @@ def get_recipes_from_gemini(malzemeler_metni):
     model = genai.GenerativeModel('gemini-2.5-flash')
     
     prompt = f"""
-    Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
+    Sen profesyonel bir aşçısın. Bugün için BİRBİRİNDEN FARKLI, yaratıcı ve lezzetli 3 ADET MENÜ ALTERNATİFİ öner. Türk mutfağı ağırlıklı olabilir ama dünya mutfaklarından da ilham alabilirsin.
     
     Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır. 
     Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt, bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle ve tüm menünün tahmini toplam hazırlanma süresini (Örn: "45 dk", "1 saat 15 dk") 'hazirlik_suresi' olarak belirt.
@@ -581,9 +581,9 @@ def kalori_hesapla(yemek_adi):
         print(f"⚠️ Spoonacular bağlantı hatası: {e}. Gemini (AI) devrede!")
         return gemini_kalori_tahmini(yemek_adi)
 
-def akilli_menu_olustur(malzemeler_listesi):
+def akilli_menu_olustur(malzemeler_listesi=None):
     """Sistemin ana köprüsü. 3 farklı menüyü ve kalorileri tek bir JSON'da birleştirir."""
-    malzemeler_metni = ", ".join(malzemeler_listesi)
+    malzemeler_metni = ", ".join(malzemeler_listesi) if malzemeler_listesi else ""
     
     # 1. PLAN: GEMINI AI
     try:
@@ -1059,4 +1059,3 @@ if __name__ == "__main__":
     
     print("\n🍽️ OLUŞTURULAN MENÜ VERİSİ (JSON):")
     print(json.dumps(final_menu, indent=4, ensure_ascii=False))
-

@@ -307,22 +307,11 @@ def get_inventory_stats():
 @app.route('/api/menu/create', methods=['GET', 'POST'])
 def create_menu():
     """AI ile akıllı menü oluştur"""
-    try:
-        # Envanterden malzemeleri otomatik al
-        malzemeler = ai_icin_malzeme_listesi_hazirla()
-        
-        if not malzemeler:
-            return jsonify({
-                "success": False,
-                "error": "Envanterden malzeme alınamadı"
-            }), 400
-        
-        menu = akilli_menu_olustur(malzemeler)
-        
+    try: 
+        menu = akilli_menu_olustur() 
         return jsonify({
             "success": True,
             "menu": menu,
-            "kullanilan_malzemeler": malzemeler[:10]  # İlk 10 tanesini göster
         }), 200
     except Exception as e:
         print(f"AI Hatası Detayı: {e}") # Bu satırı ekle ki terminalde görelim
