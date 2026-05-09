@@ -279,26 +279,31 @@ def get_smart_recipes():
 @app.route('/api/menu/create', methods=['GET', 'POST'])
 @handle_errors
 def create_menu():
-    """AI ile akıllı menü oluştur"""
+    """AI ile rastgele günlük akıllı menü oluştur (Envanterden bağımsız)"""
+    import random
     try:
-        # Envanterden malzemeleri otomatik al
-        malzemeler = ai_icin_malzeme_listesi_hazirla()
+        # 1. Gemini'nin her seferinde farklı ve yaratıcı menüler üretmesi için 
+        # rastgele bir havuzdan ilham kelimeleri seçiyoruz.
+        konseptler = [
+            "tavuk", "kırmızı et", "balık", "mevsim sebzeleri", 
+            "bakliyat", "mantar", "patlıcan", "kabak", "kıyma", 
+            "peynir", "deniz ürünleri", "makarna", "fırın yemekleri", "yöresel"
+        ]
+        # Havuzdan rastgele 3 konsept çek
+        ilham_kaynagi = random.sample(konseptler, 3) 
         
-        if not malzemeler:
-            return jsonify({
-                "success": False,
-                "error": "Envanterden malzeme alınamadı"
-            }), 400
+        # 2. Seçilen bu rastgele malzemeleri/konseptleri AI'a gönderiyoruz
+        menu = akilli_menu_olustur(ilham_kaynagi)
         
-        menu = akilli_menu_olustur(malzemeler)
-        
+        # 3. Başarılı sonucu döndür
         return jsonify({
             "success": True,
             "menu": menu,
-            "kullanilan_malzemeler": malzemeler[:10]  # İlk 10 tanesini göster
+            "kullanilan_malzemeler": ilham_kaynagi # Sadece loglama/gösterim amaçlı
         }), 200
+        
     except Exception as e:
-        print(f"AI Hatası Detayı: {e}") # Bu satırı ekle ki terminalde görelim
+        print(f"❌ AI Günlük Menü Hatası: {e}") 
         return jsonify({
             "success": False,
             "error": str(e)

@@ -18,5 +18,10 @@
     "ad": "demet mutaf",
     "email": "demet1@gmail.com",
     "password": "scrypt:32768:8:1$hVlt4L96hkzq84wK$51f468f8c3fec1e8ffb789b32208fde52f43d181e5c0355eb78e4541c694ea9b0137c8f0a0140b112109f779ca919665df9f2ee9bee8923a6ec8c0149ee10cda"
+  },
+  {
+    "ad": "Duygu Güldali",
+    "email": "guldaliduygu123@gmail.com",
+    "password": "scrypt:32768:8:1$7bXdopjT6bGoagsW$9e8115621e228030a60e59b29ccea6986470c47d6d1c73361c1c7a790975cc5def79a40c8ef0956ba0df6637a9990248f50cc808c8f51aff485e735c9efa9305"
   }
 ]
