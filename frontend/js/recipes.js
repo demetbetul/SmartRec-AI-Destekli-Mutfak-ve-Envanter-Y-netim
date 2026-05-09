@@ -23,6 +23,17 @@ function _favKey() {
   return `smartrec_favorites_${suffix}`;
 }
 
+/**
+ * Tarif ID'sini kullanarak 8.5–9.9 arası sabit ama çeşitli bir puan üretir.
+ * Math.random() kullanmaz → önbellek/yenileme bağımsız, her zaman aynı tarif = aynı puan.
+ */
+function _scoreFromId(id) {
+  const seed = (id * 2654435761) >>> 0; // basit hash
+  const normalized = (seed % 1000) / 1000; // 0.000–0.999
+  return (8.5 + normalized * 1.4).toFixed(1); // 8.5–9.9
+}
+
+
 // ─── Favori Yönetimi ──────────────────────────────────────────────────────────
 export const Favorites = {
   getAll() {
@@ -107,7 +118,7 @@ try {
       }),
 
       emoji      : '✨',
-      score      : "9.5",
+      score: _scoreFromId(t.id),
       ingredients: t.malzemeler
         ? t.malzemeler.map(m => typeof m === 'object' ? `${m.miktar} ${m.birim} ${m.isim}` : m)
         : [],
