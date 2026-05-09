@@ -611,32 +611,36 @@
     fetchDailyMenu();
 
     // ─── GÜNLÜK DEĞİŞEN TARİF SEÇİMİ FONKSİYONU ───
+// ✅ YENİ — cache sadece ID'leri saklar, puanı her zaman canlı MOCK_RECIPES'ten alır:
 function getDailyDiscovery(tag, count, cacheKey) {
     const today = new Date().toDateString();
     const cached = localStorage.getItem(cacheKey);
 
     if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed.date === today) {
-            return parsed.recipes;
-        }
+        try {
+            const parsed = JSON.parse(cached);
+            if (parsed.date === today && Array.isArray(parsed.ids)) {
+                // ID listesini al, puanları MOCK_RECIPES'ten taze oku
+                const result = parsed.ids
+                    .map(id => MOCK_RECIPES.find(r => r.id === id))
+                    .filter(Boolean);
+                if (result.length > 0) return result;
+            }
+        } catch {}
     }
 
-    // Bugün için yeni seçim yap
     const filtered = MOCK_RECIPES.filter(r => r.tags.includes(tag));
-    // Listeyi rastgele karıştır (Fisher-Yates Shuffle)
     const shuffled = [...filtered].sort(() => 0.5 - Math.random());
     const selection = shuffled.slice(0, count);
 
-    // Hafızaya kaydet
+    // Cache'e sadece ID'leri kaydet, objenin tamamını değil:
     localStorage.setItem(cacheKey, JSON.stringify({
         date: today,
-        recipes: selection
+        ids: selection.map(r => r.id)  // ← sadece ID
     }));
 
     return selection;
 }
-
 // ─── DİĞER TARİF KARTLARINI BAŞLAT ───
 // Geleneksel tariflerden bugün için 3 tane seç
 const traditional = getDailyDiscovery('geleneksel', 8, 'smartrec_traditional_daily');

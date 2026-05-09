@@ -24,14 +24,10 @@ function _favKey() {
 }
 
 /**
- * Tarif ID'sini kullanarak 8.5–9.9 arası sabit ama çeşitli bir puan üretir.
- * Math.random() kullanmaz → önbellek/yenileme bağımsız, her zaman aynı tarif = aynı puan.
+ * ✅ KALDIRILDI: _scoreFromId() artık kullanılmıyor.
+ * Puan artık doğrudan recipes.json'daki t.puan alanından okunur.
+ * (t.puan bir string olarak saklandığı için parseFloat ile sayıya dönüştürülür.)
  */
-function _scoreFromId(id) {
-  const seed = (id * 2654435761) >>> 0; // basit hash
-  const normalized = (seed % 1000) / 1000; // 0.000–0.999
-  return (8.5 + normalized * 1.4).toFixed(1); // 8.5–9.9
-}
 
 
 // ─── Favori Yönetimi ──────────────────────────────────────────────────────────
@@ -118,7 +114,7 @@ try {
       }),
 
       emoji      : '✨',
-      score: _scoreFromId(t.id),
+      score: t.puan != null ? parseFloat(t.puan).toFixed(1) : "—",
       ingredients: t.malzemeler
         ? t.malzemeler.map(m => typeof m === 'object' ? `${m.miktar} ${m.birim} ${m.isim}` : m)
         : [],
