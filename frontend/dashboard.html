@@ -277,7 +277,28 @@
       saveInv(items);
       cancelInventoryBtn.click();
       renderInventory();
+      // Malzeme ekleme bildirimi
+      _showAddedNotif(name);
     });
+
+    function _showAddedNotif(malzemeAdi) {
+      const container = document.getElementById('notificationsList');
+      if (!container) return;
+      const existing = container.innerHTML;
+      const notifHtml = `
+        <div class="notif-item notif-item--tip" id="_addedNotif" style="animation:fadeInUp 0.25s ease both;">
+          <span class="notif-icon">✅</span>
+          <div class="notif-text">
+            <strong>Malzeme Eklendi</strong>
+            <span>${malzemeAdi} dolaba eklendi.</span>
+          </div>
+        </div>`;
+      container.innerHTML = notifHtml + existing;
+      setTimeout(() => {
+        document.getElementById('_addedNotif')?.remove();
+      }, 4000);
+    }
+
     [inputAd, inputSKT, inputMiktar].forEach((inp, i, arr) => {
       inp?.addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); i < arr.length-1 ? arr[i+1]?.focus() : saveInventoryBtn?.click(); }
@@ -435,7 +456,6 @@
       if (!container) return;
       const invNames = getInv().map(i => i.ad.toLowerCase());
 
-      // Envanterle eşleşen tarifi skorla
       const scored = MOCK_RECIPES.map(r => {
         const match = r.ingredients.filter(ing => invNames.some(n => n.includes(ing.toLowerCase()) || ing.toLowerCase().includes(n)));
         return { ...r, matchCount: match.length };

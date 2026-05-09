@@ -175,25 +175,30 @@
     </section>
 
     <div class="remzi-grid">
+      <!-- SOL KART: Sana Özel Menü (AI YOK — DB'den rastgele) -->
       <section class="remzi-panel">
         <div class="remzi-panel__header">
-          <h3>🧊 Envanterden Öneri</h3>
+          <h3>🎲 Sana Özel Menü</h3>
+          <button id="refreshDailyBtn" style="font-size:0.8rem; color:var(--clr-text-muted); font-weight:600; background:none; border:none; cursor:pointer;" title="Yeni rastgele menü">🔄 Yenile</button>
+        </div>
+        <div class="remzi-panel__body" id="remziDailyList">
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
+        </div>
+      </section>
+
+      <!-- SAĞ KART: Envantere Özel Menü (AI önerisi) -->
+      <section class="remzi-panel">
+        <div class="remzi-panel__header">
+          <h3>🧊 Envantere Özel Menü</h3>
           <div style="display: flex; gap: 0.75rem; align-items: center;">
             <button id="refreshInvBtn" style="font-size:0.8rem; color:var(--clr-text-muted); font-weight:600; background:none; border:none; cursor:pointer;" title="Yeni tarifler üret">🔄 Yenile</button>
             <button id="openInventoryBtn" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; background:none; border:none; cursor:pointer;">Düzenle →</button>
           </div>
         </div>
-        <div class="remzi-panel__body" id="remziDailyList">
-          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
-          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
-        </div>
-      </section>
-      <section class="remzi-panel">
-        <div class="remzi-panel__header">
-          <h3>🧊 Envanterden Öneri</h3>
-          <button id="openInventoryBtn" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; background:none; border:none; cursor:pointer;">Düzenle →</button>
-        </div>
         <div class="remzi-panel__body" id="remziInvList">
+          <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
           <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
           <div class="skeleton-card"><div class="skeleton" style="width:72px;height:72px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center"><div class="skeleton" style="height:10px;width:60%"></div><div class="skeleton" style="height:14px;width:90%"></div><div class="skeleton" style="height:10px;width:40%"></div></div></div>
         </div>
@@ -214,7 +219,7 @@
     import { renderHeader, renderChatbot } from './js/header.js';
     import { Auth, initPage } from './js/auth.js';
     import { initRemzi, initDrawer } from './js/remzi.js';
-    import { MOCK_RECIPES } from './js/recipes.js';
+    import { MOCK_RECIPES, Favorites, logCalories, openRecipeDetail } from './js/recipes.js';
 
     document.getElementById('app-header').innerHTML = renderHeader('remzi');
     document.getElementById('chatbot-root').innerHTML = renderChatbot();
@@ -299,106 +304,233 @@
       });
     }
 
-    // Menü kartları (herkese gösterilir)
-    const createMenuCard = (recipe) => `
-      <div class="menu-card-h" onclick="window.location.href='recipes.html'">
-        <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img" onerror="this.style.display='none'" loading="lazy">
+    // ─── KART YARDIMCISI ───────────────────────────────────────────────────────
+    // Her iki kart için ortak menu-card-h oluşturucu (recipe objesi alır)
+    const createMenuCard = (recipe, categoryLabel) => `
+      <div class="menu-card-h" data-id="${recipe.id}" style="cursor:pointer;">
+        <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img"
+             onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c'" loading="lazy">
         <div class="menu-card-h__body">
-          <span class="menu-card-h__tag">${recipe.tagLabels?.[0] || 'Öneri'}</span>
+          <span class="menu-card-h__tag">${categoryLabel || recipe.tagLabels?.[0] || 'Öneri'}</span>
           <div class="menu-card-h__title">${recipe.title}</div>
           <div class="menu-card-h__meta">⏱ ${recipe.time} · 🔥 ${recipe.calories} kcal</div>
         </div>
         <div class="menu-card-h__arrow">›</div>
       </div>`;
 
+    // ─── SOL KART: Sana Özel Menü (AI YOK — DB'den rastgele, günlük sabit) ────
     const dailyEl = document.getElementById('remziDailyList');
-    const invEl = document.getElementById('remziInvList');
-    
-    if (dailyEl) dailyEl.innerHTML = MOCK_RECIPES.slice(0, 2).map(createMenuCard).join('');
+    const DAILY_CACHE_KEY    = 'smartrec_daily_menu_cache';
+    const DAILY_CACHE_DATE   = 'smartrec_daily_menu_date';
 
-    // Ekrana kartları çizen yardımcı fonksiyon
-    function renderInventoryCards(recipes) {
-      invEl.innerHTML = recipes.map(recipe => `
-        <div class="menu-card-h" onclick="askRemziForRecipe('${recipe.title}')">
-          <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c'" loading="lazy">
-          <div class="menu-card-h__body">
-            <span class="menu-card-h__tag">${recipe.tagLabels?.[0] || 'ENVANTER ÖNERİSİ'}</span>
-            <div class="menu-card-h__title">${recipe.title}</div>
-            <div class="menu-card-h__meta">⏱ ${recipe.time} · 🔥 ${recipe.calories} kcal</div>
-          </div>
-          <div class="menu-card-h__arrow">›</div>
-        </div>
-      `).join('');
+    function _todayStr() {
+      return new Date().toISOString().split('T')[0]; // "2025-05-09"
     }
 
-    // --- AKILLI VE HAFIZALI AI BAĞLANTISI ---
-    async function fetchInventorySuggestions(forceRefresh = false) {
-      if (!invEl || !isLoggedIn) return;
-      
-      const cacheKey = 'smartrec_ai_suggestions_cache';
+    // Deterministik pseudo-random: gün + seed string → sayı
+    function _seededRandom(seed) {
+      let h = 0;
+      for (let i = 0; i < seed.length; i++) h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+      return ((h >>> 0) / 0xFFFFFFFF);
+    }
 
-      // 1. Eğer zorla yenileme istenmediyse, önce hafızaya (localStorage) bak
+    function _pickSeeded(arr, exclude = [], extraSeed = '') {
+      const pool = arr.filter(r => !exclude.includes(r.id));
+      if (!pool.length) return null;
+      const seed = _todayStr() + extraSeed + pool.map(r => r.id).join(',');
+      const idx  = Math.floor(_seededRandom(seed) * pool.length);
+      return pool[idx];
+    }
+
+    function _attachDailyClicks() {
+      dailyEl.querySelectorAll('.menu-card-h').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = Number(card.dataset.id);
+          openRemziRecipeDetail(id);
+        });
+      });
+    }
+
+    function renderDailyMenu(forceRefresh = false) {
+      if (!dailyEl || !MOCK_RECIPES.length) return;
+
+      // Önce cache'e bak — aynı gün ise yeniden render etme
       if (!forceRefresh) {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          renderInventoryCards(JSON.parse(cached));
-          return; // Hafızada varsa API'ye gitme, burada dur!
+        const cachedDate = localStorage.getItem(DAILY_CACHE_DATE);
+        const cachedData = localStorage.getItem(DAILY_CACHE_KEY);
+        if (cachedDate === _todayStr() && cachedData) {
+          try {
+            const ids = JSON.parse(cachedData); // [anaId, corbaId, tatliId]
+            const [anaId, corbaId, tatliId] = ids;
+            const ana   = MOCK_RECIPES.find(r => r.id === anaId)   || null;
+            const corba = MOCK_RECIPES.find(r => r.id === corbaId) || null;
+            const tatli = MOCK_RECIPES.find(r => r.id === tatliId) || null;
+            const cards = [
+              ana   ? createMenuCard(ana,   '🍽️ Ana Yemek') : null,
+              corba ? createMenuCard(corba, '🍲 Çorba')     : null,
+              tatli ? createMenuCard(tatli, '🍮 Tatlı')     : null,
+            ].filter(Boolean);
+            if (cards.length) {
+              dailyEl.innerHTML = cards.join('');
+              _attachDailyClicks();
+              return;
+            }
+          } catch { /* cache bozuksa yeniden üret */ }
         }
       }
 
-      // 2. API'den veri çekerken ekranda bekleme yazısı göster
-      invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Şef Remzi dolabınıza bakıp tarif üretiyor... 👨‍🍳⏳</p>';
-      
-      try {
-        const res = await fetch('http://localhost:5000/api/inventory/strict-suggestions');
-        const data = await res.json();
-        
-        if (data.success && data.data.length > 0) {
-          // 3. Gelen yeni veriyi hemen hafızaya kaydet ve ekrana bas
-          localStorage.setItem(cacheKey, JSON.stringify(data.data));
-          renderInventoryCards(data.data);
-        } else {
-          invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;">Dolabınızda tarif üretecek kadar malzeme bulunamadı.</p>';
+      // Cache yok veya forceRefresh — seeded random ile üret
+      const anaYemekler = MOCK_RECIPES.filter(r => r.tags.includes('ana-menu'));
+      const corbalar    = MOCK_RECIPES.filter(r => r.tags.includes('corba'));
+      const tatlilar    = MOCK_RECIPES.filter(r => r.tags.includes('tatli'));
+
+      // forceRefresh ise bugünkü seed'e bir timestamp ekle ki gerçekten farklı olsun
+      const refreshSalt = forceRefresh ? String(Date.now()) : '';
+      const ana   = _pickSeeded(anaYemekler, [],                                       'ana'   + refreshSalt);
+      const corba = _pickSeeded(corbalar,    ana   ? [ana.id]   : [],                  'corba' + refreshSalt);
+      const tatli = _pickSeeded(tatlilar,    [ana?.id, corba?.id].filter(Boolean),     'tatli' + refreshSalt);
+
+      // Kaydet (gün + id listesi)
+      const ids = [ana?.id ?? null, corba?.id ?? null, tatli?.id ?? null];
+      localStorage.setItem(DAILY_CACHE_KEY,  JSON.stringify(ids));
+      localStorage.setItem(DAILY_CACHE_DATE, _todayStr());
+
+      const cards = [
+        ana   ? createMenuCard(ana,   '🍽️ Ana Yemek') : null,
+        corba ? createMenuCard(corba, '🍲 Çorba')     : null,
+        tatli ? createMenuCard(tatli, '🍮 Tatlı')     : null,
+      ].filter(Boolean);
+
+      dailyEl.innerHTML = cards.length
+        ? cards.join('')
+        : '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Tarifler yüklenemedi.</p>';
+
+      _attachDailyClicks();
+    }
+
+    // Yenile butonu: manuel güncelleme (forceRefresh=true)
+    document.getElementById('refreshDailyBtn')?.addEventListener('click', () => renderDailyMenu(true));
+
+    // Tarifler yüklendikten sonra çalıştır (MOCK_RECIPES async fetch)
+    setTimeout(() => renderDailyMenu(false), 800);
+
+    // ─── SAĞ KART: Envantere Özel Menü (günlük cache + mock fallback) ──────────
+    const invEl = document.getElementById('remziInvList');
+    const INV_CACHE_KEY  = 'smartrec_inv_suggestions_cache';
+    const INV_CACHE_DATE = 'smartrec_inv_suggestions_date';
+
+    function renderInventoryCards(recipes) {
+      if (!invEl) return;
+      const getLabel = (r) => {
+        if (r.tags.includes('corba'))    return '🍲 Çorba';
+        if (r.tags.includes('tatli'))    return '🍮 Tatlı';
+        if (r.tags.includes('ana-menu')) return '🍽️ Ana Yemek';
+        return r.tagLabels?.[0] || '🧊 Envanter Önerisi';
+      };
+      invEl.innerHTML = recipes.map(r => createMenuCard(r, getLabel(r))).join('');
+      invEl.querySelectorAll('.menu-card-h').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = Number(card.dataset.id);
+          openRemziRecipeDetail(id);
+        });
+      });
+    }
+
+    // Envanterden mock öneri üret (backend olmasa da çalışır)
+    function _mockInventorySuggestions() {
+      const inv = JSON.parse(localStorage.getItem('smartrec_inventory') || '[]').map(i => i.ad.toLowerCase());
+      let cards = [];
+      if (inv.length) {
+        const matched = MOCK_RECIPES
+          .map(r => ({ ...r, matchCount: r.ingredients.filter(ing => inv.some(n => n.includes(ing.toLowerCase()))).length }))
+          .filter(r => r.matchCount > 0)
+          .sort((a, b) => b.matchCount - a.matchCount);
+        const pick = (tag) => matched.find(r => r.tags.includes(tag));
+        cards = [pick('ana-menu'), pick('corba'), pick('tatli')].filter(Boolean);
+      }
+      // Envanter boşsa veya eşleşme yoksa rastgele 3 tarif öner
+      if (!cards.length) {
+        const pool = [...MOCK_RECIPES].sort(() => _seededRandom(_todayStr() + 'inv') - 0.5);
+        const pick2 = (tag) => pool.find(r => r.tags.includes(tag));
+        cards = [pick2('ana-menu'), pick2('corba'), pick2('tatli')].filter(Boolean);
+      }
+      return cards;
+    }
+
+    async function fetchInventorySuggestions(forceRefresh = false) {
+      if (!invEl) return;
+      if (!isLoggedIn) {
+        invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Öneriler için giriş yapın.</p>';
+        return;
+      }
+
+      // Günlük cache kontrolü
+      if (!forceRefresh) {
+        const cachedDate = localStorage.getItem(INV_CACHE_DATE);
+        const cachedData = localStorage.getItem(INV_CACHE_KEY);
+        if (cachedDate === _todayStr() && cachedData) {
+          try {
+            renderInventoryCards(JSON.parse(cachedData));
+            return;
+          } catch { /* bozuksa devam */ }
         }
-      } catch (err) {
-        console.error("AI Önerileri çekilemedi:", err);
-        invEl.innerHTML = '<p style="padding:1rem;color:#C0392B;font-size:0.9rem;">Öneriler şu an yüklenemedi (Backend kapalı olabilir).</p>';
+      }
+
+      invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Öneriler yükleniyor... 🍳</p>';
+
+      // Önce backend'i dene (3 saniye timeout)
+      try {
+        const controller = new AbortController();
+        const timeout    = setTimeout(() => controller.abort(), 3000);
+        const res  = await fetch('http://localhost:5000/api/inventory/strict-suggestions', { signal: controller.signal });
+        clearTimeout(timeout);
+        const data = await res.json();
+        if (data.success && data.data && data.data.length > 0) {
+          localStorage.setItem(INV_CACHE_KEY,  JSON.stringify(data.data));
+          localStorage.setItem(INV_CACHE_DATE, _todayStr());
+          renderInventoryCards(data.data);
+          return;
+        }
+      } catch { /* backend kapalı veya timeout — mock'a geç */ }
+
+      // Mock fallback
+      const cards = _mockInventorySuggestions();
+      if (cards.length) {
+        localStorage.setItem(INV_CACHE_KEY,  JSON.stringify(cards));
+        localStorage.setItem(INV_CACHE_DATE, _todayStr());
+        renderInventoryCards(cards);
+      } else {
+        invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Envanter boş — malzeme ekleyerek öneri alın.</p>';
       }
     }
 
-    // Yenile butonuna tıklanınca zorla (forceRefresh = true) çalıştır
-    document.getElementById('refreshInvBtn')?.addEventListener('click', () => {
-      fetchInventorySuggestions(true);
-    });
-
-    // Sayfa açıldığında normal çalıştır (Hafızada varsa oradan çeker)
+    document.getElementById('refreshInvBtn')?.addEventListener('click', () => fetchInventorySuggestions(true));
     fetchInventorySuggestions();
 
     document.getElementById('openInventoryBtn')?.addEventListener('click', () => {
       if (!isLoggedIn) { window.location.href = 'login.html'; return; }
-      const drawer = document.getElementById('inventoryDrawer');
+      const drawer  = document.getElementById('inventoryDrawer');
       const overlay = document.getElementById('drawerOverlay');
       drawer?.classList.add('open');
       overlay?.classList.add('open');
       drawer?.setAttribute('aria-hidden', 'false');
     });
 
-    // --- KARTLARA TIKLAYINCA REMZİ'YE TARİF SORDURAN FONKSİYON ---
+    // remzi.html'e özel: recipe detail sidebar açar (recipes.js openRecipeDetail ile aynı)
+    window.openRemziRecipeDetail = function(recipeId) {
+      openRecipeDetail(recipeId);
+    };
+
+    // ─── KARTLARA TIKLAYINCA REMZİ'YE TARİF SORDURAN FONKSİYON ──────────────
     window.askRemziForRecipe = function(yemekAdi) {
-        const input = document.getElementById('remziPageInput');
-        const sendBtn = document.getElementById('remziPageSend');
-        const chatSection = document.getElementById('remziChatSection');
-        
-        if (input && sendBtn) {
-            // Remzi'ye soruyu otomatik yazdırıyoruz
-            input.value = `Lütfen bana "${yemekAdi}" tarifini tam ölçüleriyle ve adım adım anlatır mısın?`;
-            
-            // Gönder butonuna otomatik tıklatıyoruz
-            sendBtn.click();
-            
-            // Ekranı havalı bir şekilde yukarı, Remzi'nin sohbetine kaydırıyoruz
-            chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+      const input      = document.getElementById('remziPageInput');
+      const sendBtn    = document.getElementById('remziPageSend');
+      const chatSection = document.getElementById('remziChatSection');
+      if (input && sendBtn) {
+        input.value = `Lütfen bana "${yemekAdi}" tarifini tam ölçüleriyle ve adım adım anlatır mısın?`;
+        sendBtn.click();
+        chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     };
 
   </script>

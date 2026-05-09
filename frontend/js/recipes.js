@@ -103,9 +103,26 @@ export function logCalories(recipeId) {
   const key   = 'smartrec_calories_log';
   const log   = JSON.parse(localStorage.getItem(key) || '[]');
   const today = new Date().toISOString().split('T')[0];
-  log.push({ date: today, recipeId, title: recipe.title, calories: recipe.calories, ts: Date.now() });
+  const entry = { date: today, recipeId, title: recipe.title, calories: recipe.calories, ts: Date.now() };
+  log.push(entry);
   localStorage.setItem(key, JSON.stringify(log));
   window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe } }));
+
+  // Backend'e de kaydet (opsiyonel — backend kapalıysa sessizce geç)
+  try {
+    const user = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
+    fetch('http://localhost:5000/api/calories/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: user?.id,
+        recipeId,
+        title: recipe.title,
+        calories: recipe.calories,
+        date: today
+      })
+    }).catch(() => {}); // backend kapalıysa sessiz kal
+  } catch {}
 }
 
 function _showAuthToast(message = 'Bu özellik için giriş yapmanız gerekiyor.') {
@@ -205,12 +222,19 @@ export function openRecipeDetail(recipeId) {
       logCalories(recipe.id);
       const btn = document.getElementById('detailCookedBtn');
       btn.textContent = '✅ Kaydedildi'; btn.disabled = true;
+      btn.style.background = '#2D7A4F';
     });
     const favBtn = document.getElementById('detailFavBtn');
     favBtn?.addEventListener('click', () => {
       const nowFav = Favorites.toggle(recipe.id);
       favBtn.textContent = nowFav ? '♥' : '♡';
       favBtn.style.color = nowFav ? '#C44B1C' : '';
+      // Backend'e de gönder (opsiyonel)
+      fetch('http://localhost:5000/api/favorites/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeId: recipe.id, title: recipe.title, favorited: nowFav })
+      }).catch(() => {});
       document.querySelectorAll(`.recipe-card[data-id="${recipe.id}"] .fav-btn`).forEach(b => {
         b.textContent = nowFav ? '♥' : '♡'; b.style.color = nowFav ? '#C44B1C' : ''; b.classList.toggle('fav-btn--active', nowFav);
       });

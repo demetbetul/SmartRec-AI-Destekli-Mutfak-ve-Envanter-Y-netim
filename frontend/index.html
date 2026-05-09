@@ -110,7 +110,7 @@
     import { renderHeader, renderChatbot } from './js/header.js';
     import { initPage, Auth } from './js/auth.js';
     import { initRemzi, initDrawer, addMissingToShopping } from './js/remzi.js';
-    import { MOCK_RECIPES, renderRecipeGrid } from './js/recipes.js';
+    import { MOCK_RECIPES, renderRecipeGrid, logCalories } from './js/recipes.js';
 
     // Header + Chatbot inject
     document.getElementById('app-header').innerHTML = renderHeader('home');
@@ -303,12 +303,22 @@
               <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.5rem;">Malzemeler</h4>
               <ul style="list-style:disc;padding-left:1.2rem;margin-bottom:1.25rem;">${malzemelerHtml}</ul>` : ''}
             <h4 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--clr-text-muted);margin-bottom:0.75rem;">Yapılışı</h4>
-            ${adimlarHtml}`;
+            ${adimlarHtml}
+            ${isLoggedIn ? `
+            <div style="margin-top:1.5rem;padding-top:1rem;border-top:1.5px solid var(--clr-border);">
+              <button id="menuDetailCookedBtn" class="btn btn--success" style="width:100%;padding:0.8rem 1rem;font-size:0.95rem;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                ✅ Pişirdim — Kaloriyi Kaydet
+              </button>
+            </div>` : ''}
+            `;
 
           stepsWrap.dataset.loaded = 'true';
           stepsWrap.style.display  = 'block';
           btn.textContent = '🙈 Tarifi Gizle';
           btn.disabled    = false;
+
+          // Pişirdim butonuna event listener ekle
+          _attachCookedBtn(menu);
         };
 
         // Eğer hafızada varsa hiç API'ye gitme, direkt bas ve çık!
@@ -355,6 +365,39 @@
 
     window.closeMenuDetail = closeMenuDetail;
     window.openMenuDetail  = openMenuDetail;
+
+    // ─── Pişirdim butonu yardımcısı ─────────────────────────────────────────────
+    function _attachCookedBtn(menu) {
+      const cookedBtn = document.getElementById('menuDetailCookedBtn');
+      if (!cookedBtn) return;
+      cookedBtn.addEventListener('click', () => {
+        // MOCK_RECIPES'ten eşleşen tarifi bul (kalori kaydı için)
+        const matched = MOCK_RECIPES.find(r =>
+          r.title.toLowerCase() === (menu.title || '').toLowerCase() || r.id === menu.id
+        );
+        if (matched) {
+          logCalories(matched.id);
+        } else {
+          // MOCK_RECIPES'te yoksa manuel localStorage'a yaz
+          const key   = 'smartrec_calories_log';
+          const log   = JSON.parse(localStorage.getItem(key) || '[]');
+          const today = new Date().toISOString().split('T')[0];
+          log.push({ date: today, recipeId: menu.id || 0, title: menu.title, calories: menu.calories || 0, ts: Date.now() });
+          localStorage.setItem(key, JSON.stringify(log));
+          window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe: menu } }));
+
+          // Backend'e de gönder
+          fetch('http://localhost:5000/api/calories/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: menu.title, calories: menu.calories || 0, date: today })
+          }).catch(() => {});
+        }
+        cookedBtn.textContent = '✅ Kaydedildi!';
+        cookedBtn.disabled = true;
+        cookedBtn.style.background = '#2D7A4F';
+      });
+    }
 
     function _showMenuAuthToast() {
       const toast = document.createElement('div');

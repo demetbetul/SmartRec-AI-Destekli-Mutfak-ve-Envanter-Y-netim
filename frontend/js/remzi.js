@@ -11,6 +11,35 @@ import { Auth } from './auth.js';
 const LS_INV  = 'smartrec_inventory';
 const LS_SHOP = 'smartrec_shopping';
 
+// ─── Toast yardımcısı (recipes.html'in srToast'ını çağırır; yoksa inline) ────
+function _srToast({ type = 'info', icon = 'ℹ️', title = '', sub = '' } = {}) {
+  if (typeof window.srToast === 'function') {
+    window.srToast({ type, icon, title, sub });
+    return;
+  }
+  // Fallback: srToast henüz yüklenmemişse hafif inline toast oluştur
+  const container = document.getElementById('sr-toast-container') || (() => {
+    const el = document.createElement('div');
+    el.id = 'sr-toast-container';
+    el.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:99999;display:flex;flex-direction:column;gap:0.5rem;';
+    document.body.appendChild(el);
+    return el;
+  })();
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    display:flex;align-items:center;gap:0.75rem;
+    background:#1A1208;color:#fff;
+    padding:0.85rem 1.25rem;border-radius:14px;
+    font-size:0.875rem;font-weight:500;
+    box-shadow:0 4px 20px rgba(0,0,0,0.25);
+    animation:toastIn 0.3s ease both;
+    max-width:320px;
+  `;
+  toast.innerHTML = `<span style="font-size:1.1rem">${icon}</span><div><div style="font-weight:700">${title}</div>${sub ? `<div style="opacity:0.75;font-size:0.78rem;margin-top:2px">${sub}</div>` : ''}</div>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.animation = 'toastOut 0.25s ease forwards'; setTimeout(() => toast.remove(), 280); }, 3800);
+}
+
 // ─── Chatbot ──────────────────────────────────────────────────────────────────
 export function initRemzi() {
   const modal    = document.getElementById('chatbotModal');
@@ -292,7 +321,7 @@ export function addMissingToShopping(recipeMaterials) {
   );
 
   if (!missing.length) {
-    alert('Tüm malzemeler envanterinizde mevcut! ✅');
+    _srToast({ type: 'success', icon: '✅', title: 'Tüm malzemeler mevcut!', sub: 'Envanterinizde eksiksiz hazır.' });
     return;
   }
 
@@ -315,5 +344,5 @@ export function addMissingToShopping(recipeMaterials) {
     document.getElementById('tabShopping')?.classList.remove('hidden');
   }
 
-  alert(`${missing.length} eksik malzeme alışveriş listesine eklendi! 🛒`);
+  _srToast({ type: 'info', icon: '🛒', title: 'Malzemeler Listeye Eklendi', sub: `${missing.length} eksik malzeme alışveriş listesine eklendi.` });
 }
