@@ -218,7 +218,7 @@
   <script type="module">
     import { renderHeader, renderChatbot } from './js/header.js';
     import { Auth, initPage } from './js/auth.js';
-    import { initRemzi, initDrawer } from './js/remzi.js';
+    import { initRemzi, initDrawer, getInventory } from './js/remzi.js';
     import { MOCK_RECIPES, Favorites, logCalories, openRecipeDetail } from './js/recipes.js';
 
     document.getElementById('app-header').innerHTML = renderHeader('remzi');
@@ -255,7 +255,7 @@
       const userInput = document.getElementById('remziPageInput');
       const sendBtn = document.getElementById('remziPageSend');
       // remzi.html içindeki mevcut chatContext satırını bul ve şununla değiştir:
-      let chatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba', 'Nasılsın' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al ve 'Selam! Bugün mutfakta sana nasıl yardımcı olabilirim, ne pişirelim?' gibi doğal bir soru sor. \n\nSADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. Tarif verirken de hep aynı şeyleri tekrarlama, yaratıcı alternatifler üret. \n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
+      let chatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba', 'Nasılsın' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al ve 'Selam! Bugün mutfakta sana nasıl yardımcı olabilirim, ne pişirelim?' gibi doğal bir soru sor. \n\nSADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. Tarif verirken de hep aynı şeyleri tekrarlama, yaratıcı alternatifler üret. \n\nÇOK ÖNEMLİ: Eğer sana gönderilen envanter listesi boşsa, 'Envanterin şu an boş' de ve tarif verme. Sadece envanterdeki malzemeleri kullan, olmayanları varmış gibi hayal etme!\n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
 
       function _appendMsg(text, type) {
         const wrap = document.createElement('div');
@@ -272,6 +272,9 @@
         if (!msg) return;
         _appendMsg(msg, 'user');
         if (!msgText) userInput.value = '';
+        const invList = getInventory().map(i => i.ad).join(', ');
+        const envanterDurumu = invList.trim() === "" ? "HİÇ MALZEME YOK (BOMBOŞ)" : invList;
+        const gonderilecekMesaj = `[SİSTEM BİLGİSİ: Kullanıcının şu anki güncel envanteri: ${envanterDurumu}]\n\n` + chatContext;
         chatContext += "Kullanıcı: " + msg + "\n";
         const typingEl = document.createElement('div');
         typingEl.className = 'rchat-msg rchat-msg--bot';
@@ -281,7 +284,7 @@
         try {
           const res = await fetch('http://localhost:5000/api/ai/chat', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mesaj: chatContext, userId: user?.id })
+            body: JSON.stringify({ mesaj: gonderilecekMesaj, userId: user?.id, email: user?.email || '', envanter: getInventory().map(i => i.ad).join(',') })
           });
           const data = await res.json();
           typingEl.remove();
