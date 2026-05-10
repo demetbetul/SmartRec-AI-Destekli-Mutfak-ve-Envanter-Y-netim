@@ -783,9 +783,6 @@
         .catch(() => {}); // Backend kapalıysa localStorage verisiyle devam et
     }
 
-    // ══════════════════════════════════════════════════════
-    // [2] ENVANTER ARAMA & SKT SIRALAMA
-    // ══════════════════════════════════════════════════════
     let _invSortBySKT = false;
 
     // Orijinal renderInventory'yi genişletilmiş versiyonla değiştir
@@ -873,9 +870,6 @@
       renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', _invSortBySKT);
     });
 
-    // ══════════════════════════════════════════════════════
-    // [3] ALIŞVERİŞ — MARKET BUTONLARI (DASHBOARD KARTI)
-    // ══════════════════════════════════════════════════════
     function _openMarket(baseUrl, label) {
       const unchecked = getShop().filter(i => !i.checked);
       if (!unchecked.length) { _toast('🛒 Listede işaretlenmemiş ürün yok.', 'warn'); return; }

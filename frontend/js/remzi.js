@@ -1,23 +1,6 @@
-/**
- * SmartRec — remzi.js  (v8 — Multi-User)
- *
- * DÜZELTMELER:
- *  ✅ Envanter localStorage anahtarı kullanıcı mailine göre izole edildi
- *     (smartrec_inventory → smartrec_inventory_mail@example_com)
- *  ✅ Alışveriş listesi anahtarı kullanıcı mailine göre izole edildi
- *  ✅ Chat fetch'ine user email eklendi
- *  ✅ getInventory() oturumu kapalı misafirler için ortak anahtar kullanmaya devam eder
- *  ✅ _userKey() — anahtarı hesaplayan merkezi yardımcı
- */
 
 import { Auth } from './auth.js';
 
-// ─── localStorage anahtar yönetimi ───────────────────────────────────────────
-/**
- * Aktif kullanıcının mail adresini alıp anahtar son ekine dönüştürür.
- * Giriş yapılmamışsa boş string döner → genel "misafir" anahtarı kullanılır.
- * Örnek: "ahmet@gmail.com" → "_ahmet_at_gmail_com"
- */
 function _userSuffix() {
   const user = Auth.getUser();
   if (!user?.email) return '';
@@ -98,7 +81,6 @@ export function initRemzi() {
     body.scrollTop = body.scrollHeight;
 
     try {
-      // DÜZELTİLDİ: user.email backend'e gönderiliyor
       const user = Auth.getUser();
       const invList = getInventory().map(i => i.ad).join(', ');
       const envanterDurumu = invList.trim() === "" ? "HİÇ MALZEME YOK (BOMBOŞ)" : invList;
@@ -177,7 +159,6 @@ export function initDrawer() {
     const user = Auth.getUser();
     const newItem = { id: Date.now(), ad: name, miktar: Number(qtyEl?.value) || 1, skt: expiryEl?.value || '' };
 
-    // DÜZELTİLDİ: Önce localStorage'a yaz (anında tepki için)
     const items = getInventory();
     items.push(newItem);
     _saveInventory(items);
@@ -216,7 +197,6 @@ export function initDrawer() {
 }
 
 // ─── Envanter CRUD ────────────────────────────────────────────────────────────
-// DÜZELTİLDİ: Tüm okuma/yazma işlemleri _invKey() ile kullanıcıya özel anahtar kullanıyor.
 export function getInventory() {
   try { return JSON.parse(localStorage.getItem(_invKey()) || '[]'); }
   catch { return []; }
@@ -277,7 +257,6 @@ function _renderInventory() {
 }
 
 // ─── Alışveriş CRUD ───────────────────────────────────────────────────────────
-// DÜZELTİLDİ: _shopKey() ile kullanıcıya özel anahtar kullanılıyor.
 function _getShopping() {
   try { return JSON.parse(localStorage.getItem(_shopKey()) || '[]'); }
   catch { return []; }

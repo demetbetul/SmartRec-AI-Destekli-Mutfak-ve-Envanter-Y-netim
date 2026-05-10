@@ -1,34 +1,13 @@
-/**
- * SmartRec — recipes.js  (v10 — Multi-User Favoriler)
- *
- * DÜZELTMELER:
- *  ✅ FAV_KEY artık sabit değil — her kullanıcı için ayrı anahtar
- *     (smartrec_favorites_ahmet_at_gmail_com gibi)
- *  ✅ _favKey() merkezi yardımcı: oturum açıksa user-specific, değilse genel
- *  ✅ Favorites.getAll / has / toggle hepsi _favKey() kullanıyor
- *  ✅ Oturum değiştiğinde (smartrec:auth-change) kart favori ikonları güncellenir
- */
+
 
 import { Auth } from './auth.js';
 
-// ─── Favori anahtar yönetimi ───────────────────────────────────────────────────
-/**
- * Aktif kullanıcıya özel localStorage anahtarını döndürür.
- * Giriş yapılmamışsa misafir anahtarı kullanılır.
- */
 function _favKey() {
   const user = Auth.getUser();
   if (!user?.email) return 'smartrec_favorites_guest';
   const suffix = user.email.replace('@', '_at_').replace(/\./g, '_');
   return `smartrec_favorites_${suffix}`;
 }
-
-/**
- * ✅ KALDIRILDI: _scoreFromId() artık kullanılmıyor.
- * Puan artık doğrudan recipes.json'daki t.puan alanından okunur.
- * (t.puan bir string olarak saklandığı için parseFloat ile sayıya dönüştürülür.)
- */
-
 
 // ─── Favori Yönetimi ──────────────────────────────────────────────────────────
 export const Favorites = {
@@ -52,8 +31,6 @@ export const Favorites = {
   }
 };
 
-// Oturum açıp kapandığında kart favori ikonları yenilenmeli.
-// initRecipeCardEvents'ten sonra render edilmiş kartlardaki kalp ikonlarını günceller.
 window.addEventListener('smartrec:auth-change', () => {
   document.querySelectorAll('.recipe-card').forEach(card => {
     const id     = Number(card.dataset.id);
@@ -98,8 +75,6 @@ export async function loadRecipes() {
     }
   }
 
-  // ─── TÜRKÇE → İNGİLİZCE ALAN EŞLEŞTİRME ───────────────────────────────────
-  // JSON'daki etiketleri URL-slug formatına normalize eder (Türkçe karakter → ASCII)
   function _slugify(str) {
     if (!str) return '';
     return str
@@ -174,10 +149,6 @@ export async function loadRecipes() {
     'geleneksel':  '🫕 Geleneksel',
   };
 
-  // ⚠️ KRİTİK: MOCK_RECIPES = [...] ile yeniden atama YAPILMAZ.
-  // ES module 'export let' değişkeni başka dosyalara live binding olarak aktarılır;
-  // = ile yeniden atama referansı koparır → diğer dosyalar hâlâ boş diziyi görür.
-  // Çözüm: aynı dizi referansına in-place yaz (length=0 + push).
   MOCK_RECIPES.length = 0;
   hamListe.forEach(t => {
     const tags    = _normalizeTags(t.etiketler);
@@ -228,9 +199,6 @@ export async function loadRecipes() {
   });
 
   console.log('✅ Türkçe→İngilizce veri eşlemesi tamamlandı:', MOCK_RECIPES.length, 'tarif');
-
-  // Her iki event ismi de fırlatılır: recipes.js kendi içinde 'tarifler-hazir',
-  // index.html ve recipes.html 'smartrec:recipes-ready' dinlediği için ikisini de gönder.
   window.dispatchEvent(new CustomEvent('tarifler-hazir',        { detail: MOCK_RECIPES }));
   window.dispatchEvent(new CustomEvent('smartrec:recipes-ready', { detail: MOCK_RECIPES }));
   
@@ -321,8 +289,6 @@ export function openRecipeDetail(recipeId) {
   const panel      = document.getElementById('recipeDetailPanel');
   const overlay    = document.getElementById('recipeDetailOverlay');
   const isLoggedIn = Auth.isLoggedIn();
-  // DÜZELTİLDİ: Favorites.has() artık _favKey() kullandığından
-  // doğru kullanıcının favorisini okur.
   const isFav      = isLoggedIn && Favorites.has(recipe.id);
   const diffColor  = recipe.difficulty === 'Kolay' ? '#2D7A4F'
                    : recipe.difficulty === 'Zor'   ? '#C0392B' : '#6B5E4E';

@@ -1,19 +1,6 @@
-/**
- * SmartRec — auth.js  (v7 — Tam & Düzeltilmiş)
- *
- * DÜZELTMELER:
- *  ✅ Auth.setUser() alias eklendi (login.html bunu çağırıyor)
- *  ✅ Dropdown: CSS'deki .active class'ı kullanılıyor (.open değil)
- *  ✅ initPage() header DOM'u oluştuktan sonra event bind ediyor
- *  ✅ Hamburger mobil menüsü tam çalışır
- *  ✅ Scroll → header gölge efekti
- *  ✅ Misafir/üye görünümü koşullu yönetimi
- *  ✅ auth-only nav linkleri JS ile gösterilir
- */
 
 const LS_USER = 'smartrec_user';
 
-// ─── Auth API ────────────────────────────────────────────────────────────────
 export const Auth = {
   getUser() {
     try { return JSON.parse(localStorage.getItem(LS_USER) || 'null'); }
@@ -22,23 +9,19 @@ export const Auth = {
 
   isLoggedIn() { return !!this.getUser(); },
 
-  /** Giriş yaptır (kullanıcıyı kaydet) */
   login(userData) {
     localStorage.setItem(LS_USER, JSON.stringify(userData));
     window.dispatchEvent(new CustomEvent('smartrec:auth-change', { detail: { user: userData } }));
   },
 
-  /** login() ile aynı — login.html eski adı kullanıyor */
   setUser(userData) { this.login(userData); },
 
-  /** Oturumu kapat */
   logout() {
     localStorage.removeItem(LS_USER);
     window.dispatchEvent(new CustomEvent('smartrec:auth-change', { detail: { user: null } }));
     window.location.href = 'index.html';
   },
 
-  /** Giriş zorunlu sayfalar için yönlendirme */
   requireAuth(returnTo) {
     if (!this.isLoggedIn()) {
       const page = returnTo || window.location.pathname.split('/').pop() || 'index.html';
@@ -48,29 +31,19 @@ export const Auth = {
   }
 };
 
-// ─── initPage ────────────────────────────────────────────────────────────────
-/**
- * Her sayfada, header inject edildikten SONRA çağrılır.
- * Header DOM hazır olduğunda tüm event'leri bağlar ve UI'yı günceller.
- */
 export function initPage() {
   _applyAuthUI();
   window.addEventListener('smartrec:auth-change', () => _applyAuthUI());
 }
 
-// ─── İç Yardımcılar ──────────────────────────────────────────────────────────
 function _applyAuthUI() {
   const user       = Auth.getUser();
   const isLoggedIn = !!user;
-
-  // Misafir / Üye alanlarını göster-gizle
   const authLinks = document.querySelectorAll('.nav__link--auth-only');
   const guestActions = document.getElementById('guestActions');
   const userWrapper  = document.getElementById('userMenuWrapper');
   guestActions?.classList.toggle('hidden', isLoggedIn);
   userWrapper?.classList.toggle('hidden', !isLoggedIn);
-  
-  // Auth-only nav linkleri
   document.querySelectorAll('.nav__link--auth-only').forEach(link => {
     link.style.display = isLoggedIn ? '' : 'none';
   });
@@ -93,7 +66,6 @@ function _applyAuthUI() {
     if (nameEl)   nameEl.textContent   = user.ad || user.name || 'Kullanıcı';
     if (emailEl)  emailEl.textContent  = user.email || '';
 
-    // remzi.html welcome mesajı
     const welcomeEl = document.getElementById('remziWelcomeMsg');
     if (welcomeEl && !welcomeEl.dataset.personalized) {
       welcomeEl.innerHTML   = `Merhaba <strong>${firstName}</strong>! 👋 Bugün ne pişirmek istersiniz?`;
@@ -108,12 +80,11 @@ let _bound = false;
 function _bindHeaderEvents() {
   if (_bound) return;
 
-  // Avatar → dropdown aç/kapat  (CSS: .active class)
   const avatarBtn = document.getElementById('userAvatarBtn');
   const dropdown  = document.getElementById('profileDropdown');
 
   if (avatarBtn && dropdown) {
-    _bound = true; // Sadece ikisi de varsa bağla
+    _bound = true; 
 
     avatarBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -121,7 +92,6 @@ function _bindHeaderEvents() {
       avatarBtn.setAttribute('aria-expanded', String(isOpen));
     });
 
-    // Dışarı tıklayınca kapat
     document.addEventListener('click', e => {
       if (!dropdown.contains(e.target) && e.target !== avatarBtn) {
         dropdown.classList.remove('active');
@@ -129,7 +99,6 @@ function _bindHeaderEvents() {
       }
     });
 
-    // ESC ile kapat
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         dropdown.classList.remove('active');
@@ -138,10 +107,8 @@ function _bindHeaderEvents() {
     });
   }
 
-  // Logout
   document.getElementById('logoutBtn')?.addEventListener('click', () => Auth.logout());
 
-  // Hamburger (mobil)
   const hamburger = document.getElementById('hamburger');
   const mainNav   = document.getElementById('mainNav');
   hamburger?.addEventListener('click', () => {
@@ -151,7 +118,6 @@ function _bindHeaderEvents() {
     hamburger.setAttribute('aria-expanded', String(expanded));
   });
 
-  // Mobil: nav link'e tıklayınca menüyü kapat
   document.querySelectorAll('.nav__link').forEach(link => {
     link.addEventListener('click', () => {
       mainNav?.classList.remove('open');
@@ -159,15 +125,13 @@ function _bindHeaderEvents() {
     });
   });
 
-  // Scroll → header gölge
   const header = document.getElementById('header');
   if (header) {
     const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // ilk çalıştırma
+    onScroll(); 
   }
 
-  // Profil dropdown'ındaki envanter/alışveriş butonları
   document.getElementById('dropdownInventoryBtn')?.addEventListener('click', e => {
     e.preventDefault();
     dropdown?.classList.remove('active');
@@ -179,7 +143,6 @@ function _bindHeaderEvents() {
     _openDrawer('shopping');
   });
 
-  // Profil Ayarları Modal
   document.getElementById('profileSettingsBtn')?.addEventListener('click', e => {
     e.preventDefault();
     dropdown?.classList.remove('active');
@@ -202,7 +165,6 @@ function _bindHeaderEvents() {
     if (goal) user.calorieGoal = Number(goal);
     Auth.login(user);
     document.getElementById('profileSettingsModal').style.display = 'none';
-    // Kullanıcı adını güncelle
     const avatarEl = document.getElementById('avatarDisplayName');
     const nameEl   = document.getElementById('dropdownUserName');
     const emailEl  = document.getElementById('dropdownUserEmail');

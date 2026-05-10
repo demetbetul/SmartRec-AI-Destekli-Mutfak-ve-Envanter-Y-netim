@@ -10,7 +10,6 @@
 </head>
 <body>
 
-  <!-- HEADER (JS tarafından inject edilir) -->
   <div id="app-header"></div>
 
   <!-- ===== HERO ===== -->
@@ -180,7 +179,6 @@
           </div>
         </div>`;
 
-      // --- [DÜZELTME] DOĞRUDAN VE AKILLI ENVANTER KONTROLÜ ---
       // Kullanıcının anlık envanterini doğrudan localStorage'dan okuyan fonksiyon
       const getLocalInventory = () => {
         const user = Auth.getUser();
@@ -200,7 +198,6 @@
         return ingredients.filter(ing => {
           const lowerIng = ing.toLocaleLowerCase('tr-TR');
           // Envanterdeki ürün tarifteki malzemenin içinde geçiyorsa eksik değildir
-          // (Örn: "domates" envanterde var, tarifte "2 adet domates" yazıyor -> eşleşir)
           return !userInv.some(invItem => invItem.length > 2 && lowerIng.includes(invItem));
         });
       };

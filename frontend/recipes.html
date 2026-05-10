@@ -9,9 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
 
-    /* ═══════════════════════════════════════════════
-       SMARTREC TOAST / BİLDİRİM SİSTEMİ
-    ═══════════════════════════════════════════════ */
     @keyframes sr-toast-in {
       from { opacity: 0; transform: translateY(20px) scale(0.92); }
       to   { opacity: 1; transform: translateY(0)     scale(1);    }
@@ -143,9 +140,6 @@
     }
     .sr-toast--auth .sr-toast__action:hover { opacity: 0.85; }
 
-    /* ═══════════════════════════════════════════════
-       YENİ KOMPAKT FİLTRE ÇUBUĞU
-    ═══════════════════════════════════════════════ */
     .smartfilter {
       max-width: 1280px;
       margin: 0 auto 1.75rem;
@@ -558,9 +552,7 @@
       });
     }
 
-    // ══════════════════════════════════════════════
     //  DROPDOWN MANTIĞI
-    // ══════════════════════════════════════════════
     function setupDropdown(dropdownId) {
       const dd = document.getElementById(dropdownId);
       if (!dd) return;

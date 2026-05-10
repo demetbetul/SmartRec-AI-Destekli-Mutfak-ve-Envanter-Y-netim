@@ -1,8 +1,3 @@
-/**
- * SmartRec — header.js  (v8)
- * ✅ Favori Tariflerim dropdown'a eklendi
- * ✅ Profil Ayarlarım butonu çalışır hale getirildi
- */
 
 export function renderHeader(activePage = 'home') {
   const a = (page, href, label, authOnly = false) => {
