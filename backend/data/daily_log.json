@@ -103,6 +103,63 @@
         "yemek": "lahmacun",
         "kalori": 500
       }
+    ],
+    "guldaliduygu123@gmail.com": [
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 1",
+        "kalori": 1540
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 3",
+        "kalori": 1383
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "menemen",
+        "kalori": 240
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "mercimek çorbası",
+        "kalori": 300
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 1",
+        "kalori": 1540
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "tavuk sote",
+        "kalori": 450
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "lahmacun",
+        "kalori": 500
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 2",
+        "kalori": 1183
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "menemen",
+        "kalori": 240
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 1",
+        "kalori": 1209
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "lahmacun",
+        "kalori": 500
+      }
     ]
   }
 }
