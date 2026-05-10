@@ -3,7 +3,6 @@ import json # JSON verilerini Python sözlüğüne çevirmek için ekledik
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# .env dosyasından API anahtarını yükle
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -18,7 +17,6 @@ else:
         
         elimizdeki_malzemeler = "tavuk göğsü, 2 adet domates, yarım paket makarna, biraz kaşar peyniri"
         
-        # Prompt'umuzu bir yazılımın anlayacağı formatta istiyoruz
         prompt = f"""
         Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana başlangıç, 
         ana yemek ve tatlıdan oluşan 3 aşamalı bir menü öner: {elimizdeki_malzemeler}. 
@@ -35,7 +33,6 @@ else:
         """
         
         try:
-            # generation_config ile AI'ı zorunlu JSON formatına sokuyoruz
             response = model.generate_content(
                 prompt,
                 generation_config=genai.GenerationConfig(
@@ -44,12 +41,8 @@ else:
             )
             
             print("✅ AI Yanıtı Başarıyla Alındı!\n")
-            
-            # Gelen JSON metnini gerçek bir Python Dictionary'sine (Sözlüğüne) dönüştürüyoruz
-            # Bu sayede verileri nokta atışı çekebiliriz
             veri = json.loads(response.text)
             
-            # Projedeki Backend Yöneticisi bu verileri artık böyle rahatça kullanabilecek:
             print("--- AYRIŞTIRILMIŞ VERİLER ---")
             print(f"🍲 Başlangıç: {veri['baslangic']}")
             print(f"🍽️ Ana Yemek: {veri['ana_yemek']}")

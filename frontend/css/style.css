@@ -1,4 +1,3 @@
-
 /* ─── CSS Değişkenleri ─────────────────────── */
 :root {
   --clr-bg:            #FAF8F7; 
@@ -1460,10 +1459,10 @@ input, select, button, textarea { font-family: var(--font-body); }
 .smartfilter__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Tek satıra yayar */
+  justify-content: space-between;
   background: #fff;
   border: 1.5px solid var(--clr-border);
-  border-radius: 50px; /* Daha yuvarlak, modern hatlar */
+  border-radius: 50px; 
   padding: 0.5rem 1.5rem;
   gap: 1rem;
 }

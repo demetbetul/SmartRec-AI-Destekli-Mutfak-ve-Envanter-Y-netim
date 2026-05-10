@@ -178,7 +178,7 @@
       margin: 0 0.2rem;
     }
 
-    /* Normal chip butonları (Ana Yemek, Çorba, vb.) */
+    /* Normal chip butonları */
     .sf-chip {
       display: inline-flex;
       align-items: center;
@@ -406,7 +406,7 @@
 </head>
 <body>
 
-  <!-- Toast container (tüm bildirimler buraya eklenir) -->
+  <!-- Toast container -->
   <div id="sr-toast-container"></div>
 
   <div id="app-header"></div>
@@ -442,7 +442,7 @@
 
         <div class="sf-divider"></div>
 
-        <!-- Kategoriler dropdown (Diyet) -->
+        <!-- Kategoriler dropdown -->
         <div class="sf-dropdown" id="dietDropdown">
           <button class="sf-dropdown__trigger" id="dietTrigger">
             🌿 Kategoriler <span class="sf-dropdown__arrow">▼</span>
@@ -765,7 +765,7 @@
       });
     });
 
-    // ── Kalori kaydı toast
+
     window.addEventListener('smartrec:calorie-logged', (e) => {
       const { recipe } = e.detail;
       srToast({
@@ -782,7 +782,7 @@
       e.target.disabled = true;
     });
 
-    // Tarifler hazır olunca kartları bas; zaten yüklüyse (cache) anında çalışır
+  
     let _recipesRendered = false;
     let _recipesPoll = null;
     function _renderCardsOnce() {
@@ -795,7 +795,7 @@
     if (MOCK_RECIPES.length > 0) {
       _renderCardsOnce();
     } else {
-      // Yükleniyor göstergesi
+     
       const grid = document.getElementById('recipeCards');
       if (grid) grid.innerHTML = `
         <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;">
@@ -804,7 +804,7 @@
         </div>`;
       window.addEventListener('smartrec:recipes-ready', _renderCardsOnce, { once: true });
       window.addEventListener('tarifler-hazir',         _renderCardsOnce, { once: true });
-      // Fallback: event kaçırıldıysa polling ile yakala (her 50ms, max 10sn)
+  
       _recipesPoll = setInterval(() => {
         if (MOCK_RECIPES.length > 0) _renderCardsOnce();
       }, 50);

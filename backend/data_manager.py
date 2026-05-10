@@ -25,10 +25,8 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # ─── Merkezi dizin tanımları ───────────────────────────────────────────────────
-# Kural 1: Tek DATA_DIR. Tüm yollar buradan türetilir; başka hiçbir yerde
-# sabit dosya yolu yoktur.
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR   = os.path.join(BASE_DIR, 'data')          # backend/data klasörü
+DATA_DIR   = os.path.join(BASE_DIR, 'data')          
 BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
 
 os.makedirs(DATA_DIR,   exist_ok=True)
@@ -42,17 +40,15 @@ logging.basicConfig(
 )
 
 # ─── Dosya şablonları ──────────────────────────────────────────────────────────
-# Kural 3: Merkezi JSON yapısı. inventory ve daily_log artık tüm kullanıcıları
-# e-posta anahtarıyla tek dosyada tutar.
 DOSYA_SABLONLARI = {
-    "inventory.json":  {"envanterler": {}},     # {"envanterler": {"user@mail.com": [...]}}
-    "daily_log.json":  {"gunluk_kayitlar": {}},  # {"gunluk_kayitlar": {"user@mail.com": [...]}}
+    "inventory.json":  {"envanterler": {}},    
+    "daily_log.json":  {"gunluk_kayitlar": {}}, 
     "recipes.json":    [],
     "nutrition.json":  {},
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# KURAL 4 — Fail-Safe: Dosya garantisi
+# — Fail-Safe: Dosya garantisi
 # ─────────────────────────────────────────────────────────────────────────────
 def dosyayi_garantile(dosya_adi: str) -> str:
     """
@@ -67,7 +63,7 @@ def dosyayi_garantile(dosya_adi: str) -> str:
     return yol
 
 # ─────────────────────────────────────────────────────────────────────────────
-# KURAL 5 — DRY: Merkezi JSON okuma / yazma yardımcıları
+# — DRY: Merkezi JSON okuma / yazma yardımcıları
 # ─────────────────────────────────────────────────────────────────────────────
 def load_json(dosya_adi: str) -> dict:
     """Dosyayı garantileyip içeriğini döndürür."""
@@ -101,7 +97,7 @@ def save_json(dosya_adi: str, veri) -> bool:
 #                 Her dosya için en fazla MAX_YEDEK_SAYISI yedek tutulur;
 #                 eskiler otomatik silinir.
 # ─────────────────────────────────────────────────────────────────────────────
-MAX_YEDEK_SAYISI = 3   # Her dosya için tutulacak maksimum yedek adedi
+MAX_YEDEK_SAYISI = 3  
 
 def _kritik_yedek_al(dosya_adi: str) -> None:
     """
@@ -116,11 +112,10 @@ def _kritik_yedek_al(dosya_adi: str) -> None:
         return
     try:
         zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
-        kok           = dosya_adi.split('.')[0]              # "inventory"
+        kok           = dosya_adi.split('.')[0]           
         yedek_adi     = f"{kok}_{zaman_damgasi}.json"
         shutil.copy2(kaynak, os.path.join(BACKUP_DIR, yedek_adi))
 
-        # Bu dosyaya ait tüm yedekleri tarihe göre sırala; fazlasını sil
         tum_yedekler = sorted(
             f for f in os.listdir(BACKUP_DIR)
             if f.startswith(kok + "_") and f.endswith(".json")
@@ -147,8 +142,7 @@ def veri_yedekle():
     print(f"🛡️ Manuel yedekleme tamamlandı. (Maks. {MAX_YEDEK_SAYISI} yedek/dosya)")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Kural 2 — Merkezi kullanıcı envanter/log erişimi
-# (Ayrı klasör ve inventory_{email}.json mantığı tamamen kaldırıldı)
+#  Merkezi kullanıcı envanter/log erişimi
 # ─────────────────────────────────────────────────────────────────────────────
 def kullanici_envanterini_getir(user_email: str) -> list:
     """inventory.json içinden tek kullanıcının listesini döndürür."""
@@ -200,7 +194,6 @@ def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
     try:
         ham = load_json(dosya_adi)
         if 'recipes' in dosya_adi:
-            # {"tarifler": [...]} → [...]  veya zaten liste ise doğrudan döndür
             if isinstance(ham, dict):
                 return ham.get('tarifler', [])
             elif isinstance(ham, list):
@@ -359,7 +352,7 @@ def akilli_temizlik_yap(user_email):
     Bu, _kritik_yedek_al()'ın tetiklendiği nadir durumlardan biridir.
     """
     try:
-        _kritik_yedek_al("inventory.json")   # ← Otomatik, tek seferlik yedek
+        _kritik_yedek_al("inventory.json") 
 
         envanter   = kullanici_envanterini_getir(user_email)
         bugun      = datetime.now()
@@ -806,8 +799,6 @@ def sifir_ekstra_malzemeli_oneri(user_email=None):
         return []
 
 # ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
-# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
-# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
 def envanter_icin_ai_tarif_oner(user_email=None):
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
 
@@ -853,16 +844,15 @@ Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
         tarifler = json.loads(response.text)
 
         result = []
-        base_id = int(time.time()) # ✅ ÇÖZÜM 1: HER TARİFE EŞSİZ KİMLİK!
+        base_id = int(time.time()) 
         
         for i, t in enumerate(tarifler):
             cat = t.get("category", "ana-menu")
             
-            # ✅ ÇÖZÜM 2: YAPAY ZEKA İSİM DEĞİŞTİRİRSE HEPSİNİ YAKALA
             adims = t.get("steps") or t.get("adimlar") or t.get("yapilisi") or t.get("hazirlanis") or ["1. Tüm malzemeleri hazırlayın.", "2. Afiyetle tüketin."]
             
             result.append({
-                "id":         -(base_id + i), # Asla çakışmayan ID
+                "id":         -(base_id + i), 
                 "title":      t.get("title", "Tarif"),
                 "image":      yemek_fotografi_bul(t.get("title", "")),
                 "time":       t.get("time", "30 dk"),
@@ -871,7 +861,7 @@ Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
                 "tags":       [cat],
                 "tagLabels":  [KATEGORI_LABEL.get(cat, "🍽️ Öneri")],
                 "ingredients": t.get("ingredients") or t.get("malzemeler") or [],
-                "steps":      adims, # Garantiye alınmış adımlar
+                "steps":      adims, 
                 "desc":       f"Envanterinize göre AI önerisi"
             })
         return result

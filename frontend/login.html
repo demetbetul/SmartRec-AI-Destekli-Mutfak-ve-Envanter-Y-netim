@@ -87,7 +87,7 @@
   <script type="module">
     import { Auth } from './js/auth.js';
 
-    // ─── Zaten giriş yapılmışsa dashboard'a yönlendir ───
+    
     if (Auth.isLoggedIn()) {
       window.location.replace('index.html');
     }
@@ -121,7 +121,7 @@
     document.getElementById('switchToRegister')?.addEventListener('click', (e) => { e.preventDefault(); showPanel('register'); });
     document.getElementById('switchToLogin')?.addEventListener('click', (e) => { e.preventDefault(); showPanel('login'); });
 
-    // Eğer URL'de ?tab=register varsa direkt kayıt paneline geç
+    
     if (new URLSearchParams(location.search).get('tab') === 'register') {
       showPanel('register');
     }
@@ -228,7 +228,6 @@
         });
         const data = await res.json();
         if (data.success) {
-          // Kayıt sonrası otomatik giriş yap
           Auth.setUser({ ad: name.value.trim(), email: email.value.trim() });
           window.location.href = 'index.html';
         } else {

@@ -33,8 +33,6 @@ function filtreleTemelMalzemeler(malzemelerListesi) {
   const atilacaklar = ['tuz', 'su', 'karabiber', 'zeytinyağı', 'sıvı yağ', 'sıvıyağ', 'ayçiçek yağı', 'yağ', 'şeker'];
   return malzemelerListesi.filter(malzeme => {
     const kucuk = malzeme.toLowerCase().trim();
-    // Tam kelime eşleşmesi veya cümlenin bununla bitmesi ("1 çay kaşığı tuz")
-    // "1 su bardağı un" içindeki "su" kelimesi silinmesin diye endsWith kullanıyoruz!
     return !atilacaklar.some(t => kucuk === t || kucuk.endsWith(' ' + t));
   });
 }
@@ -74,8 +72,6 @@ window.addEventListener('smartrec:auth-change', () => {
 });
 
 export let MOCK_RECIPES = [];
-
-/** Backend'den tarif çeker. Başarısız olursa ../data/recipes.json'a düşer. */
 export async function loadRecipes() {
   if (MOCK_RECIPES.length > 0) return MOCK_RECIPES;
 
@@ -134,7 +130,6 @@ export async function loadRecipes() {
     return [...slugs].filter(Boolean);
   }
 
-  // ✅ ARKADAŞININ EKLEDİĞİ ÖZELLİK — miktar 0/boş/anlamsızsa sadece isim göster:
   function _malzemeStr(malzemeler = []) {
     return malzemeler.map(m => {
       if (typeof m === 'string') return m.trim();
@@ -191,7 +186,6 @@ export async function loadRecipes() {
       difficulty: _zorluk(t.zorluk),
       calories:   typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
       
-      // ✅ ARKADAŞININ EKLEDİĞİ ÖZELLİK — JSON'daki gerçek değeri kullan:
       score: t.puan != null ? parseFloat(t.puan) : null,
       puan:  t.puan != null ? String(t.puan) : '—',
       
@@ -323,7 +317,7 @@ export function openRecipeDetail(recipeId) {
      </li>`
   ).join('');
 
-  // HAFIZA KONTROLLERİ (SENİN KODUN)
+  // HAFIZA KONTROLLERİ
   const zatenPisirildi = isCookedToday(recipe.id);
   const zatenEklendi = isAddedToList(recipe.id);
 
@@ -376,8 +370,6 @@ export function openRecipeDetail(recipeId) {
       btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
       try {
         const { addMissingToShopping } = await import('./remzi.js');
-        
-        // YENİ EKLENEN FİLTRE: Tuz, su gibi maddeleri atar
         const eksikler = filtreleTemelMalzemeler(rIngredients);
         addMissingToShopping(eksikler);
         
@@ -408,8 +400,6 @@ export function openRecipeDetail(recipeId) {
       btn.textContent = '✅ Pişirildi'; btn.disabled = true;
       btn.style.background = '#2D7A4F'; btn.style.color = 'white'; 
       btn.style.border = 'none'; btn.style.cursor = 'not-allowed'; btn.style.opacity = '0.8';
-
-      // ARKA PLANDAKİ KARTI DA ANINDA YEŞİL YAPAR
       document.querySelectorAll(`.cooked-btn[data-id="${recipe.id}"]`).forEach(b => {
         b.textContent = '✅ Pişirildi'; b.disabled = true;
         b.style.background = '#2D7A4F'; b.style.color = 'white'; 
@@ -551,7 +541,7 @@ function _initCardEvents(container, recipes) {
 
   container.querySelectorAll('.missing-btn').forEach(btn => {
     btn.addEventListener('click', async e => {
-      e.preventDefault(); // SAYFA YENİLENMESİNİ ENGELLER
+      e.preventDefault();
       e.stopPropagation();
       const id = Number(btn.dataset.id);
       if (isAddedToList(id)) return;
@@ -562,8 +552,6 @@ function _initCardEvents(container, recipes) {
       btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
       try {
         const { addMissingToShopping } = await import('./remzi.js');
-        
-        // YENİ EKLENEN FİLTRE: Tuz, su gibi maddeleri atar
         const eksikler = filtreleTemelMalzemeler(recipe.ingredients);
         addMissingToShopping(eksikler);
         
@@ -578,7 +566,7 @@ function _initCardEvents(container, recipes) {
 
   container.querySelectorAll('.cooked-btn').forEach(btn => {
     btn.addEventListener('click', e => {
-      e.preventDefault(); // SAYFA YENİLENMESİNİ ENGELLER
+      e.preventDefault();
       e.stopPropagation();
       const id = Number(btn.dataset.id);
       
