@@ -103,6 +103,18 @@
         "yemek": "lahmacun",
         "kalori": 500
       }
+    ],
+    "demet1@gmail.com": [
+      {
+        "tarih": "2026-05-10",
+        "yemek": "mercimek çorbası",
+        "kalori": 300
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "Menü Seçeneği 1",
+        "kalori": 815
+      }
     ]
   }
 }
