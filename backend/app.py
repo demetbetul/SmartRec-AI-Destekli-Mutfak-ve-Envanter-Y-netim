@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 import os
+import re
 from datetime import datetime, timedelta
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -461,6 +462,10 @@ def register():
         if not email or not password:
             return jsonify({"success": False,
                             "message": "E-posta ve şifre zorunludur!"}), 400
+        
+        if not re.match(r'^(?=.*\d)(?=.*[!@#$%^&*.,?+\-]).{8,}$', password):
+            return jsonify({"success": False, 
+                            "message": "Şifre en az 8 karakter uzunluğunda olmalı, en az 1 rakam ve 1 özel karakter içermelidir."}), 400
 
         users = kullanicilari_yukle()
         if any(u['email'] == email for u in users):

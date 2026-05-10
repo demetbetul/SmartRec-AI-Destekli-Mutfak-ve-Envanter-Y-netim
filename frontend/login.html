@@ -66,8 +66,8 @@
           </div>
           <div class="form-group">
             <label for="regPassword">Şifre</label>
-            <input type="password" id="regPassword" class="input" placeholder="En az 6 karakter" autocomplete="new-password" required />
-            <span class="form-error" id="regPasswordError">En az 6 karakter giriniz.</span>
+            <input type="password" id="regPassword" class="input" placeholder="En az 8 karakter, 1 rakam, 1 özel karakter" autocomplete="new-password" required />
+            <span class="form-error" id="regPasswordError">En az 8 karakter, 1 rakam ve 1 özel karakter giriniz.</span>
           </div>
           <div class="form-group">
             <label for="regPasswordConfirm">Şifre Tekrar</label>
@@ -200,9 +200,16 @@
       if (!email.value.trim() || !email.checkValidity()) { markInput('regEmail', true); showError('regEmailError'); valid = false; }
       else { markInput('regEmail', false); showError('regEmailError', false); }
 
-      if (pass.value.length < 6) { markInput('regPassword', true); showError('regPasswordError'); valid = false; }
-      else { markInput('regPassword', false); showError('regPasswordError', false); }
-
+      const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*.,?+\-]).{8,}$/;
+      if (!passwordRegex.test(pass.value)) { 
+        markInput('regPassword', true); 
+        showError('regPasswordError'); 
+        valid = false; 
+      } else { 
+        markInput('regPassword', false); 
+        showError('regPasswordError', false); 
+      }
+      
       if (pass.value !== confirm.value) { markInput('regPasswordConfirm', true); showError('regConfirmError'); valid = false; }
       else { markInput('regPasswordConfirm', false); showError('regConfirmError', false); }
 

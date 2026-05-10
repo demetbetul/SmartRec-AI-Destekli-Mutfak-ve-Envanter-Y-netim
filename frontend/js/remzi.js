@@ -69,9 +69,19 @@ export function initRemzi() {
     });
   }
 
+  let isWaitingForResponse = false; // 1. İstek kilidi eklendi
+
   const sendMsg = async () => {
+    // Eğer Remzi hala düşünüyorsa yeni mesaja izin verme
+    if (isWaitingForResponse) return; 
+
     const text = input?.value.trim();
     if (!text || !body) return;
+
+    // İstek başladı, kilidi kapat ve butonu devre dışı bırak
+    isWaitingForResponse = true;
+    if (sendBtn) sendBtn.disabled = true;
+
     _appendMsg(body, text, 'user');
     input.value = '';
     body.scrollTop = body.scrollHeight;
@@ -82,29 +92,32 @@ export function initRemzi() {
 
     try {
       const user = Auth.getUser();
-      const invList = getInventory().map(i => i.ad).join(', ');
-      const envanterDurumu = invList.trim() === "" ? "HİÇ MALZEME YOK (BOMBOŞ)" : invList;
-      const gonderilecekMesaj = `[SİSTEM BİLGİSİ: Kullanıcının şu anki güncel envanteri: ${envanterDurumu}]\n\nKullanıcı: ${text}`;
 
       const res  = await fetch('http://localhost:5000/api/ai/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({
-          mesaj    : gonderilecekMesaj,
+          // Ön yüzden envanter göndermeyi kaldırdık, çünkü backend (Python) zaten ekliyor.
+          mesaj    : text, 
           kullanici: user?.ad || 'Misafir',
-          email    : user?.email || '',   // ← Eklendi
-          envanter : getInventory().map(i => i.ad).join(', ')
+          email    : user?.email || ''
         })
       });
     
       const data = await res.json();
       const el = document.getElementById(loadId);
-      if (el) el.querySelector('p').textContent = data.cevap || 'Bir şeyler ters gitti.';
+      // Remzi'nin satır atlamalarını düzgün göstermek için ufak bir regex eklendi
+      if (el) el.querySelector('p').innerHTML = data.cevap.replace(/\n/g, '<br>') || 'Bir şeyler ters gitti.';
     } catch {
       const el = document.getElementById(loadId);
       if (el) el.querySelector('p').innerHTML = '<span style="color:#C0392B">⚠️ Sunucuya ulaşılamıyor.</span>';
+    } finally {
+      // İstek bitti, kilidi aç, butonu aktifleştir ve odağı inputa geri ver
+      isWaitingForResponse = false;
+      if (sendBtn) sendBtn.disabled = false;
+      body.scrollTop = body.scrollHeight;
+      input?.focus(); 
     }
-    body.scrollTop = body.scrollHeight;
   };
 
   sendBtn?.addEventListener('click', sendMsg);

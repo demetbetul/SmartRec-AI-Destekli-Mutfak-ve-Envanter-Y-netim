@@ -28,5 +28,10 @@
     "ad": "saliha",
     "email": "saliha@gmail.com",
     "password": "scrypt:32768:8:1$GU8Z8tUVCNt45nRL$fa283d111bbca8b581bf96ace4f8f46c9f5c2bd136fec324b8b7a3b2cd2443cb73e133b3ebb3e8c77eefb3e374521aa31baafc4b61b62bc907593c2b6350a1e1"
+  },
+  {
+    "ad": "selin",
+    "email": "selen@gmail.com",
+    "password": "scrypt:32768:8:1$6vib8263PhS9QorL$1aaab3183d40c5928541dddb0ab079d95c198fb5bc0341f9122859033046c8470a10270b11eadf240ded7e1779cbe3c205673a60b025f1adee9162092bf0b948"
   }
 ]
