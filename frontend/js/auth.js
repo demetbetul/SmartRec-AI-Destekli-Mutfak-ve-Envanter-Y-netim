@@ -11,7 +11,7 @@ export const Auth = {
   login(userData) {
     const current = localStorage.getItem(LS_USER);
     const next = JSON.stringify(userData);
-    if (current === next) return; // ← Değişiklik yoksa event atma!
+    if (current === next) return; 
     localStorage.setItem(LS_USER, next);
     window.dispatchEvent(new CustomEvent('smartrec:auth-change', { detail: { user: userData } }));
   },
@@ -37,6 +37,7 @@ export const Auth = {
 
 export function initPage() {
   _applyAuthUI();
+  initProfileSettings();
   window.addEventListener('smartrec:auth-change', () => _applyAuthUI());
 }
 
@@ -162,20 +163,22 @@ function _bindHeaderEvents() {
   document.getElementById('saveProfileSettings')?.addEventListener('click', () => {
     const user = Auth.getUser();
     if (!user) return;
+    
     const name = document.getElementById('settingsName')?.value.trim();
     const email = document.getElementById('settingsEmail')?.value.trim();
     const goal = document.getElementById('settingsCalGoal')?.value;
+    
     if (name) user.ad = name;
     if (email) user.email = email;
-    if (goal) user.calorieGoal = Number(goal);
+    
+    if (goal) {
+        user.calorieGoal = Number(goal);
+        localStorage.setItem('smartrec_cal_goal', goal); 
+    }
+    
     Auth.login(user);
     document.getElementById('profileSettingsModal').style.display = 'none';
-    const avatarEl = document.getElementById('avatarDisplayName');
-    const nameEl   = document.getElementById('dropdownUserName');
-    const emailEl  = document.getElementById('dropdownUserEmail');
-    if (avatarEl) avatarEl.textContent = (user.ad||'U').charAt(0).toUpperCase();
-    if (nameEl)   nameEl.textContent   = user.ad || 'Kullanıcı';
-    if (emailEl)  emailEl.textContent  = user.email || '';
+    window.location.reload();
   });
 }
 
@@ -207,4 +210,30 @@ function _openProfileSettings() {
     if (goalEl) goalEl.value = user.calorieGoal || 2000;
   }
   modal.style.display = 'flex';
+}
+
+
+export function initProfileSettings() {
+  const saveBtn = document.getElementById('saveProfileSettingsBtn');
+  if (!saveBtn) return;
+
+  saveBtn.addEventListener('click', () => {
+    const nameEl = document.getElementById('settingsName');
+    const goalEl = document.getElementById('settingsCalGoal');
+    const user = Auth.getUser();
+
+    if (user && nameEl) {
+      user.ad = nameEl.value.trim();
+      Auth.setUser(user);
+    }
+
+    if (goalEl) {
+      const newGoal = goalEl.value;
+      if (newGoal && Number(newGoal) > 0) {
+        localStorage.setItem('smartrec_cal_goal', newGoal);
+      }
+    }
+
+    window.location.reload();
+  });
 }

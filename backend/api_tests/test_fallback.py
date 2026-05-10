@@ -9,7 +9,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
 genai.configure(api_key=GEMINI_API_KEY)
-# Test için İngilizce malzeme listesi (Spoonacular uyumu için)
 elimizdeki_malzemeler = "chicken, tomato, pasta, cheese" 
 
 def get_recipes_from_gemini():

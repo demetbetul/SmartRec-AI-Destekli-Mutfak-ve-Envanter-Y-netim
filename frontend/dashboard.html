@@ -150,7 +150,7 @@
     </div>
   </aside>
 
-  <!-- Bildirim FAB -->
+  
   <button id="notifFab" aria-label="Bildirimler" style="position:fixed;bottom:6rem;right:1.5rem;width:52px;height:52px;border-radius:50%;background:var(--clr-accent);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(196,75,28,0.35);font-size:1.3rem;display:flex;align-items:center;justify-content:center;z-index:7999;transition:transform 0.2s,box-shadow 0.2s;">
     🔔
     <span id="notifBadge" style="position:absolute;top:-2px;right:-2px;background:#e74c3c;color:#fff;border-radius:50%;width:18px;height:18px;font-size:0.65rem;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid #fff;"></span>
@@ -185,14 +185,14 @@
     if (subtitleEl) subtitleEl.textContent = `Hoş geldin, ${displayName}! Mutfak envanterini yönet.`;
 
     // ─── LOCAL STORAGE KEYS ───────────────────────────────
-    // remzi.js ile aynı kullanıcıya-özgü key mantığı
+    
     function _userSuffix() {
       const u = Auth.getUser();
       return u?.email ? '_' + u.email.replace('@','_at_').replace(/\./g,'_') : '';
     }
     const LS_INV   = () => `smartrec_inventory${_userSuffix()}`;
     const LS_SHOP  = () => `smartrec_shopping${_userSuffix()}`;
-    const LS_CAL   = `smartrec_calories_log${_userSuffix()}`;  // kullanıcıya özel
+    const LS_CAL   = `smartrec_calories_log${_userSuffix()}`;  
     const LS_GOAL  = 'smartrec_cal_goal';
 
     function getInv()   { try { return JSON.parse(localStorage.getItem(LS_INV())  || '[]'); } catch { return []; } }
@@ -285,7 +285,6 @@
           if (items[idx].miktar === 0) items.splice(idx, 1);
           saveInv(items);
           renderInventory();
-          // Backend'e miktar değişimini bildir
           if (user?.email && itemAd) {
             fetch(`http://localhost:5000/api/inventory/qty/${encodeURIComponent(itemAd)}?email=${encodeURIComponent(user.email)}&degisim=${degisim}`, {
               method: 'POST'
@@ -301,7 +300,6 @@
           const updated = all.filter(i => String(i.id) !== btn.dataset.id);
           saveInv(updated);
           renderInventory();
-          // Backend'den de sil
           if (user?.email && item) {
             fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
               method: 'DELETE'
@@ -341,10 +339,7 @@
       cancelInventoryBtn.click();
       renderInventory();
       _toast(`✅ "${name}" dolaba eklendi.`, 'success');
-
-      // Backend'e de yaz (oturum açıksa)
-      if (user?.email) {
-        // SKT girilmişse gün farkını hesapla, girilmemişse 7 gün default
+      if (user?.email) {t
         let tuketim_suresi = 7;
         if (skt) {
           const diff = Math.ceil((new Date(skt) - new Date()) / 86400000);
@@ -795,8 +790,6 @@
     renderInventory();
     renderCalorie();
     renderShopping();
-
-    // Backend'den güncel envanteri çek ve localStorage ile birleştir
     if (user?.email) {
       fetch(`http://localhost:5000/api/inventory?email=${encodeURIComponent(user.email)}`)
         .then(r => r.json())
@@ -813,12 +806,10 @@
             renderInventory();
           }
         })
-        .catch(() => {}); // Backend kapalıysa localStorage verisiyle devam et
+        .catch(() => {}); 
     }
 
     let _invSortBySKT = false;
-
-    // Orijinal renderInventory'yi genişletilmiş versiyonla değiştir
     renderInventory = function renderInventoryExt(filter, sortSKT) {
       const container = document.getElementById('inventoryList');
       if (!container) return;
@@ -906,7 +897,6 @@
     function _openMarket(baseUrl, label) {
       const unchecked = getShop().filter(i => !i.checked);
       if (!unchecked.length) { _toast('🛒 Listede işaretlenmemiş ürün yok.', 'warn'); return; }
-      // Her ürün için sıralı sekmeler aç (pop-up blocker'ı aşmak için küçük delay)
       unchecked.forEach((it, idx) =>
         setTimeout(() => window.open(baseUrl + encodeURIComponent(it.ad), '_blank'), idx * 350)
       );

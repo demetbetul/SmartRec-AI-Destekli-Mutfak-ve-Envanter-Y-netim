@@ -323,7 +323,6 @@
 
     // ─── SOL KART: Sana Özel Menü (Günlük Sabit) ──────────────────────────────────
     const dailyEl = document.getElementById('remziDailyList');
-    // ✅ ÇÖZÜM 3: Eski bozuk hafızayı patlatmak için anahtarı v2 yaptık!
     const DAILY_CACHE_KEY    = 'smartrec_remzi_daily_v2_cache';
     const DAILY_CACHE_DATE   = 'smartrec_remzi_daily_v2_date';
 
@@ -419,7 +418,6 @@
     // ─── SAĞ KART: Envantere Özel Menü (Yapay Zeka) ───────────────────────────────
     const invEl = document.getElementById('remziInvList');
     const _userSlug = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
-    // ✅ ÇÖZÜM 4: Eski bozuk AI hafızasını patlatmak için anahtarı v2 yaptık!
     const INV_CACHE_KEY  = `smartrec_inv_v2_cache${_userSlug}`;
     const INV_CACHE_DATE = `smartrec_inv_v2_date${_userSlug}`;
 

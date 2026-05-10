@@ -57,7 +57,6 @@ from data_manager import (
 app = Flask(__name__)
 CORS(app)
 
-# DATA_DIR: data_manager ile aynı kök. users.json buraya yazılır.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -125,7 +124,6 @@ def health_check():
 @handle_errors
 def get_all_recipes():
     ham = veriyi_yukle('recipes.json')
-    # recipes.json {"tarifler": [...]} yapısında olabilir; düz liste de olabilir
     if isinstance(ham, dict):
         tarifler = ham.get('tarifler', [])
     elif isinstance(ham, list):
@@ -199,7 +197,6 @@ def get_inventory():
     if not user_email:
         return jsonify({"success": False, "error": "Email parametresi gerekli!"}), 400
 
-    # Merkezi inventory.json'dan kullanıcının listesi doğrudan alınır.
     envanter = kullanici_envanterini_getir(user_email)
     return jsonify({
         "success": True,
@@ -234,7 +231,6 @@ def remove_from_inventory(urun_id):
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    # Merkezi inventory.json'dan kullanıcı envanteri okunur, güncellenir, yazılır.
     envanter = kullanici_envanterini_getir(user_email)
     original_count = len(envanter)
     envanter = [
@@ -256,7 +252,6 @@ def get_inventory_stats():
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    # Merkezi inventory.json'dan kullanıcı verisi alınır; dosya yolu kullanılmaz.
     envanter = kullanici_envanterini_getir(user_email)
     bugun = datetime.now()
 
@@ -288,7 +283,6 @@ def update_qty(urun_ad):
     if not user_email:
         return jsonify({"success": False, "message": "Email eksik!"}), 400
 
-    # miktar_guncelle yerine doğrudan envanter işlemi (data_manager'da fonksiyon yoksa)
     envanter = kullanici_envanterini_getir(user_email)
     urun = next(
         (item for item in envanter if veri_temizle(item["ad"]) == veri_temizle(urun_ad)),
@@ -320,7 +314,6 @@ def get_smart_recipes():
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    # Kullanıcının envanter listesi hazırlanıp AI menüye gönderilir.
     malzemeler = ai_icin_malzeme_listesi_hazirla(user_email)
     if not malzemeler:
         return jsonify({"success": True, "recipes": {"kaynak": "bos", "menuler": []}}), 200
@@ -399,7 +392,7 @@ def get_recipe_details():
     return jsonify({
         "success": True,
         "data": tarif_detayi,
-        "detay": tarif_detayi  # index.html geriye dönük uyumluluk için
+        "detay": tarif_detayi 
     }), 200
 
 
@@ -422,7 +415,6 @@ def get_daily_logs():
     if not user_email:
         return jsonify({"success": True, "kayitlar": []}), 200
 
-    # Merkezi daily_log.json'dan kullanıcının kayıtları güvenli biçimde alınır.
     kayitlar = kullanici_logunu_getir(user_email)
     return jsonify({"success": True, "kayitlar": kayitlar}), 200
 
@@ -488,8 +480,6 @@ def register():
         })
         kullanicilari_kaydet(users)
 
-        # Yeni kullanıcı için merkezi inventory.json'a boş kayıt açılır.
-        # (kullanici_envanterini_kaydet setdefault ile güvenli şekilde ekler)
         kullanici_envanterini_kaydet(email, [])
 
         print(f"✅ Kullanıcı kaydedildi: {email}")
@@ -528,7 +518,6 @@ def get_notifications():
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    # Klasör veya dosya yolu kontrolü yok; merkezi inventory.json'dan okunur.
     envanter    = kullanici_envanterini_getir(user_email)
     bildirimler = []
     bugun       = datetime.now()
