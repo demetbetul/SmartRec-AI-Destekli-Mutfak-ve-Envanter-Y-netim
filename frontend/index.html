@@ -201,16 +201,38 @@
 
       let missing = menu.ingredients ? [...menu.ingredients] : [];
       
-      const filterMissing = (ingredients) => {
-        if (!isLoggedIn) return ingredients;
+      // ✅ YENİ — hem temel malzemeleri hem de envanteri filtrele:
+const TEMEL_MALZEMELER = [
+  'tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ',
+  'şeker', 'salça', 'domates salçası', 'biber salçası',
+  'un', 'nişasta', 'sirke', 'limon suyu', 'sarımsak',
+  'soğan', 'tereyağı', 'tereyağ', 'margarin',
+  'toz şeker', 'pudra şekeri', 'vanilya', 'kabartma tozu',
+  'kırmızı pul biber', 'nane', 'kekik', 'pul biber'
+];
+
+  const filterMissing = (ingredients) => {
+    return ingredients.filter(ing => {
+      const lowerIng = (ing || '').toLocaleLowerCase('tr-TR').trim();
+      
+      // 1) Temel malzeme mi? → listeden çıkar (giriş yapılmış olsun ya da olmasın)
+      const isTemel = TEMEL_MALZEMELER.some(
+        temel => lowerIng.includes(temel) || temel.includes(lowerIng)
+      );
+      if (isTemel) return false;
+      
+      // 2) Envanterde var mı? → listeden çıkar (sadece giriş yapmış kullanıcılar için)
+      if (isLoggedIn) {
         const userInv = getLocalInventory().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
-        return ingredients.filter(ing => {
-          const lowerIng = ing.toLocaleLowerCase('tr-TR');
-          // Envanterdeki ürün tarifteki malzemenin içinde geçiyorsa eksik değildir
-          // (Örn: "domates" envanterde var, tarifte "2 adet domates" yazıyor -> eşleşir)
-          return !userInv.some(invItem => invItem.length > 2 && lowerIng.includes(invItem));
-        });
-      };
+        const isInInventory = userInv.some(
+          invItem => invItem.length > 2 && (lowerIng.includes(invItem) || invItem.includes(lowerIng))
+        );
+        if (isInInventory) return false;
+      }
+      
+      return true; // gerçekten eksik
+    });
+  };
       
       // İlk açılışta karttaki kaba bilgiyle hesapla
       missing = filterMissing(missing);
@@ -655,6 +677,25 @@
       }
     }
 
+        // Her iki yerde kullanılabilmesi için dışarıda tanımla
+    const TEMEL_MALZEMELER_LISTESI = [
+      'tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ',
+      'şeker', 'salça', 'domates salçası', 'biber salçası',
+      'un', 'nişasta', 'sirke', 'limon suyu', 'sarımsak',
+      'soğan', 'tereyağı', 'tereyağ', 'margarin',
+      'toz şeker', 'pudra şekeri', 'vanilya', 'kabartma tozu',
+      'kırmızı pul biber', 'nane', 'kekik', 'pul biber'
+    ];
+
+    function _filterTemelMalzemeler(ingredients) {
+      return ingredients.filter(ing => {
+        const lower = (ing || '').toLocaleLowerCase('tr-TR').trim();
+        return !TEMEL_MALZEMELER_LISTESI.some(
+          temel => lower.includes(temel) || temel.includes(lower)
+        );
+      });
+    }
+
     function _buildAndRenderMenuCards(menuler) {
       const today = MENU_TODAY;
       const parseCal = (val) => {
@@ -675,7 +716,8 @@
         score: _menuScore(menu.id),
         tags: ['Tam Menü'],
         emoji: '✨',
-        ingredients: menu.eksik_malzemeler || [],
+        // ✅ YENİ — kart nesnesine eklemeden önce filtrele:
+        ingredients: _filterTemelMalzemeler(menu.eksik_malzemeler || []),
         _raw: menu
       }));
       localStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ date: today, menuCards }));

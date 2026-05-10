@@ -116,13 +116,18 @@ export async function loadRecipes() {
     return [...slugs].filter(Boolean);
   }
 
-  // Malzemeleri obje dizisinden string dizisine çevirir
+  // ✅ YENİ — miktar 0/boş/anlamsızsa sadece isim göster:
   function _malzemeStr(malzemeler = []) {
     return malzemeler.map(m => {
-      if (typeof m === 'string') return m;
-      const { miktar = '', birim = '', isim = '' } = m;
+      if (typeof m === 'string') return m.trim();
+      const { miktar, birim = '', isim = '' } = m;
+      const miktarSayi = parseFloat(miktar);
+      // Miktar 0, boş veya NaN ise sadece ismi yaz
+      if (!miktar || isNaN(miktarSayi) || miktarSayi <= 0) {
+        return isim.trim();
+      }
       return [miktar, birim, isim].filter(Boolean).join(' ').trim();
-    });
+    }).filter(s => s.length > 0); // boş stringleri at
   }
 
   // Zorluk Türkçe normalize
@@ -180,7 +185,9 @@ export async function loadRecipes() {
       time:       t.toplam_sure || t.hazirlanma_suresi || '30 dk',
       difficulty: _zorluk(t.zorluk),
       calories:   typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
-      score:      parseFloat(t.puan) || 4.5,
+      // ✅ YENİ — JSON'daki gerçek değeri kullan, yoksa "—" göster:
+      score: t.puan != null ? parseFloat(t.puan) : null,
+      puan:  t.puan != null ? String(t.puan) : '—',
       image:      t.resim_url || t.thumbnail_url
                   || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80',
       emoji:      '🍽',
@@ -298,7 +305,10 @@ export function openRecipeDetail(recipeId) {
   const rDesc     = recipe.desc     || recipe.aciklama || '';
   const rTime     = recipe.time     || recipe.sure     || '—';
   const rCalories = recipe.calories ?? recipe.kalori   ?? 0;
-  const rScore    = recipe.score    || recipe.puan     || '—';
+  // ✅ YENİ:
+  const rScore = (recipe.score != null && recipe.score > 0)
+    ? parseFloat(recipe.score).toFixed(1)
+    : (recipe.puan && recipe.puan !== '—' ? recipe.puan : '—');
   const rDiff     = recipe.difficulty || recipe.zorluk || 'Orta';
   const rImage    = recipe.image    || recipe.resim    || '';
   // ingredients: her zaman string dizisi (map zaten dönüştürdü)
