@@ -1,9 +1,14 @@
 {
   "gunluk_kayitlar": [
     {
-      "tarih": "2026-05-09",
-      "yemek": "Peynirli gözleme",
-      "kalori": 500
+      "tarih": "2026-04-20",
+      "yemek": "Kuru Fasulye",
+      "kalori": 600
+    },
+    {
+      "tarih": "2026-05-07",
+      "yemek": "Fırında Sebzeli İzmir Köfte ve Pirinç Pilavı",
+      "kalori": 300
     }
   ]
 }

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {
   "tarifler": [
     {
@@ -2394,6 +2395,1329 @@
     },
     {
       "id": 31,
+=======
+{"tarifler": [
+  {
+   "id": 1,
+    "ad": "menemen",
+    "slug": "menemen",
+    "kategori": "kahvaltı",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "10 dk",
+    "toplam_sure": "15 dk",
+    "kalori": 240,
+    "protein_g": 12,
+    "karbonhidrat_g": 8,
+    "yag_g": 18,
+    "etiketler": ["kahvaltı", "pratik", "vejetaryen"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Domates, biber ve yumurta ile hazırlanan klasik Türk kahvaltılığı. Sabahları hızlıca hazırlanabilen, doyurucu ve lezzetli bir yemektir.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "2", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Biberleri ince halkalar halinde doğrayın.",
+      "Zeytinyağını tavaya alıp orta ateşte ısıtın.",
+      "Biberleri yağda 3-4 dakika kavurun.",
+      "Domatesleri küçük küpler halinde doğrayıp biberlerin üzerine ekleyin.",
+      "Domates suyunu salıp çekene kadar 5 dakika pişirin.",
+      "Yumurtaları kırıp hafifçe karıştırın, tuz ekleyin.",
+      "Yumurtalar pişince ocaktan alıp sıcak servis edin."
+    ],
+    "ipuclari": [
+      "Daha kremsi bir menemen için yumurtaları çok fazla karıştırmayın.",
+      "Acı seven misafirler için kırmızı pul biber ekleyebilirsiniz."
+    ],
+    "servis_onerisi": "Taze ekmek veya simit ile sıcak servis edin.",
+    "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/ykvmayiswebsite23.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80"
+  },
+  {
+    "id": 2,
+    "ad": "mercimek çorbası",
+    "slug": "mercimek-corbasi",
+    "kategori": "çorba",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "35 dk",
+    "kalori": 300,
+    "protein_g": 14,
+    "karbonhidrat_g": 38,
+    "yag_g": 9,
+    "etiketler": ["çorba", "vejetaryen", "sağlıklı"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Besleyici ve doyurucu klasik Türk çorbası. Kırmızı mercimeğin kremsi dokusu ve baharatların uyumuyla hazırlanan bu çorba, soğuk günlerin vazgeçilmezidir.",
+    "malzemeler": [
+      {"miktar": "1.5", "birim": "su bardağı", "isim": "kırmızı mercimek"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "1", "birim": "adet", "isim": "havuç"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kimyon"},
+      {"miktar": "5", "birim": "su bardağı", "isim": "su"}
+    ],
+    "hazirlanis": [
+      "Soğanı ve havucu ince doğrayın.",
+      "Tereyağını tencereye alıp soğanı pembeleşene kadar kavurun.",
+      "Havucu ekleyip 2 dakika daha kavurun.",
+      "Yıkanmış mercimeği ekleyin, karıştırın.",
+      "Üzerine suyu dökün ve kaynamaya bırakın.",
+      "Kısık ateşte mercimek yumuşayana dek 20 dakika pişirin.",
+      "Blender ile pürüzsüz hale getirin.",
+      "Kimyon ve tuzu ekleyip bir taşım daha kaynatın."
+    ],
+    "ipuclari": [
+      "Servis öncesi üzerine tereyağında kızdırılmış pul biber gezdirin.",
+      "Kıvam çok koyulaşırsa biraz sıcak su ekleyebilirsiniz."
+    ],
+    "servis_onerisi": "Limon dilimleri ve ekmek kızartmasıyla servis edin.",
+    "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2024/10/sade-mercimek-corbasi-resimli-yemek-tarifi(11).jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80"
+  },
+  {
+    "id": 3,
+    "ad": "kuru fasulye",
+    "slug": "kuru-fasulye",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "60 dk",
+    "toplam_sure": "70 dk",
+    "kalori": 600,
+    "protein_g": 22,
+    "karbonhidrat_g": 72,
+    "yag_g": 14,
+    "etiketler": ["baklagil", "protein", "geleneksel"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Türk mutfağının en sevilen baklagil yemeklerinden biri. Salçalı sos içinde pişen fasulye, pilavın yanında sunulduğunda eşsiz bir lezzet sunar.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "kuru fasulye"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "domates salçası"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "sıvıyağ"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Fasulyeyi bir gece önceden ıslata bırakın.",
+      "Islatılmış fasulyeyi süzüp tencerenize alın.",
+      "Üzerini geçecek kadar su ekleyip 30 dakika haşlayın.",
+      "Ayrı bir tencerede yağda soğanı kavurun.",
+      "Salçayı ekleyip 2-3 dakika daha kavurun.",
+      "Haşlanmış fasulyeyi salçalı soğanın üzerine aktarın.",
+      "Tuz ve pul biber ekleyip kısık ateşte 30 dakika daha pişirin."
+    ],
+    "ipuclari": [
+      "Haşlama suyunu dökmek fasulyenin hazım sorununa iyi gelir.",
+      "Pastırma veya sucuk eklemek tarife derinlik katar."
+    ],
+    "servis_onerisi": "Pirinç pilavı ve turşu ile servis edin.",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/sutlu-kuru-fasulye-tarifi-3ccedf2b-e81b-49aa-805b-103e42e4b393.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1607116667981-ff148a9e5282?w=400&q=80"
+  },
+  {
+    "id": 4,
+    "ad": "pirinç pilavı",
+    "slug": "pirinc-pilavi",
+    "kategori": "yan yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "30 dk",
+    "kalori": 520,
+    "protein_g": 9,
+    "karbonhidrat_g": 88,
+    "yag_g": 12,
+    "etiketler": ["pirinç", "tamamlayıcı", "temel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Tane tane, tereyağlı pirinç pilavı. Her yemeğin yanına yakışan, Türk mutfağının temel yapı taşlarından biridir.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "baldo pirinç"},
+      {"miktar": "3", "birim": "su bardağı", "isim": "sıcak su"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Pirinci ılık tuzlu suda 20 dakika bekletin, durulayın.",
+      "Tencerede tereyağını eritin.",
+      "Pirinci ekleyip orta ateşte 3-4 dakika kavurun.",
+      "Sıcak suyu ve tuzu ekleyin.",
+      "Kaynamaya başlayınca kısık ateşe alın, kapağını kapatın.",
+      "Su çekilene kadar yaklaşık 18 dakika pişirin.",
+      "Ocaktan alıp 5 dakika demlenmeye bırakın."
+    ],
+    "ipuclari": [
+      "Pirinci kavururken hafif şeffaflaşınca su ekleyin.",
+      "Demleme süresi pilavın tane tane olmasını sağlar."
+    ],
+    "servis_onerisi": "Her türlü et ve sebze yemeğinin yanında servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2019/11/07/pirinc-pilavi-tarifi.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1536304993881-ff86e0c9b24b?w=400&q=80"
+  },
+  {
+    "id": 5,
+    "ad": "tavuk sote",
+    "slug": "tavuk-sote",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "30 dk",
+    "kalori": 450,
+    "protein_g": 38,
+    "karbonhidrat_g": 14,
+    "yag_g": 22,
+    "etiketler": ["protein", "pratik", "tavuk"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Renkli sebzelerle sotelenmiş, hafif baharatlı tavuk yemeği. Pratikliği ve lezzetiyle hafta içi akşam yemeklerinin gözdesidir.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "tavuk göğsü"},
+      {"miktar": "2", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "sıvıyağ"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Tavuk göğsünü küpler halinde doğrayın.",
+      "Soğanı ince dilimleyin, biberleri halkalar halinde kesin.",
+      "Yağı kızdırıp tavukları ekleyin, suyunu çekene kadar pişirin.",
+      "Soğanı ekleyip pembeleşene kadar kavurun.",
+      "Biberleri ekleyip 3 dakika pişirin.",
+      "Domatesleri küp küp doğrayıp ekleyin.",
+      "Tuz ve karabiber ekleyip 10 dakika daha pişirin."
+    ],
+    "ipuclari": [
+      "Tavukları önce mühürlemek suyunun hapsolmasını sağlar.",
+      "Taze kekik veya kekik eklemek aromasını zenginleştirir."
+    ],
+    "servis_onerisi": "Pirinç pilavı veya makarna ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2018/09/21/tavuk-sote-tarifi-5.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&q=80"
+  },
+  {
+    "id": 6,
+    "ad": "karnıyarık",
+    "slug": "karniyarik",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "40 dk",
+    "toplam_sure": "60 dk",
+    "kalori": 700,
+    "protein_g": 28,
+    "karbonhidrat_g": 22,
+    "yag_g": 48,
+    "etiketler": ["etli", "geleneksel", "patlıcan"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Kıymalı harçla doldurulmuş, fırında pişirilmiş patlıcan yemeği. Türk mutfağının şah eseri olarak kabul edilen bu tarif sofraları şenlendirir.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "orta boy patlıcan"},
+      {"miktar": "300", "birim": "gr", "isim": "kıyma"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "1", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "sıvıyağ"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Patlıcanları alacalı soyup tuzlu suda 15 dakika bekletin.",
+      "Süzüp kurulayın ve yağda her tarafını kızartın.",
+      "Soğanı kıymayı ayrı tavada kavurun.",
+      "İnce doğranmış biber ve domatesi kıymaya ekleyin.",
+      "Tuz ve karabiber ile 10 dakika pişirin.",
+      "Patlıcanların ortasını boylamasına kesin, harçla doldurun.",
+      "Üzerine domates dilimi koyup fırında 200°C'de 25 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Patlıcanı tuzlu suda bırakmak acısını çeker.",
+      "Fırına vermeden önce üzerine az su eklemek kurumasını önler."
+    ],
+    "servis_onerisi": "Pirinç pilavı ve yoğurt ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2019/06/27/karniyarik-tarifi-videolu-7.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80"
+  },
+  {
+    "id": 7,
+    "ad": "lahmacun",
+    "slug": "lahmacun",
+    "kategori": "ana yemek",
+    "mutfak": "Güneydoğu",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 500,
+    "protein_g": 22,
+    "karbonhidrat_g": 58,
+    "yag_g": 18,
+    "etiketler": ["hamur işi", "geleneksel", "etli"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "İnce hamur üzerine baharatlı kıymalı harç sürülerek fırında pişirilen Türk usulü ince pizza. Gaziantep mutfağının dünyaya armağanıdır.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "ılık su"},
+      {"miktar": "250", "birim": "gr", "isim": "kıyma"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "biber salçası"},
+      {"miktar": "1", "birim": "demet", "isim": "maydanoz"}
+    ],
+    "hazirlanis": [
+      "Un, tuz ve suyu yoğurarak yumuşak hamur yapın, 20 dk dinlendirin.",
+      "Kıyma, rendelenmiş soğan, rendelenmiş domates, salça ve baharatları karıştırın.",
+      "Maydanozu ince kıyıp karışıma ekleyin.",
+      "Hamuru bezlere ayırıp çok ince açın.",
+      "Üzerine ince bir tabaka halinde harç sürün.",
+      "Önceden ısıtılmış 250°C fırında 8-10 dakika pişirin.",
+      "Limon sıkıp roka ve domates ile rulo yaparak servis edin."
+    ],
+    "ipuclari": [
+      "Hamur ne kadar ince açılırsa o kadar çıtır olur.",
+      "Fırın taşı kullanmak alt kısmın daha güzel pişmesini sağlar."
+    ],
+    "servis_onerisi": "Taze limon, roka ve domates ile rulo yaparak servis edin.",
+    "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS82aZAsppgoOWRH0iADyPDbDfQrX4amk-zmw&s",
+    "thumbnail_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
+  },
+  {
+    "id": 8,
+    "ad": "mantı",
+    "slug": "manti",
+    "kategori": "ana yemek",
+    "mutfak": "İç Anadolu",
+    "zorluk": "zor",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "60 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "90 dk",
+    "kalori": 800,
+    "protein_g": 32,
+    "karbonhidrat_g": 82,
+    "yag_g": 30,
+    "etiketler": ["hamur işi", "yoğurtlu", "geleneksel"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Küçük hamur parçalarının içine kıyma doldurup haşlandıktan sonra yoğurt ve tereyağı sosuyla servis edilen Türk mutfağının incisi. Kayseri'nin dünyaya hediyesi.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "su"},
+      {"miktar": "250", "birim": "gr", "isim": "kıyma"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "500", "birim": "gr", "isim": "süzme yoğurt"},
+      {"miktar": "3", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Un, yumurta, su ve tuzdan sert hamur yapın, 30 dk dinlendirin.",
+      "Kıyma ve rendelenmiş soğandan harç hazırlayın.",
+      "Hamuru ince açıp küçük kareler kesin.",
+      "Her kareye az harç koyup köşeleri birleştirerek kapatın.",
+      "Kaynar tuzlu suda mantıları haşlayın.",
+      "Sarımsaklı yoğurdu hazırlayın.",
+      "Tereyağında pul biberi kızdırın.",
+      "Tabağa mantı, üzerine yoğurt, en üste kırmızı tereyağı döküp servis edin."
+    ],
+    "ipuclari": [
+      "Mantı ne kadar küçük yapılırsa o kadar makbul sayılır.",
+      "Hamur dinlenince açmak çok daha kolay olur."
+    ],
+    "servis_onerisi": "Sarımsaklı yoğurt ve kırmızı tereyağıyla sıcak servis edin.",
+    "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQm1moNX6UyPVMBgaGMtoJTuLiIy-TJG2e_rA&s",
+    "thumbnail_url": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80"
+  },
+  {
+    "id": 9,
+    "ad": "çoban salata",
+    "slug": "coban-salata",
+    "kategori": "salata",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "10 dk",
+    "kalori": 120,
+    "protein_g": 3,
+    "karbonhidrat_g": 14,
+    "yag_g": 7,
+    "etiketler": ["vejetaryen", "hafif", "taze"],
+    "mevsim": ["ilkbahar", "yaz"],
+    "aciklama": "Taze domates, salatalık ve soğanla hazırlanan, zeytinyağı-limon sosuyla taçlanan hafif Türk salatası. Sofranın ferahlatıcı tamamlayıcısıdır.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "adet", "isim": "domates"},
+      {"miktar": "2", "birim": "adet", "isim": "salatalık"},
+      {"miktar": "1", "birim": "adet", "isim": "mor soğan"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "adet", "isim": "limon (suyu)"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "0.5", "birim": "demet", "isim": "maydanoz"}
+    ],
+    "hazirlanis": [
+      "Domates ve salatalığı küçük küpler halinde doğrayın.",
+      "Soğanı ince ince kıyın.",
+      "Tüm sebzeleri büyük bir salata kasesine alın.",
+      "Maydanozu ince kıyıp ekleyin.",
+      "Zeytinyağı, limon suyu ve tuzu karıştırarak sos yapın.",
+      "Sosu salata üzerine gezdirip hafifçe karıştırın.",
+      "Hemen servis edin."
+    ],
+    "ipuclari": [
+      "Servis etmeden hemen önce sosu ekleyin, böylece sebzeler sulanmaz.",
+      "Sumak eklemek salataya farklı bir lezzet katar."
+    ],
+    "servis_onerisi": "Kebap ve ızgara yanında, ya da tek başına meze olarak servis edin.",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge/coban-salatasi-tarifi-cec37fc1-f5b6-4152-bc70-95f4eaa5ce2c",
+    "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+  },
+  {
+    "id": 10,
+    "ad": "baklava",
+    "slug": "baklava",
+    "kategori": "tatlı",
+    "mutfak": "Osmanlı",
+    "zorluk": "zor",
+    "kac_kisilik": 8,
+    "hazirlanma_suresi": "45 dk",
+    "pisirme_suresi": "50 dk",
+    "toplam_sure": "95 dk",
+    "kalori": 1200,
+    "protein_g": 12,
+    "karbonhidrat_g": 145,
+    "yag_g": 62,
+    "etiketler": ["şerbetli", "geleneksel", "tatlı"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "İnce yufka katmanları arasına fındık veya ceviz konularak tereyağıyla pişirilen, üzerine şeker şerbeti dökülen efsanevi Türk tatlısı. Gaziantep baklavasıyla dünyaca ünlüdür.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "baklava yufkası"},
+      {"miktar": "300", "birim": "gr", "isim": "fıstık veya ceviz (çekilmiş)"},
+      {"miktar": "200", "birim": "gr", "isim": "tereyağı (eritilmiş)"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "su"},
+      {"miktar": "0.5", "birim": "adet", "isim": "limon (suyu)"}
+    ],
+    "hazirlanis": [
+      "Şeker, su ve limon suyundan kıvam şerbeti hazırlayıp soğutun.",
+      "Fırını 180°C'ye ısıtın.",
+      "Tepsiye eritilmiş tereyağı sürün.",
+      "Yufkaları ikiye bölün, yarısını tepsiye döşeyin, her yufkaya yağ sürün.",
+      "Ortasına fıstık veya ceviz serpin.",
+      "Kalan yufkaları üst üste döşeyin, her birini yağlayın.",
+      "Baklavaları elmas şeklinde kesin.",
+      "Üzerine kalan yağı gezdirip 180°C'de 40-50 dakika altın rengi olana kadar pişirin.",
+      "Fırından çıkınca soğuk şerbeti sıcak baklavaya dökün, 4 saat demlenmeye bırakın."
+    ],
+    "ipuclari": [
+      "Şerbet sıcaksa baklava soğuk, baklava sıcaksa şerbet soğuk olmalı.",
+      "Kaliteli tereyağı baklavanın lezzetini doğrudan etkiler."
+    ],
+    "servis_onerisi": "Üzerine dövülmüş fıstık serperek oda sıcaklığında servis edin.",
+    "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtjq6L4FrvifzRwTFaIuYXb1Dgq10MKJlA0w&s",
+    "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80"
+  },
+  {
+    "id": 11,
+    "ad": "sütlaç",
+    "slug": "sutlac",
+    "kategori": "tatlı",
+    "mutfak": "Osmanlı",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "35 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 400,
+    "protein_g": 8,
+    "karbonhidrat_g": 70,
+    "yag_g": 10,
+    "etiketler": ["sütlü", "hafif", "geleneksel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Süt ve pirinçle hazırlanan, fırında karamelize edilen Osmanlı kökenli sütlü tatlı. Hem soğuk hem sıcak servis edilebilen hafif bir lezzettir.",
+    "malzemeler": [
+      {"miktar": "1", "birim": "litre", "isim": "tam yağlı süt"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "pirinç"},
+      {"miktar": "0.75", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "nişasta"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "vanilya"}
+    ],
+    "hazirlanis": [
+      "Pirinci yıkayıp 1 su bardağı su ile kısık ateşte haşlayın.",
+      "Haşlanan pirinci sütle birlikte tencereye alın.",
+      "Orta ateşte sürekli karıştırarak kaynatın.",
+      "Şeker ve vanilya ekleyin.",
+      "Nişastayı az sütte eritip karışıma ekleyin.",
+      "Kıvam alana kadar 15-20 dakika daha pişirin.",
+      "Kaselere paylaştırıp fırında üzeri kızarana kadar pişirin."
+    ],
+    "ipuclari": [
+      "Sürekli karıştırmazsanız dibe tutabilir.",
+      "Tarçın ve gül suyu geleneksel lezzeti tamamlar."
+    ],
+    "servis_onerisi": "Üzerine tarçın serperek soğuk ya da sıcak servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2026/02/27/firinda-sutlac-nasil-yapilir-5.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
+  },
+  {
+    "id": 12,
+    "ad": "imam bayıldı",
+    "slug": "imam-bayildi",
+    "kategori": "ana yemek",
+    "mutfak": "Osmanlı",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "50 dk",
+    "toplam_sure": "70 dk",
+    "kalori": 500,
+    "protein_g": 5,
+    "karbonhidrat_g": 28,
+    "yag_g": 38,
+    "etiketler": ["zeytinyağlı", "vejetaryen", "geleneksel"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Patlıcanın içine soğan, domates ve sarımsak doldurularak bol zeytinyağıyla pişirilen Osmanlı mutfağının efsanevi zeytinyağlısı.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "patlıcan"},
+      {"miktar": "3", "birim": "adet", "isim": "soğan"},
+      {"miktar": "4", "birim": "adet", "isim": "domates"},
+      {"miktar": "6", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "100", "birim": "ml", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "şeker"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Patlıcanları alacalı soyup tuzlu suda bekletin.",
+      "Kuruladıktan sonra yağda her tarafını kızartın.",
+      "Soğanları ince doğrayıp zeytinyağında kavurun.",
+      "Sarımsak ve domatesleri ekleyip pişirin.",
+      "Tuz ve şeker ekleyip sos koyulaşana kadar pişirin.",
+      "Patlıcanların ortasını boylamasına kesin ve harçla doldurun.",
+      "Tencereye dizin, üzerine yarım bardak su ve zeytinyağı ekleyin.",
+      "Kısık ateşte kapağı kapalı 40 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Soğuk servis edildiğinde çok daha lezzetli olur.",
+      "Zeytinyağını cömertçe kullanmaktan çekinmeyin."
+    ],
+    "servis_onerisi": "Soğuk veya oda sıcaklığında ekmekle servis edin.",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge/imam-bayildi-5b7db1e7-bfab-4a44-853f-34a98f95a94a",
+    "thumbnail_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
+  },
+  {
+    "id": 13,
+    "ad": "ezogelin çorbası",
+    "slug": "ezogelin-corbasi",
+    "kategori": "çorba",
+    "mutfak": "Güneydoğu",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "35 dk",
+    "kalori": 320,
+    "protein_g": 14,
+    "karbonhidrat_g": 46,
+    "yag_g": 8,
+    "etiketler": ["çorba", "baharatlı", "vejetaryen"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Mercimek, bulgur ve baharatlarla hazırlanan, Gaziantepli Ezo Gelin'den ismini alan doyurucu Türk çorbası.",
+    "malzemeler": [
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "kırmızı mercimek"},
+      {"miktar": "0.25", "birim": "su bardağı", "isim": "ince bulgur"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "domates salçası"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kırmızı pul biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "nane"},
+      {"miktar": "5", "birim": "su bardağı", "isim": "su"}
+    ],
+    "hazirlanis": [
+      "Soğanı ince doğrayıp tereyağında kavurun.",
+      "Salçayı ekleyip 2 dakika daha kavurun.",
+      "Yıkanmış mercimek ve bulguru ekleyin.",
+      "Suyu ekleyip kaynamaya bırakın.",
+      "Kısık ateşte mercimek yumuşayana dek pişirin.",
+      "Tuz, pul biber ve naneyi ekleyin.",
+      "5 dakika daha kaynatıp servis edin."
+    ],
+    "ipuclari": [
+      "Servis öncesi tereyağında kızdırılmış nane ve pul biber gezdirin.",
+      "Çorba piştikçe kalınlaşır, gerekirse su ekleyin."
+    ],
+    "servis_onerisi": "Limon dilimleri ile servis edin.",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge/ezogelin-corbasi-f82a42cd-6a0c-47ac-8e5f-35e3da40df61",
+    "thumbnail_url": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80"
+  },
+  {
+    "id": 14,
+    "ad": "biber dolması",
+    "slug": "biber-dolmasi",
+    "kategori": "ana yemek",
+    "mutfak": "Osmanlı",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "25 dk",
+    "pisirme_suresi": "50 dk",
+    "toplam_sure": "75 dk",
+    "kalori": 650,
+    "protein_g": 20,
+    "karbonhidrat_g": 68,
+    "yag_g": 22,
+    "etiketler": ["geleneksel", "dolma", "zeytinyağlı"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Pirinçli iç harçla doldurulmuş biberlerin zeytinyağıyla pişirildiği Osmanlı saray mutfağından gelen klasik bir tarif.",
+    "malzemeler": [
+      {"miktar": "8", "birim": "adet", "isim": "sivri biber"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "pirinç"},
+      {"miktar": "2", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tarçın"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "yenibahar"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "kuş üzümü"}
+    ],
+    "hazirlanis": [
+      "Biberlerin üstünü kapaklı şekilde kesin, içini temizleyin.",
+      "Soğanı ince doğrayıp zeytinyağında kavurun.",
+      "Pirinci ekleyip şeffaflaşana kadar kavurun.",
+      "Rendelenmiş domates, baharatlar ve kuş üzümünü ekleyin.",
+      "Az su ekleyip yarı pişene kadar pişirin, soğutun.",
+      "İç harcı biberlere doldurun, kapak koyun.",
+      "Tencereye dizin, üzerine domates suyu ve zeytinyağı ekleyin.",
+      "Kısık ateşte 40-45 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Tarçın ve yenibahar iç pilava özgün Osmanlı aroması verir.",
+      "Soğuk servis edilince daha lezzetli olur."
+    ],
+    "servis_onerisi": "Yoğurt ve limon dilimleriyle servis edin.",
+    "resim_url": "https://emekyag.com.tr/wp-content/uploads/2025/01/Biber-Dolmasi-Tarifi.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&q=80"
+  },
+  {
+    "id": 15,
+    "ad": "peynirli gözleme",
+    "slug": "peynirli-gozleme",
+    "kategori": "kahvaltı",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "15 dk",
+    "toplam_sure": "35 dk",
+    "kalori": 500,
+    "protein_g": 18,
+    "karbonhidrat_g": 58,
+    "yag_g": 20,
+    "etiketler": ["hamur işi", "kahvaltı", "peynirli"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "El açması ince yufkanın içine beyaz peynir ve ıspanak konularak sacda pişirilen geleneksel Türk kahvaltılığı.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "su"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "200", "birim": "gr", "isim": "beyaz peynir"},
+      {"miktar": "100", "birim": "gr", "isim": "ıspanak"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "tereyağı"}
+    ],
+    "hazirlanis": [
+      "Un, su ve tuzdan yumuşak hamur yoğurun, 15 dk dinlendirin.",
+      "Hamuru bezlere ayırın, her birini ince açın.",
+      "Bir tarafına ufalanmış beyaz peynir ve ıspanak serin.",
+      "Diğer tarafını üzerine katlayın.",
+      "Yağlanmış sac veya tava da her iki tarafını pişirin.",
+      "Üzerine tereyağı sürüp servis edin."
+    ],
+    "ipuclari": [
+      "Hamur ince açıldıkça gözleme daha lezzetli olur.",
+      "Izgara veya sacda pişirmek aynı sonucu verir."
+    ],
+    "servis_onerisi": "Sıcak çay veya ayranla servis edin.",
+    "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/peynirli_gozleme.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
+  },
+  {
+    "id": 16,
+    "ad": "kısır",
+    "slug": "kisir",
+    "kategori": "salata",
+    "mutfak": "Güneydoğu",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "20 dk",
+    "kalori": 350,
+    "protein_g": 8,
+    "karbonhidrat_g": 56,
+    "yag_g": 10,
+    "etiketler": ["vejetaryen", "hafif", "bulgur", "vegan"],
+    "mevsim": ["ilkbahar", "yaz"],
+    "aciklama": "Bulgur, domates, maydanoz ve ekşi nar ekşisiyle hazırlanan Güneydoğu Anadolu'nun vazgeçilmez salatası. Sofra toplantılarının baş tacı.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "ince bulgur"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "1", "birim": "demet", "isim": "maydanoz"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "biber salçası"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "nar ekşisi"},
+      {"miktar": "1", "birim": "adet", "isim": "limon (suyu)"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Bulguru ılık suyla yoğurun, 10 dakika bekletin.",
+      "Salçayı ve zeytinyağını bulgura ekleyip yoğurun.",
+      "Domatesleri küçük küpler halinde doğrayın.",
+      "Maydanozu ince kıyın.",
+      "Tüm malzemeleri bulgura ekleyin.",
+      "Nar ekşisi, limon suyu ve pul biber ekleyip yoğurun.",
+      "Buzdolabında 30 dakika dinlendirin."
+    ],
+    "ipuclari": [
+      "Nar ekşisi kısıra özgün ekşi tadını verir.",
+      "Taze limon suyu kullanmak farkı ortaya koyar."
+    ],
+    "servis_onerisi": "Marul yaprakları üzerinde ya da sade servis edin.",
+    "resim_url": "https://www.hataydanal.com/image/cache/wp/lj/kisir-tarifi.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
+  },
+  {
+    "id": 17,
+    "ad": "şakşuka",
+    "slug": "saksuka",
+    "kategori": "meze",
+    "mutfak": "Akdeniz",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 400,
+    "protein_g": 4,
+    "karbonhidrat_g": 22,
+    "yag_g": 30,
+    "etiketler": ["meze", "sebze", "vejetaryen"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Kızartılmış patlıcan, biber ve domatesten hazırlanan, yoğurt sosuyla servis edilen lezzetli Akdeniz mezesi.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "adet", "isim": "patlıcan"},
+      {"miktar": "2", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "3", "birim": "adet", "isim": "domates"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "sıvıyağ"},
+      {"miktar": "3", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "200", "birim": "gr", "isim": "yoğurt"}
+    ],
+    "hazirlanis": [
+      "Patlıcan ve biberleri küp küp doğrayın.",
+      "Yağda patlıcanları kızartın, kenara alın.",
+      "Biberleri aynı yağda kızartın.",
+      "Domatesleri rendeleyip soğanla birlikte pişirin.",
+      "Tüm kızartmaları domates sosuyla karıştırın.",
+      "Sarımsaklı yoğurdu hazırlayın.",
+      "Tabağa şakşuka, üzerine yoğurt döküp servis edin."
+    ],
+    "ipuclari": [
+      "Meze soğuk servis edildiğinde çok daha lezzetlidir.",
+      "Patlıcanları fazla yağ çekmemesi için sıcak yağa atın."
+    ],
+    "servis_onerisi": "Sarımsaklı yoğurt ve ekmekle servis edin.",
+    "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpSyWggb3HnJtOITDNyHkbugVKNH8LSRP0iQ&s",
+    "thumbnail_url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80"
+  },
+  {
+    "id": 18,
+    "ad": "tavuk pilav",
+    "slug": "tavuk-pilav",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 700,
+    "protein_g": 36,
+    "karbonhidrat_g": 72,
+    "yag_g": 20,
+    "etiketler": ["protein", "pratik", "tavuk"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Baharatlı haşlanmış tavuk ve nohutlu pirinç pilavının birlikte servis edildiği, İstanbul sokaklarının simgesi haline gelen pratik bir yemek.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "tavuk but"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "pirinç"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "haşlanmış nohut"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "0.5", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Tavuğu tuzlu suda baharatlarla haşlayın, suyu saklayın.",
+      "Tavuk suyuyla pirinç pilavını pişirin.",
+      "Haşlanan tavukları kemikten ayırın.",
+      "Pilavı pişirirken nohutu ekleyin.",
+      "Tavukları tereyağında çevirin.",
+      "Tabağa pilav koyun, üzerine tavuk parçaları yerleştirin.",
+      "İsteğe göre pulbiber ve tereyağı gezdirebilirsiniz."
+    ],
+    "ipuclari": [
+      "Tavuk suyuyla pişirilen pilav çok daha lezzetli olur.",
+      "İstanbul usulü üzerine tarçın tozu serpin."
+    ],
+    "servis_onerisi": "Turşu ve ayranla servis edin.",
+    "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2023/10/pilav-ustu-tavuk-resimli-yemek-tarifi(11).jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&q=80"
+  },
+  {
+    "id": 19,
+    "ad": "fırın makarna",
+    "slug": "firin-makarna",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "45 dk",
+    "kalori": 750,
+    "protein_g": 28,
+    "karbonhidrat_g": 88,
+    "yag_g": 28,
+    "etiketler": ["hamur işi", "fırın", "peynirli"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Beşamel sosla buluşan makarna, üzerine rendelenmiş kaşar peyniri kaplı fırın makarnası. Hem çocukların hem büyüklerin sevdiği pratik bir akşam yemeği.",
+    "malzemeler": [
+      {"miktar": "400", "birim": "gr", "isim": "boru makarna"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "un"},
+      {"miktar": "500", "birim": "ml", "isim": "süt"},
+      {"miktar": "150", "birim": "gr", "isim": "rendelenmiş kaşar peyniri"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Makarnayı tuzlu suda al dente haşlayın.",
+      "Tereyağını eritin, unu ekleyip kavurun.",
+      "Sütü yavaş yavaş ekleyerek topaksız beşamel sos yapın.",
+      "Tuz ve karabiber ekleyin.",
+      "Süzülen makarnayı sosla karıştırın.",
+      "Fırın kabına aktarın, üzerine peynir serin.",
+      "Önceden ısıtılmış 180°C fırında 25 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Beşamel sosu sürekli karıştırarak yapın, topaklanır.",
+      "Üzerine ekmek kırıntısı serpmek çıtırlık katar."
+    ],
+    "servis_onerisi": "Yeşil salatayla birlikte servis edin.",
+    "resim_url": "https://cdn.myikas.com/images/ad03fdde-e48e-47ec-aa11-21dfdc3fe605/d8567133-db57-4499-a536-03b4dd40e40d/image_1080.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80"
+  },
+  {
+    "id": 20,
+    "ad": "revani",
+    "slug": "revani",
+    "kategori": "tatlı",
+    "mutfak": "Osmanlı",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "35 dk",
+    "toplam_sure": "50 dk",
+    "kalori": 900,
+    "protein_g": 10,
+    "karbonhidrat_g": 140,
+    "yag_g": 30,
+    "etiketler": ["şerbetli", "irmik", "geleneksel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "İrmik, yoğurt ve yumurtayla hazırlanan, pişince üzerine şerbet dökülen Osmanlı tatlısı. Kıvrak dokusu ve hafif portakal aromasıyla sofraları tatlandırır.",
+    "malzemeler": [
+      {"miktar": "1.5", "birim": "su bardağı", "isim": "irmik"},
+      {"miktar": "2", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "yoğurt"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "sıvıyağ"},
+      {"miktar": "1", "birim": "adet", "isim": "portakal (kabuğu ve suyu)"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "şerbet için şeker"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "şerbet için su"}
+    ],
+    "hazirlanis": [
+      "Yumurta ve şekeri çırpın.",
+      "Yoğurt, yağ ve portakal kabuğunu ekleyin.",
+      "İrmiği ekleyip karıştırın, 15 dk bekletin.",
+      "Fırın kabına aktarıp 180°C fırında 30-35 dk pişirin.",
+      "Şeker ve suyu kaynatarak şerbet yapın.",
+      "Sıcak revani üzerine soğuk şerbeti dökün.",
+      "4 saat dinlendirin, şerbet çekince servis edin."
+    ],
+    "ipuclari": [
+      "Şerbet sıcaksa revani soğuk, tersi de doğru.",
+      "Portakal yerine limon da kullanılabilir."
+    ],
+    "servis_onerisi": "Üzerine dövülmüş fıstık serperek servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2018/03/07/revani-tatlisi-1.jpeg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=80"
+  },
+  {
+    "id": 21,
+    "ad": "peynirli poğaça",
+    "slug": "peynirli-pogaca",
+    "kategori": "kahvaltı",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "30 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "55 dk",
+    "kalori": 800,
+    "protein_g": 22,
+    "karbonhidrat_g": 90,
+    "yag_g": 38,
+    "etiketler": ["hamur işi", "kahvaltı", "peynirli"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Yumuşacık maya hamurundan yapılan, içinde beyaz peynir barındıran Türk kahvaltısının vazgeçilmezi. Fırından çıkınca üstü parlak ve altın sarısıdır.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "paket", "isim": "kuru maya"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "ılık süt"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "sıvıyağ"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "şeker"},
+      {"miktar": "200", "birim": "gr", "isim": "beyaz peynir"},
+      {"miktar": "1", "birim": "adet", "isim": "yumurta sarısı (üstü için)"}
+    ],
+    "hazirlanis": [
+      "Maya, şeker ve ılık sütü karıştırıp 10 dk bekletin.",
+      "Un, tuz, yağ ve maya karışımını yoğurun.",
+      "Hamur yumuşak ve ele yapışmayan kıvamda olmalı.",
+      "30 dakika ılık yerde mayalanmaya bırakın.",
+      "Bezlere ayırıp yuvarlayın, içine peynir koyun.",
+      "Hamuru kapatıp fırın tepsisine dizin.",
+      "Üzerine yumurta sarısı sürün.",
+      "Önceden ısıtılmış 180°C fırında 20-25 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Hamurun iyi mayalanması için ılık yer tercih edin.",
+      "Peyniri bol kullanmak poğaçayı daha lezzetli yapar."
+    ],
+    "servis_onerisi": "Sıcak çay ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/03/18/peynirli-pogaca-11.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400&q=80"
+  },
+  {
+    "id": 22,
+    "ad": "su böreği",
+    "slug": "su-boregi",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "30 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "60 dk",
+    "kalori": 850,
+    "protein_g": 24,
+    "karbonhidrat_g": 78,
+    "yag_g": 44,
+    "etiketler": ["hamur işi", "peynirli", "geleneksel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Haşlanmış yufkaların beyaz peynir ve maydanozlu iç harçla katlanarak tereyağıyla pişirildiği klasik Türk böreği.",
+    "malzemeler": [
+      {"miktar": "5", "birim": "adet", "isim": "yufka"},
+      {"miktar": "300", "birim": "gr", "isim": "beyaz peynir"},
+      {"miktar": "1", "birim": "demet", "isim": "maydanoz"},
+      {"miktar": "150", "birim": "gr", "isim": "tereyağı"},
+      {"miktar": "3", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "süt"}
+    ],
+    "hazirlanis": [
+      "Kaynar tuzlu suda yufkaları 30 saniye haşlayın, soğuk suya atın.",
+      "Peynir ve kıyılmış maydanozu karıştırın.",
+      "Tereyağını eritin.",
+      "Yağlanmış tepsiye bir yufka serin, üzerine tereyağı sürün.",
+      "İkinci yufkayı serin, peynirli harcı dökün.",
+      "Kalan yufkaları sırayla serin, her birine yağ sürün.",
+      "Yumurta ve sütü çırpıp en üste dökün.",
+      "180°C fırında 30 dakika altın rengi olana kadar pişirin."
+    ],
+    "ipuclari": [
+      "Yufkalar ıslak olunca börek daha yumuşak olur.",
+      "Pişince 5 dakika bekleyip dilimleyin."
+    ],
+    "servis_onerisi": "Sıcak olarak çay ile servis edin.",
+    "resim_url": "https://www.lepleziz.com/images/content/kolay-su-boregi_nsez.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
+  },
+  {
+    "id": 23,
+    "ad": "tarhana çorbası",
+    "slug": "tarhana-corbasi",
+    "kategori": "çorba",
+    "mutfak": "İç Anadolu",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "25 dk",
+    "kalori": 300,
+    "protein_g": 12,
+    "karbonhidrat_g": 42,
+    "yag_g": 8,
+    "etiketler": ["çorba", "geleneksel", "fermente"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Kurutulmuş sebze ve yoğurttan elde edilen tarhanadan yapılan, soğuk günlerin şifa dolu geleneksel Türk çorbası.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "tarhana tozu"},
+      {"miktar": "5", "birim": "su bardağı", "isim": "su"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "domates salçası"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Tarhanayı biraz soğuk su ile ezin, 10 dakika bekletin.",
+      "Tereyağını tencerede eritin, salçayı kavurun.",
+      "Erimiş tarhanayı ekleyin.",
+      "Suyu yavaş yavaş ekleyerek karıştırın.",
+      "Tuz ve pul biber ekleyin.",
+      "Orta ateşte 15-20 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Ev yapımı tarhana çorbaya çok daha derin bir tat verir.",
+      "Nane ve kuru kekik eklemek aromasını artırır."
+    ],
+    "servis_onerisi": "Üzerine tereyağında kavurulmuş nane dökerek servis edin.",
+    "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2008/11/tarhana_corbasi2-1.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80"
+  },
+  {
+    "id": 24,
+    "ad": "hamsi tava",
+    "slug": "hamsi-tava",
+    "kategori": "ana yemek",
+    "mutfak": "Karadeniz",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "15 dk",
+    "toplam_sure": "30 dk",
+    "kalori": 600,
+    "protein_g": 42,
+    "karbonhidrat_g": 20,
+    "yag_g": 36,
+    "etiketler": ["balık", "Karadeniz", "kızartma"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Karadeniz'in küçük ama besleyici balığı hamsinin unlanıp kızartılmasıyla hazırlanan Rize ve Trabzon mutfağının simgesi.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "hamsi (temizlenmiş)"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "mısır unu"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "200", "birim": "ml", "isim": "kızartma yağı"}
+    ],
+    "hazirlanis": [
+      "Hamsileri temizleyip yıkayın ve kurulayın.",
+      "Mısır unu ve tuzu karıştırın.",
+      "Hamsileri una bulayın.",
+      "Yağı kızdırın.",
+      "Hamsileri bol kızgın yağda her iki tarafını kızartın.",
+      "Kâğıt havlu üzerine alıp fazla yağını çıkarın.",
+      "Hemen sıcak servis edin."
+    ],
+    "ipuclari": [
+      "Mısır unu kullanmak çıtırlığı artırır.",
+      "Yağın iyice kızması gerekir, aksi hâlde balık yağ çeker."
+    ],
+    "servis_onerisi": "Limon ve yeşil soğanla servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/02/16/hamsi-tava-tarifi-8.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=80"
+  },
+  {
+    "id": 25,
+    "ad": "izmir köfte",
+    "slug": "izmir-kofte",
+    "kategori": "ana yemek",
+    "mutfak": "Ege",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "35 dk",
+    "toplam_sure": "55 dk",
+    "kalori": 700,
+    "protein_g": 32,
+    "karbonhidrat_g": 44,
+    "yag_g": 34,
+    "etiketler": ["etli", "fırın", "İzmir"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Domates sosu içinde patates ve köftenin birlikte pişirildiği, İzmir'e özgü lezzetli fırın yemeği.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "kıyma"},
+      {"miktar": "3", "birim": "adet", "isim": "patates"},
+      {"miktar": "4", "birim": "adet", "isim": "domates"},
+      {"miktar": "2", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "1", "birim": "dilim", "isim": "bayat ekmek (ıslatılmış)"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Kıyma, rendelenmiş soğan, ıslatılmış ekmek, tuz ve baharatları yoğurun.",
+      "Küçük uzun köfteler şekil verin.",
+      "Patatesleri dilimleyin, biberleri halkalar kesin.",
+      "Köfteleri yağda mühürleyin.",
+      "Fırın kabına patates, köfte ve biber sıralayın.",
+      "Rendelenmiş domatesi üzerine dökün.",
+      "200°C fırında 30-35 dakika pişirin."
+    ],
+    "ipuclari": [
+      "Köfteyi önceden mühürlemek içinin sulu kalmasını sağlar.",
+      "Üzerine biraz su eklemek fırında kurumayı önler."
+    ],
+    "servis_onerisi": "Fırından çıkınca sıcak servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2018/05/16/lokanta-usulu-izmir-kofte-14.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1544025162-d76538b2a921?w=400&q=80"
+  },
+  {
+    "id": 26,
+    "ad": "çiğ köfte",
+    "slug": "cig-kofte",
+    "kategori": "meze",
+    "mutfak": "Güneydoğu",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "30 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "30 dk",
+    "kalori": 500,
+    "protein_g": 10,
+    "karbonhidrat_g": 84,
+    "yag_g": 14,
+    "etiketler": ["vegan", "baharatlı", "bulgur"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Bulgur, salça ve çok sayıda baharatla yoğrularak hazırlanan, nar ekşisiyle tatlandırılan Şanlıurfa kökenli vegan atıştırmalık.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "ince köftelik bulgur"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "domates salçası"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "biber salçası"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "nar ekşisi"},
+      {"miktar": "1", "birim": "adet", "isim": "limon (suyu)"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "isot biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kimyon"}
+    ],
+    "hazirlanis": [
+      "Bulguru geniş bir kaba alın.",
+      "Salçaları ekleyip yoğurun.",
+      "Isıtılmış su ilave edip 10 dakika bekletin.",
+      "Baharatları, zeytinyağını ve nar ekşisini ekleyin.",
+      "Limon suyunu sıkın.",
+      "15-20 dakika iyice yoğurun.",
+      "El ile şekil verip servis edin."
+    ],
+    "ipuclari": [
+      "Ne kadar çok yoğrulursa o kadar lezzetli olur.",
+      "İsot biberi olmadan hakiki Urfa tadı yakalanmaz."
+    ],
+    "servis_onerisi": "Marul yaprağı ve limon dilimiyle servis edin.",
+    "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGm240IOMUppt06Leb_8vAxtmCyqrZ23Te0w&s",
+    "thumbnail_url": "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&q=80"
+  },
+  {
+    "id": 27,
+    "ad": "Ayran",
+    "slug": "ayran",
+    "kategori": "içecek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "5 dk",
+    "kalori": 80,
+    "protein_g": 5,
+    "karbonhidrat_g": 8,
+    "yag_g": 3,
+    "etiketler": ["içecek", "serinletici", "sağlıklı"],
+    "mevsim": ["ilkbahar", "yaz"],
+    "aciklama": "Yoğurt, su ve tuzun bir araya gelmesiyle oluşan, Türklerin her öğünde içtiği milli içecek. Probiyotik açısından oldukça zengindir.",
+    "malzemeler": [
+      {"miktar": "200", "birim": "gr", "isim": "sade yoğurt"},
+      {"miktar": "200", "birim": "ml", "isim": "soğuk su"},
+      {"miktar": "1", "birim": "tutam", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Yoğurdu geniş bir kaba alın.",
+      "Üzerine soğuk suyu ekleyin.",
+      "Çırpıcı veya blender ile pürüzsüz kıvama gelinceye kadar çırpın.",
+      "Tuzu ekleyin, tekrar karıştırın.",
+      "Köpüklü olması için iyice çırpın.",
+      "Soğuk servis edin."
+    ],
+    "ipuclari": [
+      "Ekşi yoğurt kullanmak ayranı daha lezzetli yapar.",
+      "Blender ile yapılınca köpüklü olur."
+    ],
+    "servis_onerisi": "Buz ekleyerek soğuk servis edin.",
+    "resim_url": "https://www.umraniyeziyafet.com/images/urunler/Ayran--1lt--resim-52.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=80"
+  },
+  {
+    "id": 28,
+    "ad": "Kazandibi",
+    "slug": "kazandibi",
+    "kategori": "tatlı",
+    "mutfak": "Osmanlı",
+    "zorluk": "zor",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "50 dk",
+    "toplam_sure": "60 dk",
+    "kalori": 850,
+    "protein_g": 10,
+    "karbonhidrat_g": 120,
+    "yag_g": 32,
+    "etiketler": ["sütlü", "karamelize", "geleneksel"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Altı kasık tavada karamelize edilen, üstü beyaz kremsi, Osmanlı saray mutfağından gelen meşhur sütlü tatlı. İstanbul'un simge tatlılarından biridir.",
+    "malzemeler": [
+      {"miktar": "1", "birim": "litre", "isim": "tam yağlı süt"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "nişasta"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "un"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "vanilya"}
+    ],
+    "hazirlanis": [
+      "Sütün bir kısmıyla nişasta ve unu eritin.",
+      "Kalan sütü şekerle kaynatın.",
+      "Nişastalı karışımı yavaş yavaş ekleyin, sürekli karıştırın.",
+      "Kıvam alana kadar pişirin, vanilya ekleyin.",
+      "Kalın tabanlı tavaya aktarın.",
+      "Kısık ateşte alt kısmı yanacak kıvama gelene kadar tutun.",
+      "Soğuyunca ters çevirip dilimleyerek servis edin."
+    ],
+    "ipuclari": [
+      "Alt kısım düzgün kararmalı ama yanmamalı.",
+      "Soğuduktan sonra buzdolabında 2 saat beklettikten sonra ters çevirin."
+    ],
+    "servis_onerisi": "Ters çevirip tarçın serperek servis edin.",
+    "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/19_19_11zon-952.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
+  },
+  {
+    "id": 29,
+    "ad": "Lokma tatlısı",
+    "slug": "lokma-tatlisi",
+    "kategori": "tatlı",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 8,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 900,
+    "protein_g": 8,
+    "karbonhidrat_g": 130,
+    "yag_g": 35,
+    "etiketler": ["şerbetli", "kızartma", "geleneksel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Maya hamurundan oluşan küçük topların kızartılarak şerbete batırıldığı, Türk sokak mutfağının sevilen tatlısı.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "paket", "isim": "kuru maya"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "ılık su"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "şeker (hamur için)"},
+      {"miktar": "1", "birim": "tutam", "isim": "tuz"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "şeker (şerbet için)"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "su (şerbet için)"},
+      {"miktar": "0.5", "birim": "adet", "isim": "limon (şerbet için)"}
+    ],
+    "hazirlanis": [
+      "Maya, şeker ve ılık suyu karıştırıp 10 dk bekletin.",
+      "Un ve tuzu ekleyip pürüzsüz, akışkan hamur yapın.",
+      "30 dakika mayalanmaya bırakın.",
+      "Şerbet için şeker, su ve limon suyunu kaynatın.",
+      "Bol kızgın yağda kaşık yardımıyla küçük toplar kızartın.",
+      "Altın rengi olunca çıkarın.",
+      "Sıcakken şerbete atıp 1-2 dakika bekletin.",
+      "Süzüp servis edin."
+    ],
+    "ipuclari": [
+      "Hamur akışkan olmalı, kolay şekil verilebilmeli.",
+      "Şerbet soğuk, lokma sıcak servis edilmeli."
+    ],
+    "servis_onerisi": "Üzerine tarçın ve susam serperek servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2022/06/15/gercek-lokma-tatlisi.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=80"
+  },
+  {
+    "id": 30,
+    "ad": "Fırında Tavuk",
+    "slug": "firin-tavuk",
+    "kategori": "ana yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "60 dk",
+    "toplam_sure": "75 dk",
+    "kalori": 650,
+    "protein_g": 52,
+    "karbonhidrat_g": 6,
+    "yag_g": 42,
+    "etiketler": ["protein", "fırın", "pratik"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Baharatlarla marine edilmiş bütün tavuğun fırında altın rengi olana kadar pişirildiği, her sofrada karşılık bulan klasik tarif.",
+    "malzemeler": [
+      {"miktar": "1", "birim": "adet", "isim": "bütün tavuk (yaklaşık 1.5 kg)"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "4", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kırmızı toz biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kekik"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "0.5", "birim": "çay kaşığı", "isim": "karabiber"},
+      {"miktar": "1", "birim": "adet", "isim": "limon"}
+    ],
+    "hazirlanis": [
+      "Zeytinyağı, ezilmiş sarımsak, baharatlar ve limon suyunu karıştırın.",
+      "Tavuğun her tarafını marinat karışımıyla kaplayın.",
+      "Mümkünse buzdolabında 2-4 saat marine edin.",
+      "Fırını 200°C'ye ısıtın.",
+      "Tavuğu fırın kabına alın.",
+      "200°C'de 30 dakika, ardından 180°C'de 30 dakika daha pişirin.",
+      "Pişince 10 dakika dinlendirip dilimleyin."
+    ],
+    "ipuclari": [
+      "Marine süresi ne kadar uzarsa lezzet o kadar artar.",
+      "Fırında altı altın, üstü da kızarmalı; çevirerek pişirin."
+    ],
+    "servis_onerisi": "Patates kızartması ve salatayla servis edin.",
+    "resim_url": "https://i.tmgrup.com.tr/sfr/2026/02/17/firinda-tavuk-1771317260299.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1598103442097-8b74394b95c1?w=400&q=80"
+  },
+  
+  {
+      "id": 31, 
+>>>>>>> Stashed changes
       "ad": "Arabaşı Çorbası",
       "slug": "arabasi-corbasi",
       "kategori": "çorba",
@@ -2407,6 +3731,7 @@
       "protein_g": 18,
       "karbonhidrat_g": 25,
       "yag_g": 14,
+<<<<<<< Updated upstream
       "etiketler": [
         "çorba",
         "tavuklu",
@@ -2458,6 +3783,20 @@
           "birim": "su bardağı",
           "isim": "su (hamuru için)"
         }
+=======
+      "etiketler": ["çorba", "tavuklu", "geleneksel", "kış"],
+      "mevsim": ["kış"],
+      "aciklama": "İç Anadolu mutfağına özgü, acılı ve tavuklu suyuyla içilen, özel hamuruyla yutularak tüketilen geleneksel kış çorbası.",
+      "malzemeler": [
+        {"miktar": "1", "birim": "adet", "isim": "tavuk kalçası (veya göğüs)"},
+        {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+        {"miktar": "2", "birim": "yemek kaşığı", "isim": "un (çorba için)"},
+        {"miktar": "1", "birim": "yemek kaşığı", "isim": "biber salçası"},
+        {"miktar": "1", "birim": "yemek kaşığı", "isim": "domates salçası"},
+        {"miktar": "1", "birim": "tatlı kaşığı", "isim": "pul biber"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "un (hamuru için)"},
+        {"miktar": "5", "birim": "su bardağı", "isim": "su (hamuru için)"}
+>>>>>>> Stashed changes
       ],
       "hazirlanis": [
         "Tavuğu bol suda haşlayın, suyunu süzün ve etlerini didikleyin.",
@@ -2473,6 +3812,7 @@
       ],
       "servis_onerisi": "Soğuk hamur dilimleri ile çok sıcak olarak, bol limon ve acı biber eşliğinde servis edin.",
       "resim_url": "https://i.ytimg.com/vi/P7M2K5mFLHg/maxresdefault.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80",
       "puan": "7.2"
     },
@@ -3976,6 +5316,839 @@
       "puan": "8.5"
     },
     {
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80"
+    },
+  {
+    "id": 32,
+    "ad": "Adana Kebap",
+    "slug": "adana-kebap",
+    "kategori": "ana yemek",
+    "mutfak": "Güneydoğu",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 680,
+    "protein_g": 45,
+    "karbonhidrat_g": 10,
+    "yag_g": 50,
+    "etiketler": ["etli", "ızgara", "baharatlı"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar"],
+    "aciklama": "Kuzu kıyması ve kuyrukyağıyla hazırlanan, közde pişirilen Adana'nın adını dünyaya duyuran acı kebabı.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "kuzu kıyma (yağlı)"},
+      {"miktar": "100", "birim": "gr", "isim": "kuyruk yağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "isot biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kırmızı pul biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "0.5", "birim": "çay kaşığı", "isim": "karabiber"}
+    ],
+    "hazirlanis": [
+      "Kuyruk yağını ince doğrayın.",
+      "Kıyma, yağ ve baharatları yoğurun.",
+      "Buzdolabında 30 dakika dinlendirin.",
+      "Geniş şişlere uzun ince şeritler halinde geçirin.",
+      "Közde her tarafı pişene kadar çevirerek pişirin.",
+      "Sıcak servis edin."
+    ],
+    "ipuclari": [
+      "Kuyruk yağı kıymayı sulu ve lezzetli tutar.",
+      "İsot biber olmadan gerçek Adana tadı yakalanmaz."
+    ],
+    "servis_onerisi": "Lavaş, sumak soğan ve közlenmiş domates ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/03/15/adana-kebap.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1544025162-d76538b2a921?w=400&q=80"
+  },
+  {
+    "id": 33,
+    "ad": "Cacık",
+    "slug": "cacik",
+    "kategori": "meze",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "10 dk",
+    "kalori": 160,
+    "protein_g": 6,
+    "karbonhidrat_g": 10,
+    "yag_g": 10,
+    "etiketler": ["vejetaryen", "serinletici", "meze"],
+    "mevsim": ["ilkbahar", "yaz"],
+    "aciklama": "Yoğurt, salatalık ve sarımsağın zeytinyağıyla buluştuğu, yazın baş tacı serin Türk mezesi.",
+    "malzemeler": [
+      {"miktar": "400", "birim": "gr", "isim": "süzme yoğurt"},
+      {"miktar": "2", "birim": "adet", "isim": "salatalık"},
+      {"miktar": "2", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kuru nane"},
+      {"miktar": "1", "birim": "tutam", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Salatalıkları rendeleyin veya ince doğrayın.",
+      "Fazla suyunu sıkın.",
+      "Yoğurdu geniş bir kaseye alın.",
+      "Sarımsağı ezin, yoğurda ekleyin.",
+      "Salatalık, zeytinyağı, nane ve tuzu ekleyin.",
+      "Karıştırın, servis edin."
+    ],
+    "ipuclari": [
+      "Salatalığın suyunu iyi sıkmazsanız cacık sulanır.",
+      "Servis öncesi buzdolabında soğutun."
+    ],
+    "servis_onerisi": "Soğuk olarak ekmek ve kebap yanında servis edin.",
+    "resim_url": "https://cdn.kisikatesakademi.com.tr/image-cache/cache/recipe_main_image_large/https---cdn.kisikatesakademi.com.tr/recipe-media/47909dc8c0c5a9bc8cd52840a341b20957f4f5e0.jpeg.webp",
+    "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+  },
+  {
+    "id": 34,
+    "ad": "Patlıcan Silkme",
+    "slug": "patlican-silkme",
+    "kategori": "ana yemek",
+    "mutfak": "Karadeniz",
+    "zorluk": "kolay",
+    "kac_kisilik": 3,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "25 dk",
+    "toplam_sure": "35 dk",
+    "kalori": 340,
+    "protein_g": 6,
+    "karbonhidrat_g": 26,
+    "yag_g": 22,
+    "etiketler": ["vejetaryen", "sebze", "pratik"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Taze patlıcanın zeytinyağı ve sarımsakla silkelenerek pişirildiği, sade ama lezzetli Karadeniz usulü yemek.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "patlıcan"},
+      {"miktar": "4", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Patlıcanları küp küp doğrayın.",
+      "Zeytinyağını tencereye alıp ısıtın.",
+      "Sarımsakları ekleyip kavurun.",
+      "Patlıcanları ekleyip kapağı kapalı pişirin.",
+      "Domatesleri ekleyip 10 dakika daha pişirin.",
+      "Tuz ekleyip servis edin."
+    ],
+    "ipuclari": [
+      "Kapağı kapalı pişirmek patlıcanın kendi suyunda pişmesini sağlar.",
+      "Taze fesleğen eklemek aromasını güzelleştirir."
+    ],
+    "servis_onerisi": "Ekmek ve yoğurt ile servis edin.",
+    "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2020/04/patlican_silkme2-600x450.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
+  },
+  {
+    "id": 35,
+    "ad": "Hünkâr Beğendi",
+    "slug": "hunkar-begendi",
+    "kategori": "ana yemek",
+    "mutfak": "Osmanlı",
+    "zorluk": "zor",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "50 dk",
+    "toplam_sure": "70 dk",
+    "kalori": 780,
+    "protein_g": 40,
+    "karbonhidrat_g": 28,
+    "yag_g": 54,
+    "etiketler": ["Osmanlı", "etli", "geleneksel"],
+    "mevsim": ["yaz", "sonbahar"],
+    "aciklama": "Közlenmiş patlıcandan yapılan kremalı beşamel üzerine kuzu eti ragusunun döküldüğü, Sultan için yapılan Osmanlı saray yemeği.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "kuzu eti (kuşbaşı)"},
+      {"miktar": "4", "birim": "adet", "isim": "patlıcan"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "un"},
+      {"miktar": "300", "birim": "ml", "isim": "süt"},
+      {"miktar": "50", "birim": "gr", "isim": "rendelenmiş kaşar"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"}
+    ],
+    "hazirlanis": [
+      "Patlıcanları közde ya da fırında közleyin, soyun.",
+      "Patlıcan etini iyice ezin.",
+      "Tereyağında unu kavurun, sütü ekleyerek beşamel yapın.",
+      "Patlıcanı ve rendelenmiş kaşarı beşamele ekleyin.",
+      "Ayrı tencerede soğanı kavurun, eti ekleyin.",
+      "Domatesleri ekleyip 30 dakika kısık ateşte pişirin.",
+      "Tabağa beğendi, üzerine eti koyun."
+    ],
+    "ipuclari": [
+      "Patlıcanın közde pişmesi duman aromasını katar.",
+      "Kaşar peyniri beğendiye kremsi doku verir."
+    ],
+    "servis_onerisi": "Pilavla servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2024/04/15/hunkar-begendi-yapimi-videolu.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80"
+  },
+  {
+    "id": 36,
+    "ad": "Trileçe",
+    "slug": "trilece",
+    "kategori": "tatlı",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 8,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "50 dk",
+    "kalori": 950,
+    "protein_g": 12,
+    "karbonhidrat_g": 130,
+    "yag_g": 40,
+    "etiketler": ["sütlü", "kremalı", "modern"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Balkanlarda doğup Türkiye'de sevilen, üç sütlü karışımla ıslanan bisküvili kremalı tatlı. Pratik ve çok lezzetlidir.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "paket", "isim": "kabartma tozu"},
+      {"miktar": "200", "birim": "ml", "isim": "krema"},
+      {"miktar": "200", "birim": "ml", "isim": "süt"},
+      {"miktar": "200", "birim": "ml", "isim": "yoğun krema"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "sıvı krema (üst için)"}
+    ],
+    "hazirlanis": [
+      "Yumurta ve şekeri çırpın.",
+      "Un ve kabartma tozunu ekleyip hamur yapın.",
+      "180°C fırında 25 dakika pişirin.",
+      "Soğuyunca çatal ile delip delikler açın.",
+      "Süt, krema ve yoğun kremayı karıştırın.",
+      "Bu karışımı keki üzerine dökün.",
+      "Buzdolabında 2 saat bekletin.",
+      "Üzerine çırpılmış krema sürüp servis edin."
+    ],
+    "ipuclari": [
+      "Kekin delikleri ne kadar fazla olursa süt o kadar güzel emer.",
+      "En az 2 saat buzdolabında beklemek gerekir."
+    ],
+    "servis_onerisi": "Üzerine karamel sosu gezdirerek servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2023/03/31/buyuk-borcamda-trilece.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
+  },
+  {
+    "id": 37,
+    "ad": "zeytinyağlı taze fasulye",
+    "slug": "zeytinyagli-taze-fasulye",
+    "kategori": "ana yemek",
+    "mutfak": "Ege",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "40 dk",
+    "toplam_sure": "55 dk",
+    "kalori": 280,
+    "protein_g": 7,
+    "karbonhidrat_g": 34,
+    "yag_g": 12,
+    "etiketler": ["zeytinyağlı", "vejetaryen", "yaz"],
+    "mevsim": ["yaz"],
+    "aciklama": "Zeytinyağı ve domates ile pişirilen, oda sıcaklığında servis edilen Ege mutfağının vazgeçilmez zeytinyağlısı.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "taze fasulye"},
+      {"miktar": "2", "birim": "adet", "isim": "soğan"},
+      {"miktar": "3", "birim": "adet", "isim": "domates"},
+      {"miktar": "4", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "şeker"}
+    ],
+    "hazirlanis": [
+      "Fasulyelerin uçlarını kesin, iri ise ikiye bölün.",
+      "Soğanları ince doğrayın.",
+      "Zeytinyağında soğanları kavurun.",
+      "Fasulyeleri ekleyip 5 dakika kavurun.",
+      "Rendelenmiş domatesleri ekleyin.",
+      "Tuz ve şeker ekleyip kısık ateşte 30 dakika pişirin.",
+      "Oda sıcaklığında servis edin."
+    ],
+    "ipuclari": [
+      "Zeytinyağlılar soğuk veya oda sıcaklığında çok daha lezzetlidir.",
+      "Şeker domatesteki asitliği dengeler."
+    ],
+    "servis_onerisi": "Ekmek ve yoğurt ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2014/06/taze-fasulye-tarif-fotografi.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80"
+  },
+  {
+    "id": 38,
+    "ad": "balık ekmek",
+    "slug": "balik-ekmek",
+    "kategori": "atıştırmalık",
+    "mutfak": "İstanbul",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "15 dk",
+    "toplam_sure": "25 dk",
+    "kalori": 480,
+    "protein_g": 28,
+    "karbonhidrat_g": 48,
+    "yag_g": 18,
+    "etiketler": ["balık", "sokak yemeği", "İstanbul"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "İstanbul Eminönü'nün simgesi olan, ızgara balığın ekmek arasına yerleştirilip soğan ve roka ile sunulduğu meşhur sokak yemeği.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "levrek ya da uskumru fileto"},
+      {"miktar": "4", "birim": "adet", "isim": "sandviç ekmeği"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "1", "birim": "demet", "isim": "roka"},
+      {"miktar": "1", "birim": "adet", "isim": "limon"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kırmızı toz biber"}
+    ],
+    "hazirlanis": [
+      "Balık filetolarını tuzlayıp baharat serpin.",
+      "Izgarada her iki tarafını pişirin.",
+      "Ekmeği ısıtın.",
+      "Soğanı halkalar halinde kesin.",
+      "Ekmek arasına roka, balık ve soğan koyun.",
+      "Üzerine limon sıkın.",
+      "Hemen servis edin."
+    ],
+    "ipuclari": [
+      "Balık sıcak servis edilmeli, bekletilmemeli.",
+      "Sumak serpmek geleneksel lezzetini tamamlar."
+    ],
+    "servis_onerisi": "Limon dilimi ve ayranla servis edin.",
+    "resim_url": "https://imgrosetta.mynet.com.tr/file/19806227/19806227-1200x675.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=80"
+  },
+  {
+    "id": 39,
+    "ad": "pide",
+    "slug": "pide",
+    "kategori": "ana yemek",
+    "mutfak": "Karadeniz",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "30 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "50 dk",
+    "kalori": 680,
+    "protein_g": 30,
+    "karbonhidrat_g": 80,
+    "yag_g": 22,
+    "etiketler": ["hamur işi", "etli", "geleneksel"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Kıyma veya peynirli iç harçla yapılan, kayık şeklinde pişirilen Trabzon ve Samsun'un meşhur pide ekmeği.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "paket", "isim": "kuru maya"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "ılık su"},
+      {"miktar": "300", "birim": "gr", "isim": "kıyma"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "adet", "isim": "domates"},
+      {"miktar": "1", "birim": "adet", "isim": "yeşil biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Maya, su ve şekerle hamur yapıp 30 dk mayalandırın.",
+      "Kıyma, doğranmış soğan, domates ve biber karıştırın.",
+      "Hamuru bezlere ayırıp oval şekilde açın.",
+      "Üzerine harcı serin, kenarlarını içe katlayın.",
+      "Kayık şeklini verin.",
+      "250°C fırında 15-20 dakika pişirin.",
+      "Üzerine tereyağı sürüp servis edin."
+    ],
+    "ipuclari": [
+      "Fırın yeterince sıcak olmazsa alt kısmı pişmez.",
+      "Çıkınca tereyağı sürmek pidenin ömrünü uzatır."
+    ],
+    "servis_onerisi": "Sıcak, ayran veya çorba ile servis edin.",
+    "resim_url": "https://turkishfoodie.com/wp-content/uploads/2019/01/Pide-500x500.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
+  },
+  {
+    "id": 40,
+    "ad": "tarator",
+    "slug": "tarator",
+    "kategori": "meze",
+    "mutfak": "Akdeniz",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "10 dk",
+    "kalori": 280,
+    "protein_g": 8,
+    "karbonhidrat_g": 14,
+    "yag_g": 22,
+    "etiketler": ["vejetaryen", "cevizli", "meze"],
+    "mevsim": ["ilkbahar", "yaz"],
+    "aciklama": "Ceviz, sarımsak ve zeytinyağının yoğurtla buluştuğu, Akdeniz mutfağının kalın ve doyurucu mezesi.",
+    "malzemeler": [
+      {"miktar": "100", "birim": "gr", "isim": "ceviz (öğütülmüş)"},
+      {"miktar": "300", "birim": "gr", "isim": "yoğurt"},
+      {"miktar": "2", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "1", "birim": "dilim", "isim": "bayat ekmek"},
+      {"miktar": "1", "birim": "adet", "isim": "limon (suyu)"},
+      {"miktar": "1", "birim": "tutam", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Ekmeği ıslatıp sıkın.",
+      "Ceviz, ekmek ve sarımsağı blender'da çekin.",
+      "Yoğurt ekleyip karıştırın.",
+      "Zeytinyağı ve limon suyunu ekleyin.",
+      "Tuzu ayarlayın.",
+      "Servis tabağına alın.",
+      "Üzerine ceviz ve zeytinyağı gezdirin."
+    ],
+    "ipuclari": [
+      "Taze ceviz kullanmak acılığını önler.",
+      "Bayat ekmek kıvam sağlar."
+    ],
+    "servis_onerisi": "Ekmek ve taze sebzelerle servis edin.",
+    "resim_url": "https://i.tmgrup.com.tr/sfr/2025/09/22/havuc-tarator-1758544124907.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80"
+  },
+  {
+    "id": 41,
+    "ad": "şehriyeli tavuk çorbası",
+    "slug": "sehriyeli-tavuk-corbasi",
+    "kategori": "çorba",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 310,
+    "protein_g": 22,
+    "karbonhidrat_g": 32,
+    "yag_g": 10,
+    "etiketler": ["çorba", "protein", "pratik"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Tavuk suyu, şehriye ve havuçla hazırlanan, hem büyüklere hem çocuklara hitap eden besleyici klasik Türk çorbası.",
+    "malzemeler": [
+      {"miktar": "300", "birim": "gr", "isim": "tavuk göğsü"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "şehriye (tel)"},
+      {"miktar": "2", "birim": "adet", "isim": "havuç"},
+      {"miktar": "1", "birim": "adet", "isim": "soğan"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "6", "birim": "su bardağı", "isim": "su"}
+    ],
+    "hazirlanis": [
+      "Tavuğu suyla haşlayın, etleri ayırın, suyu saklayın.",
+      "Tereyağında soğanı kavurun.",
+      "Küp doğranmış havucu ekleyin.",
+      "Tavuk suyunu dökün ve kaynatın.",
+      "Şehriyeyi ekleyip 8 dakika pişirin.",
+      "Tavuk parçalarını ekleyin.",
+      "Tuz ayarlayıp servis edin."
+    ],
+    "ipuclari": [
+      "Gerçek tavuk suyu çorbanın lezzetini doğrudan etkiler.",
+      "Limon suyu servis öncesi tazelik katar."
+    ],
+    "servis_onerisi": "Limon dilimi ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2021/01/18/havuclu-ve-tel-sehriyeli-tavuk-corbasi.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80"
+  },
+  {
+    "id": 42,
+    "ad": "künefe",
+    "slug": "kunefe",
+    "kategori": "tatlı",
+    "mutfak": "Güneydoğu",
+    "zorluk": "zor",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "40 dk",
+    "kalori": 950,
+    "protein_g": 14,
+    "karbonhidrat_g": 100,
+    "yag_g": 52,
+    "etiketler": ["şerbetli", "peynirli", "Antep"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Tel kadayıf arasına taze dil peyniri yerleştirilerek pişirilen ve üzerine şerbet dökülen Antakya ve Gaziantep'in efsanevi tatlısı.",
+    "malzemeler": [
+      {"miktar": "250", "birim": "gr", "isim": "tel kadayıf"},
+      {"miktar": "150", "birim": "gr", "isim": "tuzsuz dil peyniri"},
+      {"miktar": "100", "birim": "gr", "isim": "tereyağı (eritilmiş)"},
+      {"miktar": "1.5", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "su"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "gül suyu"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "dövülmüş fıstık"}
+    ],
+    "hazirlanis": [
+      "Şerbet için şeker, su ve gül suyunu kaynatın.",
+      "Tel kadayıfı elinizle gevşetin.",
+      "Eritilmiş tereyağını kadayıfa bulayın.",
+      "Künefe tavasının altına yarım kadayıf serin.",
+      "Ufalanmış peyniri ortaya koyun.",
+      "Kalan kadayıfı üstüne serin ve bastırın.",
+      "Her iki tarafını kısık ateşte altın rengi olana kadar pişirin.",
+      "Sıcakken soğuk şerbet dökün ve fıstık serpin."
+    ],
+    "ipuclari": [
+      "Peynir tuzsuzu tercih edin, aksi hâlde tuzluluk baskın gelir.",
+      "Şerbet soğuk, künefe sıcak olmalı."
+    ],
+    "servis_onerisi": "Sıcak servis edin, üzerine fıstık serpin.",
+    "resim_url": "https://turkishfoodie.com/wp-content/uploads/2018/06/Kunefe-500x375.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80"
+  },
+  {
+    "id": 43,
+    "ad": "midye tava",
+    "slug": "midye-tava",
+    "kategori": "meze",
+    "mutfak": "Türk",
+    "zorluk": "orta",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "15 dk",
+    "toplam_sure": "30 dk",
+    "kalori": 420,
+    "protein_g": 20,
+    "karbonhidrat_g": 38,
+    "yag_g": 18,
+    "etiketler": ["deniz ürünleri", "meze", "kızartma"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Temizlenmiş midyelerin hamura batırılarak kızartıldığı, tarator sosla servis edilen lezzetli Türk mezesi.",
+    "malzemeler": [
+      {"miktar": "500", "birim": "gr", "isim": "midye (temizlenmiş)"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "soğuk su"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "200", "birim": "ml", "isim": "kızartma yağı"}
+    ],
+    "hazirlanis": [
+      "Un, yumurta, su ve tuzdan sıvı hamur yapın.",
+      "Midyeleri kurulayın.",
+      "Yağı kızdırın.",
+      "Midyeleri hamura batırıp kızgın yağa atın.",
+      "Altın rengi olana kadar kızartın.",
+      "Kâğıt havlu üzerine alın.",
+      "Tarator sosuyla servis edin."
+    ],
+    "ipuclari": [
+      "Midyeler taze olmalı, tazeliği kokundan anlaşılır.",
+      "Hamur kıvamı krep hamuru gibi olmalı."
+    ],
+    "servis_onerisi": "Tarator sos ve limon ile servis edin.",
+    "resim_url": "https://img.elele.com.tr/rcman/Cw780h439q95gc/storage/files/images/2021/11/01/midye-tava-nasil-yapilir-SYyZ_cover.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=80"
+  },
+  {
+    "id": 44,
+    "ad": "çılbır",
+    "slug": "cilbir",
+    "kategori": "kahvaltı",
+    "mutfak": "Osmanlı",
+    "zorluk": "orta",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "10 dk",
+    "toplam_sure": "15 dk",
+    "kalori": 360,
+    "protein_g": 18,
+    "karbonhidrat_g": 8,
+    "yag_g": 28,
+    "etiketler": ["yumurtalı", "kahvaltı", "Osmanlı"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Sirkeli suda haşlanan yumurtanın sarımsaklı yoğurt ve tereyağı sosuyla buluştuğu, Osmanlı saray mutfağından gelen zarif kahvaltı tarifi.",
+    "malzemeler": [
+      {"miktar": "4", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "200", "birim": "gr", "isim": "süzme yoğurt"},
+      {"miktar": "2", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "sirke"},
+      {"miktar": "1", "birim": "tutam", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Sarımsaklı yoğurdu hazırlayıp tabağa yayın.",
+      "Suya sirke ve tuz ekleyip kaynatın.",
+      "Yumurtaları kırıp sirkeli suya bırakın.",
+      "3-4 dakikada sarısı akışkan kalacak şekilde haşlayın.",
+      "Tereyağında pul biberi kızdırın.",
+      "Yumurtaları yoğurdun üzerine koyun.",
+      "Üzerine kırmızı tereyağı gezdirin."
+    ],
+    "ipuclari": [
+      "Sirke yumurtanın dağılmadan pişmesini sağlar.",
+      "Yumurtayı çukur bir kapta kırıp suya bırakmak kolaylaştırır."
+    ],
+    "servis_onerisi": "Sıcak taze ekmekle servis edin.",
+    "resim_url": "https://img-s1.onedio.com/id-647711aae62e6cdd469b2116/rev-0/w-600/h-750/f-jpg/s-f4d7d08f67d0599e659abde616e4a4f940802690.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80"
+  },
+  {
+    "id": 45,
+    "ad": "bulgur pilavı",
+    "slug": "bulgur-pilavi",
+    "kategori": "yan yemek",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "20 dk",
+    "toplam_sure": "25 dk",
+    "kalori": 420,
+    "protein_g": 12,
+    "karbonhidrat_g": 72,
+    "yag_g": 10,
+    "etiketler": ["bulgur", "vejetaryen", "sağlıklı"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Domates salçası ve tereyağıyla kavrulan köy bulgurdan hazırlanan, pirince sağlıklı alternatif geleneksel pilav.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "su bardağı", "isim": "köy bulguru"},
+      {"miktar": "3", "birim": "su bardağı", "isim": "sıcak su"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "domates salçası"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"}
+    ],
+    "hazirlanis": [
+      "Tereyağını tencereye alıp eritin.",
+      "Salçayı ekleyip kavurun.",
+      "Bulguru ekleyip 3 dakika kavurun.",
+      "Sıcak suyu ve tuzu ekleyin.",
+      "Kaynamaya başlayınca kısın.",
+      "Kapağı kapalı 15 dakika pişirin.",
+      "5 dakika demlenmeye bırakın."
+    ],
+    "ipuclari": [
+      "Bulgur pilavı pirinçten daha kısa sürede pişer.",
+      "Kıyılmış ceviz eklemek farklı bir lezzet katar."
+    ],
+    "servis_onerisi": "Yoğurt veya ayran ile servis edin.",
+    "resim_url": "https://i.nefisyemektarifleri.com/2018/09/06/bulgur-pilavi-tarifi-7.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1536304993881-ff86e0c9b24b?w=400&q=80"
+  },
+  {
+    "id": 46,
+    "ad": "haytalı",
+    "slug": "haytali",
+    "kategori": "tatlı",
+    "mutfak": "Doğu Anadolu",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "20 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "50 dk",
+    "kalori": 520,
+    "protein_g": 8,
+    "karbonhidrat_g": 88,
+    "yag_g": 14,
+    "etiketler": ["sütlü", "geleneksel", "Doğu Anadolu"],
+    "mevsim": ["yaz"],
+    "aciklama": "Nişasta jölesi, şeker şerbeti, gül suyu ve dondurmayla servis edilen, Maraş'ın özgün serinletici tatlısı.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "yemek kaşığı", "isim": "nişasta"},
+      {"miktar": "1", "birim": "litre", "isim": "süt"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "gül suyu"},
+      {"miktar": "4", "birim": "top", "isim": "dondurma"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "nar ekşisi"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "dövülmüş fıstık"}
+    ],
+    "hazirlanis": [
+      "Nişastayı soğuk sütle eritin.",
+      "Kalan sütü şekerle kaynatın.",
+      "Nişastalı karışımı ekleyip pişirin.",
+      "Gül suyunu ekleyip kalıplara dökün.",
+      "Soğuyunca buzdolabına alın.",
+      "Servis kabına küpler kesin.",
+      "Üzerine dondurma, fıstık ve nar ekşisi ekleyin."
+    ],
+    "ipuclari": [
+      "Gül suyu miktarını damağınıza göre ayarlayın.",
+      "Çok soğuk servis edilmesi lezzetini artırır."
+    ],
+    "servis_onerisi": "Dondurma ve nar ekşisiyle servis edin.",
+    "resim_url": "https://i.lezzet.com.tr/images-xxlarge/haytali-tarifi-69caf12b-99ea-443f-8f8a-9a3614750fe8",
+    "thumbnail_url": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=80"
+  },
+  {
+    "id": 47,
+    "ad": "ispanaklı yumurta",
+    "slug": "ispanakli-yumurta",
+    "kategori": "kahvaltı",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 2,
+    "hazirlanma_suresi": "5 dk",
+    "pisirme_suresi": "15 dk",
+    "toplam_sure": "20 dk",
+    "kalori": 270,
+    "protein_g": 16,
+    "karbonhidrat_g": 10,
+    "yag_g": 18,
+    "etiketler": ["kahvaltı", "vejetaryen", "sağlıklı"],
+    "mevsim": ["ilkbahar", "kış"],
+    "aciklama": "Taze ıspanakla pişirilen yumurtanın sarımsaklı yoğurtla servis edildiği besleyici ve pratik kahvaltı.",
+    "malzemeler": [
+      {"miktar": "200", "birim": "gr", "isim": "taze ıspanak"},
+      {"miktar": "4", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "zeytinyağı"},
+      {"miktar": "2", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "150", "birim": "gr", "isim": "yoğurt"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Sarımsakları zeytinyağında kavurun.",
+      "Yıkanmış ıspanakları ekleyip 3 dakika soteleyin.",
+      "Yumurtaları kırın, tuz ekleyin.",
+      "Kapağı kapatıp sarısı istenilen kıvama gelene kadar pişirin.",
+      "Sarımsaklı yoğurdu tabağa yayın.",
+      "Üzerine ıspanaklı yumurtaları koyun.",
+      "Pul biber serpin."
+    ],
+    "ipuclari": [
+      "Sarısı akışkan kalırsa lezzeti artar.",
+      "Sızma zeytinyağı aroması güçlendirir."
+    ],
+    "servis_onerisi": "Sıcak ekmekle servis edin.",
+    "resim_url": "https://www.diyetkolik.com/_next/image?url=https%3A%2F%2Fwww.diyetkolik.com%2Fsite_media%2Fmedia%2Ffoodrecipe_images%2FAdobeStock_516416358.jpg&w=828&q=75",
+    "thumbnail_url": "https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80"
+  },
+  {
+    "id": 48,
+    "ad": "portakallı kek",
+    "slug": "portakalli-kek",
+    "kategori": "tatlı",
+    "mutfak": "Türk",
+    "zorluk": "kolay",
+    "kac_kisilik": 8,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "40 dk",
+    "toplam_sure": "55 dk",
+    "kalori": 780,
+    "protein_g": 10,
+    "karbonhidrat_g": 110,
+    "yag_g": 32,
+    "etiketler": ["tatlı", "kek", "pratik"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Portakal suyu ve kabuğunun parfümlü aromasıyla hazırlanan, sünger gibi yumuşak geleneksel Türk keki.",
+    "malzemeler": [
+      {"miktar": "3", "birim": "adet", "isim": "yumurta"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "şeker"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "sıvıyağ"},
+      {"miktar": "0.5", "birim": "su bardağı", "isim": "portakal suyu"},
+      {"miktar": "2", "birim": "su bardağı", "isim": "un"},
+      {"miktar": "1", "birim": "paket", "isim": "kabartma tozu"},
+      {"miktar": "1", "birim": "adet", "isim": "portakal (rendelenmiş kabuğu)"}
+    ],
+    "hazirlanis": [
+      "Yumurta ve şekeri iyice çırpın.",
+      "Sıvıyağ ve portakal suyunu ekleyin.",
+      "Un, kabartma tozu ve portakal kabuğunu eleyip ekleyin.",
+      "Pürüzsüz hamur elde edin.",
+      "Yağlanmış kalıba dökün.",
+      "Önceden ısıtılmış 180°C fırında 35-40 dakika pişirin.",
+      "Soğuyunca servis edin."
+    ],
+    "ipuclari": [
+      "Fırın kapısını ilk 20 dakika açmayın.",
+      "Kürdan batırınca temiz çıkıyorsa pişmiştir."
+    ],
+    "servis_onerisi": "Çay yanında ince dilimler halinde servis edin.",
+    "resim_url": "https://i.ytimg.com/vi/59AlT9lT-14/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB_5tVG3wqH91lVzmborJIX4MtfZw",
+    "thumbnail_url": "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=80"
+  },
+  {
+    "id": 49,
+    "ad": "çerkez tavuğu",
+    "slug": "cerkez-tavugu",
+    "kategori": "meze",
+    "mutfak": "Osmanlı",
+    "zorluk": "orta",
+    "kac_kisilik": 6,
+    "hazirlanma_suresi": "15 dk",
+    "pisirme_suresi": "30 dk",
+    "toplam_sure": "45 dk",
+    "kalori": 560,
+    "protein_g": 42,
+    "karbonhidrat_g": 14,
+    "yag_g": 36,
+    "etiketler": ["tavuk", "cevizli", "Osmanlı"],
+    "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+    "aciklama": "Haşlanmış tavuğun cevizli sos ile karıştırılıp üzerine kırmızı yağ dökülen, Kafkasya kökenli Osmanlı saray mezesi.",
+    "malzemeler": [
+      {"miktar": "1", "birim": "adet", "isim": "tavuk (haşlanmış)"},
+      {"miktar": "150", "birim": "gr", "isim": "ceviz"},
+      {"miktar": "2", "birim": "dilim", "isim": "bayat ekmek"},
+      {"miktar": "3", "birim": "diş", "isim": "sarımsak"},
+      {"miktar": "1", "birim": "su bardağı", "isim": "tavuk suyu"},
+      {"miktar": "2", "birim": "yemek kaşığı", "isim": "tereyağı"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "kırmızı biber"}
+    ],
+    "hazirlanis": [
+      "Tavuğu haşlayın, etleri parçalayın.",
+      "Ceviz, ekmek ve sarımsağı blender'dan geçirin.",
+      "Tavuk suyuyla krem haline getirin.",
+      "Tavuk parçalarını sosla karıştırın.",
+      "Servis tabağına alın.",
+      "Tereyağında kırmızı biberi kızdırın.",
+      "Üzerine gezdirin."
+    ],
+    "ipuclari": [
+      "Sos çok kalınsa tavuk suyu ekleyin.",
+      "Soğuk servis edilmesi gelenekseldir."
+    ],
+    "servis_onerisi": "Soğuk olarak roka ve limonla servis edin.",
+    "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/8d2c0ef1-3983-4efb-85e4-e7e5ac973eb4/Derivates/cfd419b0-bd9b-4305-8436-7a49cfbf697c.jpg",
+    "thumbnail_url": "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=400&q=80"
+  },
+  {
+    "id": 50,
+    "ad": "şalgam suyu",
+    "slug": "salgam-suyu",
+    "kategori": "içecek",
+    "mutfak": "Güneydoğu",
+    "zorluk": "kolay",
+    "kac_kisilik": 4,
+    "hazirlanma_suresi": "10 dk",
+    "pisirme_suresi": "0 dk",
+    "toplam_sure": "10 dk",
+    "kalori": 45,
+    "protein_g": 1,
+    "karbonhidrat_g": 8,
+    "yag_g": 0,
+    "etiketler": ["içecek", "fermente", "Adana"],
+    "mevsim": ["sonbahar", "kış"],
+    "aciklama": "Turp ve mor havucun fermantasyonuyla elde edilen, Adana mutfağının ekşi ve acı karakterli geleneksel içeceği.",
+    "malzemeler": [
+      {"miktar": "2", "birim": "adet", "isim": "mor havuç"},
+      {"miktar": "2", "birim": "adet", "isim": "turp"},
+      {"miktar": "1", "birim": "litre", "isim": "su"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "tuz"},
+      {"miktar": "1", "birim": "yemek kaşığı", "isim": "bulgur"},
+      {"miktar": "1", "birim": "çay kaşığı", "isim": "pul biber"}
+    ],
+    "hazirlanis": [
+      "Havuç ve turpları halkalar kesin.",
+      "Cam kavanoza dizin.",
+      "Bulgur ve tuzu ekleyin.",
+      "Su ile doldurun.",
+      "Ağzını bağlayıp 3-5 gün oda sıcaklığında bekletin.",
+      "Fermente olduktan sonra süzüp servis edin."
+    ],
+    "ipuclari": [
+      "Ne kadar uzun fermente edilirse o kadar ekşi olur.",
+      "Piyasadaki hazır şalgam da kullanılabilir."
+    ],
+    "servis_onerisi": "Buz ve pul biber ile servis edin.",
+    "resim_url": "https://media.medipol.com.tr/assets/s3fs-public/styles/just_webp/public/2025-10/Salgam.jpg.webp?VersionId=cefbbe36-c0d5-4fda-9cf8-f785576b5424&itok=IP7qwD60",
+    "thumbnail_url": "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=80"
+  },
+  {
+>>>>>>> Stashed changes
       "id": 51,
       "ad": "yayla çorbası",
       "slug": "yayla-corbasi",
@@ -4039,8 +6212,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.ardaninmutfagi.com/wp-content/uploads/2025/03/yayla-corbasi-t.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.7"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 52,
@@ -4108,8 +6285,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.dergibursa.com.tr/wp-content/uploads/2015/08/iskender-kebap.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "9.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 53,
@@ -4176,8 +6357,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/zeytinyagli_sarma.webp",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.8"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 54,
@@ -4244,8 +6429,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/e9964c08-1177-4cb9-880a-185e1eeee576/Derivates/22085e12-5a3b-4b0b-bf0e-5ad1c9a05017.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.3"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 55,
@@ -4312,8 +6501,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/fava-876.webp",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.8"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 56,
@@ -4379,8 +6572,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2019/11/04/babagannus-tarifi-6.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 57,
@@ -4447,8 +6644,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2021/06/14/pacanga-boregi-nasil-yapilir-10.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 58,
@@ -4515,8 +6716,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.ytimg.com/vi/GpEbL48uw70/maxresdefault.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "9.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 59,
@@ -4583,8 +6788,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.alaybeyi.com.tr/blog/wp-content/uploads/2023/06/etli-ekmek-nasil-yapilir.webp",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.6"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 60,
@@ -4651,8 +6860,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6hMuwJzEfh1z1Yl7deMolkb0aGc3yX_LEdQ&s",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.9"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 61,
@@ -4719,8 +6932,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2024/03/25/ali-nazik-kebabi-7.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 62,
@@ -4787,8 +7004,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2013/11/orman_kebabi1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 63,
@@ -4855,8 +7076,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2017/08/30/tas-kebabi-lokanta-usulu-7.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.3"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 64,
@@ -4923,8 +7148,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://static.ticimax.cloud/cdn-cgi/image/width=-,quality=85/43437/uploads/urunresimleri/buyuk/tepsi-kebabi-eb3c8f.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.9"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 65,
@@ -4991,8 +7220,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2021/03/belen_tava1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.6"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 66,
@@ -5059,8 +7292,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/87ecfb3768fe6500eb5f6b41bc825554/Derivates/3c9709786de5d8b950f57b04dd18fd56aa96a981.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.4"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 67,
@@ -5127,8 +7364,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge/dugun-corbasi-60d8ea53-c378-4774-aa05-0ef1ccf4c028",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.4"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 68,
@@ -5195,8 +7436,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://static.daktilo.com/sites/1271/uploads/2023/12/06/large/58052276-5a99-4401-bde6-cad7c1276cd1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 69,
@@ -5263,8 +7508,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://image.hurimg.com/i/hurriyet/90/0x0/5d4951702269a224a8dd6279.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.8"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 70,
@@ -5331,8 +7580,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2012/07/ayran_asi_corbasi1-1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 71,
@@ -5399,8 +7652,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2014/02/nohutlu_bamya_yemegi1-2.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.7"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 72,
@@ -5467,8 +7724,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2018/02/bulgurlu_kapuska1-2-600x450.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.1"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 73,
@@ -5535,8 +7796,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2014/09/firinda-patlican-musakka-resimli-yemek-tarifi(15).jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 74,
@@ -5603,8 +7868,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2014/08/guvecte_etli_turlu1-1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 75,
@@ -5671,8 +7940,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2018/03/09/karnabahar-graten-videolu.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.8"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 76,
@@ -5739,8 +8012,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2011/12/zeytinyagli_kereviz1-2.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 77,
@@ -5807,8 +8084,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2019/12/pirincli-pirasa-yemegi-resimli-yemek-tarifi(9).jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.7"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 78,
@@ -5874,8 +8155,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/deniz_borulcesi_salatasi-c82c5aaf-c763-43c6-a193-f76127c4d695.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 79,
@@ -5942,8 +8227,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2012/09/mucver3-600x450.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.3"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 80,
@@ -6010,8 +8299,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/ykv_web_site_8959.webp",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 81,
@@ -6078,8 +8371,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/izgara-lufer-020a9943-1490-4724-b578-8826109c22c7.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.1"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 82,
@@ -6146,8 +8443,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2021/06/kalamar_tava1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 83,
@@ -6214,8 +8515,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://gastrotarifler.com/wp-content/uploads/2025/09/Karides-Guvec-servis-sunum1-1024x1024.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.4"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 84,
@@ -6282,8 +8587,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2022/12/02/sekerpare-tatlisi-tarifi-7.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 85,
@@ -6350,8 +8659,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2022/04/01/gullac-tarifi.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.8"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 86,
@@ -6418,8 +8731,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2020/05/06/sutlu-nuriye.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.3"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 87,
@@ -6486,8 +8803,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/kemalpasa_tatlisi-2c9bc9ca-651e-41d2-ba96-a22acae972a8.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.9"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 88,
@@ -6554,8 +8875,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://image.hurimg.com/i/hurriyet/90/0x0/69d9fc3f0c50728add7edb88.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "7.1"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 89,
@@ -6622,8 +8947,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/glutensiz-supangle-edc65949-8e93-4955-9590-4a29445df83f.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 90,
@@ -6690,8 +9019,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.refikaninmutfagi.com/profiterol-tarifi-1277-cikolatali-tatlilar-profiterol-tarifi-1306-12-B.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 91,
@@ -6758,8 +9091,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.ytimg.com/vi/HKCAPKSHxR0/maxresdefault.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.6"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 92,
@@ -6776,6 +9113,7 @@
       "protein_g": 8,
       "karbonhidrat_g": 75,
       "yag_g": 6,
+<<<<<<< Updated upstream
       "etiketler": [
         "tatlı",
         "geleneksel",
@@ -6820,6 +9158,18 @@
           "birim": "su bardağı",
           "isim": "şeker"
         }
+=======
+      "etiketler": ["tatlı", "geleneksel", "vegan", "meyveli"],
+      "mevsim": ["ilkbahar", "yaz", "sonbahar", "kış"],
+      "aciklama": "Türk mutfağının bereket simgesi, bakliyat ve kuru meyvelerin muhteşem uyumuyla hazırlanan şifalı tatlısı.",
+      "malzemeler": [
+        {"miktar": "2", "birim": "su bardağı", "isim": "aşurelik buğday"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "haşlanmış nohut"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "haşlanmış kuru fasulye"},
+        {"miktar": "1", "birim": "su bardağı", "isim": "doğranmış kuru incir ve kayısı"},
+        {"miktar": "0.5", "birim": "su bardağı", "isim": "kuru üzüm"},
+        {"miktar": "3", "birim": "su bardağı", "isim": "şeker"}
+>>>>>>> Stashed changes
       ],
       "hazirlanis": [
         "Geceden ıslatılmış buğdayı iyice yumuşayana kadar haşlayın.",
@@ -6834,8 +9184,12 @@
       ],
       "servis_onerisi": "Üzerini nar taneleri, ceviz, fındık ve tarçınla bolca süsleyerek soğuk servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-secondary/asure-tarifleri-dc577792-f4a0-44c3-b5b7-8ec2553b2ded",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80",
       "puan": "8.9"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 93,
@@ -6902,8 +9256,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.hacibekirkunc.com/upload/keskul-1-9914.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.1"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 94,
@@ -6970,8 +9328,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://cahidesultan.com/wp-content/uploads/2023/10/d45b2-am-yakn1.png",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.0"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 95,
@@ -7038,8 +9400,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://d17wu0fn6x6rgz.cloudfront.net/img/w/tarif/mgt/tulumba-tatls.webp",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.4"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 96,
@@ -7106,8 +9472,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://cdn.ye-mek.net/App_UI/Img/out/650/2021/12/narli-ayva-tatlisi-resimli-yemek-tarifi(10).jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.2"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 97,
@@ -7174,8 +9544,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.lezzet.com.tr/images-xxlarge-recipe/air-fryerda-kabak-tatlisi-c6f765c0-8659-4459-bf6d-efd9badfbb99.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.5"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 98,
@@ -7242,8 +9616,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2013/07/dondurmali_irmik_helvasi3-600x450.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.7"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 99,
@@ -7310,8 +9688,12 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://i.nefisyemektarifleri.com/2016/06/16/un-helvasi-tam-kivaminda-7.jpeg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "8.3"
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+>>>>>>> Stashed changes
     },
     {
       "id": 100,
@@ -7378,8 +9760,15 @@
       ],
       "servis_onerisi": "Sıcak veya soğuk, damak zevkinize göre servis edin.",
       "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2011/11/icli_kofte1-1.jpg",
+<<<<<<< Updated upstream
       "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80",
       "puan": "9.1"
     }
   ]
 }
+=======
+      "thumbnail_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80"
+    }
+  ]
+}
+>>>>>>> Stashed changes
