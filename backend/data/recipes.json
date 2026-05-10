@@ -9200,10 +9200,10 @@
     "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2013/07/brokoli_corbasi1-1.jpg",
     "thumbnail_url": "https://example.com/brokoli-corbasi-thumb.jpg",
     "puan": "8.5"
-  },
+    },
     
     {
-    "id": 151,
+    "id": 146,
     "ad": "muhammara",
     "slug": "muhammara",
     "kategori": "meze",
@@ -9248,7 +9248,7 @@
   },
     
     {
-    "id": 153,
+    "id": 147,
     "ad": "magnolia",
     "slug": "magnolia",
     "kategori": "tatlı",
@@ -9290,10 +9290,10 @@
     "resim_url": "https://www.kevserinmutfagi.com/wp-content/uploads/2020/04/cilekli_magnolia_puding1.jpg",
     "thumbnail_url": "https://example.com/magnolia-thumb.jpg",
     "puan": "8.9"
-  },
-   [
-  {
-    "id": 154,
+    },
+  
+    {
+    "id": 148,
     "ad": "yeşil mercimek salatası",
     "slug": "yesil-mercimek-salatasi",
     "kategori": "salata",
@@ -9336,9 +9336,9 @@
     "resim_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
     "puan": "8.7"
-  },
-  {
-    "id": 155,
+    },
+    {
+    "id": 149,
     "ad": "kuzu tandır",
     "slug": "kuzu-tandir",
     "kategori": "ana yemek",
@@ -9381,9 +9381,9 @@
     "resim_url": "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80",
     "puan": "9.6"
-  },
-  {
-    "id": 156,
+    },
+    {
+    "id": 150,
     "ad": "çerkez peyniri salatası",
     "slug": "cerkez-peyniri-salatasi",
     "kategori": "salata",
@@ -9425,9 +9425,9 @@
     "resim_url": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80",
     "puan": "8.5"
-  },
-  {
-    "id": 157,
+    },
+    {
+    "id": 151,
     "ad": "fıstıklı baklava",
     "slug": "fistikli-baklava",
     "kategori": "tatlı",
@@ -9469,9 +9469,9 @@
     "resim_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80",
     "puan": "9.9"
-  },
-  {
-    "id": 158,
+    },
+    {
+    "id": 152,
     "ad": "domates çorbası",
     "slug": "domates-corbasi",
     "kategori": "çorba",
@@ -9515,9 +9515,9 @@
     "resim_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80",
     "puan": "8.9"
-  },
-  {
-    "id": 159,
+    },
+    {
+    "id": 153,
     "ad": "nohut yemeği",
     "slug": "nohut-yemegi",
     "kategori": "ana yemek",
@@ -9561,9 +9561,9 @@
     "resim_url": "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=400&q=80",
     "puan": "9.0"
-  },
-  {
-    "id": 160,
+    },
+    {
+    "id": 154,
     "ad": "spagetti bolonez",
     "slug": "spagetti-bolonez",
     "kategori": "ana yemek",
@@ -9608,9 +9608,9 @@
     "resim_url": "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=400&q=80",
     "puan": "9.3"
-  },
-  {
-    "id": 161,
+    },
+    {
+    "id": 155,
     "ad": "Meksika fasulyesi (frijoles)",
     "slug": "meksika-fasulyesi-frijoles",
     "kategori": "ana yemek",
@@ -9654,9 +9654,9 @@
     "resim_url": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=80",
     "puan": "8.6"
-  },
-  {
-    "id": 162,
+    },
+    {
+    "id": 156,
     "ad": "Japon miso çorbası",
     "slug": "japon-miso-corbasi",
     "kategori": "çorba",
@@ -9697,9 +9697,9 @@
     "resim_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80",
     "puan": "8.8"
-  },
-  {
-    "id": 163,
+    },
+    {
+    "id": 157,
     "ad": "Hint butter chicken",
     "slug": "hint-butter-chicken",
     "kategori": "ana yemek",
@@ -9745,9 +9745,9 @@
     "resim_url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&q=80",
     "puan": "9.5"
-  },
-  {
-    "id": 164,
+    },
+    {
+    "id": 158,
     "ad": "chia tohumu pudingi",
     "slug": "chia-tohumu-pudingi",
     "kategori": "tatlı",
@@ -9785,9 +9785,9 @@
     "resim_url": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80",
     "puan": "8.7"
-  },
-  {
-    "id": 165,
+    },
+    {
+    "id": 159,
     "ad": "Yunan musakası",
     "slug": "yunan-musakasi",
     "kategori": "ana yemek",
@@ -9832,9 +9832,9 @@
     "resim_url": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80",
     "puan": "9.2"
-  },
-  {
-    "id": 166,
+    },
+    {
+    "id": 160,
     "ad": "soğuk yeşil smoothie",
     "slug": "soguk-yesil-smoothie",
     "kategori": "içecek",
@@ -9873,9 +9873,9 @@
     "resim_url": "https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=400&q=80",
     "puan": "8.8"
-  },
-  {
-    "id": 167,
+    },
+    {
+    "id": 161,
     "ad": "kuzey Afrika güveci (tagine)",
     "slug": "tagine-guvec",
     "kategori": "ana yemek",
@@ -9919,9 +9919,9 @@
     "resim_url": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
     "puan": "9.1"
-  },
-  {
-    "id": 168,
+    },
+    {
+    "id": 162,
     "ad": "ev yapımı limonata",
     "slug": "ev-yapimi-limonata",
     "kategori": "içecek",
@@ -9961,9 +9961,9 @@
     "resim_url": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&q=80",
     "puan": "9.0"
-  },
-  {
-    "id": 169,
+    },
+    {
+    "id": 163,
     "ad": "patates çorbası",
     "slug": "patates-corbasi",
     "kategori": "çorba",
@@ -10006,9 +10006,9 @@
     "resim_url": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400&q=80",
     "puan": "8.8"
-  },
-  {
-    "id": 170,
+    },
+    {
+    "id": 164,
     "ad": "New York cheesecake",
     "slug": "new-york-cheesecake",
     "kategori": "tatlı",
@@ -10052,9 +10052,9 @@
     "resim_url": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&q=80",
     "puan": "9.4"
-  },
-  {
-    "id": 171,
+    },
+    {
+    "id": 165,
     "ad": "kestane çorbası",
     "slug": "kestane-corbasi",
     "kategori": "çorba",
@@ -10097,9 +10097,9 @@
     "resim_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80",
     "puan": "8.9"
-  },
-  {
-    "id": 172,
+    },
+    {
+    "id": 166,
     "ad": "çilekli kek",
     "slug": "cilekli-kek",
     "kategori": "tatlı",
@@ -10142,9 +10142,9 @@
     "resim_url": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=80",
     "puan": "9.1"
-  },
-  {
-    "id": 173,
+    },
+    {
+    "id": 167,
     "ad": "Tayland yeşil köri",
     "slug": "tayland-yesil-kori",
     "kategori": "ana yemek",
@@ -10187,9 +10187,9 @@
     "resim_url": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&q=80",
     "puan": "9.2"
-  },
-  {
-    "id": 174,
+    },
+    {
+    "id": 168,
     "ad": "Türk çayı demlemesi",
     "slug": "turk-cayi-demlemesi",
     "kategori": "içecek",
@@ -10227,9 +10227,9 @@
     "resim_url": "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400&q=80",
     "puan": "9.7"
-  },
-  {
-    "id": 175,
+    },
+    {
+    "id": 169,
     "ad": "kepekli ekmek",
     "slug": "kepekli-ekmek",
     "kategori": "ekmek",
@@ -10271,9 +10271,9 @@
     "resim_url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80",
     "puan": "8.7"
-  },
-  {
-    "id": 176,
+    },
+    {
+    "id": 170,
     "ad": "sebzeli güveç",
     "slug": "sebzeli-guvec",
     "kategori": "ana yemek",
@@ -10317,9 +10317,9 @@
     "resim_url": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80",
     "puan": "9.0"
-  },
-  {
-    "id": 177,
+    },
+    {
+    "id": 171,
     "ad": "portakallı ördek",
     "slug": "portakalli-ordek",
     "kategori": "ana yemek",
@@ -10362,9 +10362,9 @@
     "resim_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80",
     "puan": "9.0"
-  },
-  {
-    "id": 178,
+    },
+    {
+    "id": 172,
     "ad": "çikolatalı mousse",
     "slug": "cikolatali-mousse",
     "kategori": "tatlı",
@@ -10405,9 +10405,9 @@
     "resim_url": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80",
     "puan": "9.3"
-  },
-  {
-    "id": 179,
+    },
+    {
+    "id": 173,
     "ad": "Kore bibimbap",
     "slug": "kore-bibimbap",
     "kategori": "ana yemek",
@@ -10452,9 +10452,9 @@
     "resim_url": "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=400&q=80",
     "puan": "9.2"
-  },
-  {
-    "id": 180,
+    },
+    {
+    "id": 174,
     "ad": "avokado tostu",
     "slug": "avokado-tostu",
     "kategori": "kahvaltı",
@@ -10495,9 +10495,9 @@
     "resim_url": "https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=400&q=80",
     "puan": "9.1"
-  },
-  {
-    "id": 181,
+    },
+    {
+    "id": 175,
     "ad": "soğuk çay (ice tea)",
     "slug": "soguk-cay-ice-tea",
     "kategori": "içecek",
@@ -10538,9 +10538,9 @@
     "resim_url": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80",
     "puan": "8.9"
-  },
-  {
-    "id": 182,
+    },
+    {
+    "id": 176,
     "ad": "levrek ızgara",
     "slug": "levrek-izgara",
     "kategori": "ana yemek",
@@ -10581,9 +10581,9 @@
     "resim_url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80",
     "puan": "9.3"
-  },
-  {
-    "id": 183,
+    },
+    {
+    "id": 177,
     "ad": "kırmızı mercimek köftesi",
     "slug": "kirmizi-mercimek-koftesi",
     "kategori": "meze",
@@ -10628,7 +10628,6 @@
     "resim_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80",
     "thumbnail_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
     "puan": "9.2"
-  }
+    }
 ]
-  ]
 }

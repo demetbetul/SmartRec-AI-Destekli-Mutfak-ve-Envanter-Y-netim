@@ -337,12 +337,48 @@ function _renderShopping() {
 }
 
 // ─── Eksikleri Alışveriş'e Ekle ──────────────────────────────────────────────
+// ─── Eksikleri Alışveriş'e Ekle ──────────────────────────────────────────────
 export function addMissingToShopping(recipeMaterials) {
-  const inv     = getInventory().map(i => i.ad.toLowerCase());
-  const shop    = _getShopping().map(i => i.ad.toLowerCase());
-  const missing = recipeMaterials.filter(
-    m => !inv.includes(m.toLowerCase()) && !shop.includes(m.toLowerCase())
-  );
+  const inv  = getInventory().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
+  const shop = _getShopping().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
+  
+  // Gereksiz kelimeleri temizleme listeleri
+  const units = ['su bardağı', 'çay bardağı', 'yemek kaşığı', 'tatlı kaşığı', 'çay kaşığı', 'kahve fincanı', 'gram', 'gr', 'kilogram', 'kg', 'ml', 'litre', 'lt', 'adet', 'dilim', 'tutam', 'paket', 'demet', 'diş', 'baş', 'kutu', 'kase', 'fincan', 'bardak', 'kaşık', 'yaprak', 'dal', 'küp', 'yarım', 'çeyrek', 'birkaç', 'tepeleme', 'silme', 'avuç', 'kilo', 'porsiyon'];
+  const extras = ['rendelenmiş', 'haşlanmış', 'doğranmış', 'ezilmiş', 'kıyılmış', 'oda sıcaklığında', 'soğuk', 'sıcak', 'ılık', 'ince', 'kalın', 'iri', 'ufak', 'ayıklanmış', 'yıkanmış', 'kavrulmuş', 'eritilmiş', 'kırılmış', 'çırpılmış', 'dövülmüş', 'isteğe bağlı', 'üzeri için', 'süslemek için', 'içi için'];
+
+  // Temel malzemeleri zaten hiç eklemeyelim
+  const TEMEL_MALZEMELER = ['tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ', 'şeker', 'salça', 'domates salçası', 'biber salçası', 'un', 'nişasta', 'sirke', 'limon suyu', 'sarımsak', 'soğan', 'tereyağı', 'tereyağ', 'margarin', 'toz şeker', 'pudra şekeri', 'vanilya', 'kabartma tozu', 'kırmızı pul biber', 'nane', 'kekik', 'pul biber'];
+
+  let missing = [];
+
+  recipeMaterials.forEach(ing => {
+      let clean = (ing || '').toLocaleLowerCase('tr-TR');
+      clean = clean.replace(/\(.*?\)/g, '').replace(/[\d\/\.,]+/g, '');
+      
+      [...units, ...extras].forEach(word => {
+          const regex = new RegExp(`(^|\\s)${word}(?=\\s|$)`, 'g');
+          clean = clean.replace(regex, ' ');
+      });
+
+      clean = clean.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!clean || clean.length < 2) return;
+
+      // Temel malzeme kontrolü
+      const isTemel = TEMEL_MALZEMELER.some(temel => clean === temel || clean.includes(temel) || temel.includes(clean));
+      if (isTemel) return;
+
+      // Hem envanter (inv) hem de sepet (shop) kontrolünü daha esnek yapıyoruz (includes ile)
+      const isInInventory = inv.some(invItem => invItem.length > 2 && (clean.includes(invItem) || invItem.includes(clean)));
+      const isInShop = shop.some(shopItem => shopItem.length > 2 && (clean.includes(shopItem) || shopItem.includes(clean)));
+
+      if (!isInInventory && !isInShop) {
+          // İlk harfini büyük yapıp listeye al
+          const capitalized = clean.charAt(0).toLocaleUpperCase('tr-TR') + clean.slice(1);
+          if (!missing.includes(capitalized)) {
+              missing.push(capitalized);
+          }
+      }
+  });
 
   if (!missing.length) {
     _srToast({ type: 'success', icon: '✅', title: 'Tüm malzemeler mevcut!', sub: 'Envanterinizde eksiksiz hazır.' });
@@ -366,10 +402,4 @@ export function addMissingToShopping(recipeMaterials) {
     document.getElementById('tabInventory')?.classList.add('hidden');
     document.getElementById('tabShopping')?.classList.remove('hidden');
   }
-
-  _srToast({
-    type: 'info', icon: '🛒',
-    title: 'Malzemeler Listeye Eklendi',
-    sub: `${missing.length} eksik malzeme alışveriş listesine eklendi.`
-  });
 }
