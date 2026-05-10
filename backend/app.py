@@ -446,7 +446,16 @@ def add_calories():
     user_email = data.get('email', '').strip()
     yemek_adi  = data.get('yemek', 'Bilinmeyen Yemek')
     kalori     = data.get('kalori', 0)
+    
+    # 🌟 Ön yüzden malzemeleri alıyoruz
+    malzemeler = data.get('malzemeler', []) 
+    
     yemeği_gunluge_kaydet(yemek_adi, int(kalori), user_email if user_email else None)
+    
+    # 🌟 Ve ENVANTERDEN DÜŞÜYORUZ!
+    if user_email:
+        envanter_guncelle(yemek_adi, user_email, malzemeler)
+        
     return jsonify({"success": True}), 200
 
 

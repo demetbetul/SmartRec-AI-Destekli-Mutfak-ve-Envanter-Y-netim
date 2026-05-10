@@ -216,7 +216,6 @@ export async function loadRecipes() {
 
 loadRecipes();
 
-// ─── Kalori Kayıt ─────────────────────────────────────────────────────────────
 export function logCalories(recipeId) {
   const recipe = MOCK_RECIPES.find(r => r.id === recipeId);
   if (!recipe) return;
@@ -233,11 +232,15 @@ export function logCalories(recipeId) {
   window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe } }));
 
   try {
-    const user = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
     fetch('http://localhost:5000/api/calories/add', {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ email: user?.email || '', yemek: recipeTitle, kalori: recipeCalories })
+      body   : JSON.stringify({ 
+          email: user?.email || '', 
+          yemek: recipeTitle, 
+          kalori: recipeCalories,
+          malzemeler: recipe.ingredients || [] // 🌟 BU SATIR EN KRİTİK OLAN!
+      })
     }).catch(() => {});
   } catch {}
 }

@@ -308,26 +308,88 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori, user_email=None):
         print(f"❌ Günlük kaydı hatası: {e}")
 
 # ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
-def envanter_guncelle(yemek_adi, user_email):
+
+# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
+# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
+def envanter_guncelle(yemek_adi, user_email, disaridan_malzemeler=None):
     try:
+        import re 
         tarifler = veriyi_yukle()
         envanter = kullanici_envanterini_getir(user_email)
 
-        secilen_tarif = next(
-            (t for t in tarifler if t["ad"].lower() == yemek_adi.lower()), None
-        )
-        if secilen_tarif:
-            for malzeme in secilen_tarif["malzemeler"]:
-                for stok in envanter:
-                    if veri_temizle(stok["ad"]) == veri_temizle(malzeme):
-                        stok["miktar"] = max(0, stok["miktar"] - 1)
-            kullanici_envanterini_kaydet(user_email, envanter)
-            print(f"✅ {yemek_adi} yapıldı, stoklar düşüldü.")
-        else:
-            print(f"⚠️ {yemek_adi} tarifi bulunamadı.")
-    except Exception as e:
-        print(f"❌ Veri güncelleme hatası: {e}")
+        def harf_duzelt(metin):
+            return str(metin).lower().replace("ı","i").replace("ş","s").replace("ğ","g").replace("ü","u").replace("ö","o").replace("ç","c").strip()
 
+        print(f"\n[{yemek_adi}] Pişirildi! Envanter kontrolü başlıyor...")
+        
+        malzemeler_listesi = []
+
+        if disaridan_malzemeler and isinstance(disaridan_malzemeler, list) and len(disaridan_malzemeler) > 0:
+            malzemeler_listesi = disaridan_malzemeler
+        else:
+            hedef_yemek = harf_duzelt(yemek_adi)
+            for t in tarifler:
+                if harf_duzelt(t.get("ad", "")) == hedef_yemek or harf_duzelt(t.get("title", "")) == hedef_yemek:
+                    malzemeler_listesi = t.get("malzemeler", []) or t.get("ingredients", [])
+                    break
+
+        if not malzemeler_listesi:
+            print("❌ HATA: Malzeme listesi boş!")
+            return
+
+        guncellenen = 0
+        for malzeme in malzemeler_listesi:
+            if isinstance(malzeme, dict):
+                malzeme_adi = malzeme.get("isim", "")
+                malzeme_birimi = str(malzeme.get("birim", "adet")).lower().strip()
+                try:
+                    gerekli_miktar = float(malzeme.get("miktar", 1))
+                except:
+                    gerekli_miktar = 1
+            else:
+                malzeme_str = str(malzeme).lower().strip()
+                match = re.search(r'^(\d+[\.,]?\d*)\s*([a-zA-Zçğıöşü]+)?\s*(.*)', malzeme_str)
+                if match:
+                    try:
+                        gerekli_miktar = float(match.group(1).replace(',', '.'))
+                    except:
+                        gerekli_miktar = 1
+                    malzeme_birimi = match.group(2) if match.group(2) else "adet"
+                    sadece_isim = match.group(3).strip()
+                    malzeme_adi = sadece_isim if sadece_isim else malzeme_str
+                else:
+                    gerekli_miktar = 1
+                    malzeme_birimi = "adet"
+                    malzeme_adi = malzeme_str
+
+            temiz_malzeme = harf_duzelt(malzeme_adi)
+
+            for stok in envanter:
+                temiz_stok = harf_duzelt(stok.get("ad", ""))
+                
+                if temiz_stok in temiz_malzeme or temiz_malzeme in temiz_stok:
+                    mevcut_miktar = int(stok.get("miktar", 0))
+                    adet_kabul_edilenler = ["adet", "dilim", "diş", "yaprak", "dal", "top", "baş", "demet"]
+                    
+                    if malzeme_birimi in adet_kabul_edilenler:
+                        dusulecek = int(gerekli_miktar)
+                    else:
+                        if mevcut_miktar > 10 and gerekli_miktar > 10:
+                            dusulecek = int(gerekli_miktar)
+                        else:
+                            dusulecek = 1
+                            
+                    yeni_miktar = max(0, mevcut_miktar - dusulecek)
+                    stok["miktar"] = yeni_miktar
+                    guncellenen += 1
+                    print(f"    📉 EŞLEŞTİ: {stok.get('ad')} (-{dusulecek} birim) -> Kalan: {yeni_miktar}")
+                    break
+                    
+        if guncellenen > 0:
+            kullanici_envanterini_kaydet(user_email, envanter)
+            print(f"🎉 İŞLEM BAŞARILI! Toplam {guncellenen} ürün dolaptan eksiltildi.\n")
+    except Exception as e:
+        print(f"❌ HATA: {e}\n")
 # ─── Envanter istatistikleri ─────────────────────────────────────────────────
 def envanter_istatistikleri(user_email):
     try:
