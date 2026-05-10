@@ -11,34 +11,53 @@ from datetime import datetime, timedelta
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from data_manager import (
+    # ── Temel veri işlemleri ──────────────────────────────
+    load_json,
+    save_json,
     veriyi_yukle,
-    dosya_yolu_getir,
     veri_temizle,
+    # ── Kullanıcıya özel envanter ─────────────────────────
+    kullanici_envanterini_getir,
+    kullanici_envanterini_kaydet,
+    # ── Kullanıcıya özel log ──────────────────────────────
+    kullanici_logunu_getir,
+    kullanici_logunu_kaydet,
+    # ── Envanter işlemleri ────────────────────────────────
     envanter_malzeme_ekle,
     envanter_guncelle,
     envanter_istatistikleri,
+    akilli_temizlik_yap,
+    # ── AI / Tarif ────────────────────────────────────────
     ai_icin_malzeme_listesi_hazirla,
     akilli_menu_olustur,
-    yemeği_gunluge_kaydet,
-    bugunku_kaloriyi_getir,
-    veri_yedekle,
-    eksik_malzemeleri_bul,
     akilli_tarif_filtrele,
+    eksik_malzemeleri_bul,
     kalori_hesapla,
     rastgele_chatbot_tarifi,
     ai_tarif_detayi_getir,
     akilli_envanter_analizi,
     secili_malzemelerle_tek_tarif,
+    sifir_ekstra_malzemeli_oneri,
+    # ── Kalori ────────────────────────────────────────────
+    yemeği_gunluge_kaydet,
+    bugunku_kaloriyi_getir,
+    # ── Alışveriş & Sohbet ───────────────────────────────
     alisveris_linkleri_olustur,
     remzi_ile_sohbet_et,
     ai_alisveris_listesi_olustur,
-    miktar_guncelle,
-    akilli_temizlik_yap,
-    sifir_ekstra_malzemeli_oneri
+    # ── Yedekleme ─────────────────────────────────────────
+    veri_yedekle,
+    # ── Gemini menü (özel menü endpoint'i için) ───────────
+    get_recipes_from_gemini,
 )
 
 app = Flask(__name__)
 CORS(app)
+
+# DATA_DIR: data_manager ile aynı kök. users.json buraya yazılır.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
 
 
 # ─── Hata yönetimi decorator'ı ────────────────────────────────────────────────
@@ -53,14 +72,31 @@ def handle_errors(f):
 
 
 # ─── Kullanıcı yardımcıları ───────────────────────────────────────────────────
+def _users_path():
+    """users.json'un merkezi DATA_DIR içindeki yolu."""
+    return os.path.join(DATA_DIR, 'users.json')
+
+
 def kullanicilari_yukle():
-    path = dosya_yolu_getir('users.json')
+    """users.json'u DATA_DIR'dan okur. Yoksa boş liste ile oluşturur."""
+    path = _users_path()
     if not os.path.exists(path):
         with open(path, 'w', encoding='utf-8') as f:
             json.dump([], f)
         return []
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def kullanicilari_kaydet(users: list):
+    """users.json'u DATA_DIR'a yazar."""
+    path = _users_path()
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(users, f, ensure_ascii=False, indent=2)
+        f.flush()
 
 
 def _email_from_request():
@@ -85,16 +121,24 @@ def health_check():
 @app.route('/api/recipes', methods=['GET'])
 @handle_errors
 def get_all_recipes():
-    tarifler = veriyi_yukle()
+    ham = veriyi_yukle('recipes.json')
+    # recipes.json {"tarifler": [...]} yapısında olabilir; düz liste de olabilir
+    if isinstance(ham, dict):
+        tarifler = ham.get('tarifler', [])
+    elif isinstance(ham, list):
+        tarifler = ham
+    else:
+        tarifler = []
     if not tarifler:
-        return jsonify({"success": False, "error": "Tarifler yüklenemedi"}), 500
+        return jsonify({"success": True, "count": 0, "tarifler": []}), 200
     return jsonify({"success": True, "count": len(tarifler), "tarifler": tarifler}), 200
 
 
 @app.route('/api/recipes/<int:recipe_id>', methods=['GET'])
 @handle_errors
 def get_recipe(recipe_id):
-    tarifler = veriyi_yukle()
+    ham = veriyi_yukle('recipes.json')
+    tarifler = ham.get('tarifler', ham) if isinstance(ham, dict) else (ham if isinstance(ham, list) else [])
     tarif = next((t for t in tarifler if t.get("id") == recipe_id), None)
     if not tarif:
         return jsonify({"success": False, "error": "Tarif bulunamadı"}), 404
@@ -117,7 +161,6 @@ def filter_recipes():
 @app.route('/api/recipes/<int:recipe_id>/missing-ingredients', methods=['GET'])
 @handle_errors
 def eksik_malzemeleri_getir_api(recipe_id):
-    # DÜZELTİLDİ: user_email alınıp eksik_malzemeleri_bul'a iletildi.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email parametresi gerekli"}), 400
@@ -153,11 +196,12 @@ def get_inventory():
     if not user_email:
         return jsonify({"success": False, "error": "Email parametresi gerekli!"}), 400
 
-    data = veriyi_yukle('inventory.json', user_email)
+    # Merkezi inventory.json'dan kullanıcının listesi doğrudan alınır.
+    envanter = kullanici_envanterini_getir(user_email)
     return jsonify({
         "success": True,
-        "count": len(data.get("envanter", [])),
-        "envanter": data.get("envanter", [])
+        "count": len(envanter),
+        "envanter": envanter
     }), 200
 
 
@@ -187,42 +231,33 @@ def remove_from_inventory(urun_id):
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    path = dosya_yolu_getir('inventory.json', user_email)
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    original_count = len(data["envanter"])
-    data["envanter"] = [
-        item for item in data["envanter"]
+    # Merkezi inventory.json'dan kullanıcı envanteri okunur, güncellenir, yazılır.
+    envanter = kullanici_envanterini_getir(user_email)
+    original_count = len(envanter)
+    envanter = [
+        item for item in envanter
         if veri_temizle(item["ad"]) != veri_temizle(urun_id)
     ]
 
-    if len(data["envanter"]) == original_count:
+    if len(envanter) == original_count:
         return jsonify({"success": False, "error": "Ürün bulunamadı"}), 404
 
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
+    kullanici_envanterini_kaydet(user_email, envanter)
     return jsonify({"success": True, "message": f"{urun_id} başarıyla silindi"}), 200
 
 
 @app.route('/api/inventory/stats', methods=['GET'])
 @handle_errors
 def get_inventory_stats():
-    # DÜZELTİLDİ: Önceki kodda user_email alınıp kullanılmıyordu ve
-    # dosya yolu yanlış çağrılıyordu. Şimdi kullanıcıya özel yol.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    path = dosya_yolu_getir('inventory.json', user_email)
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    # Merkezi inventory.json'dan kullanıcı verisi alınır; dosya yolu kullanılmaz.
+    envanter = kullanici_envanterini_getir(user_email)
+    bugun = datetime.now()
 
-    envanter = data.get("envanter", [])
-    bugun    = datetime.now()
-
-    kritik_stok    = [i for i in envanter if i.get("miktar", 0) <= 2]
+    kritik_stok = [i for i in envanter if i.get("miktar", 0) <= 2]
     bozulmus = []
     for i in envanter:
         try:
@@ -249,8 +284,19 @@ def update_qty(urun_ad):
     degisim    = int(request.args.get('degisim', 0))
     if not user_email:
         return jsonify({"success": False, "message": "Email eksik!"}), 400
-    basari, mesaj = miktar_guncelle(user_email, urun_ad, degisim)
-    return jsonify({"success": basari, "message": mesaj})
+
+    # miktar_guncelle yerine doğrudan envanter işlemi (data_manager'da fonksiyon yoksa)
+    envanter = kullanici_envanterini_getir(user_email)
+    urun = next(
+        (item for item in envanter if veri_temizle(item["ad"]) == veri_temizle(urun_ad)),
+        None
+    )
+    if not urun:
+        return jsonify({"success": False, "message": f"{urun_ad} envanterde bulunamadı"}), 404
+
+    urun["miktar"] = max(0, urun.get("miktar", 0) + degisim)
+    kullanici_envanterini_kaydet(user_email, envanter)
+    return jsonify({"success": True, "message": f"{urun_ad} miktarı güncellendi → {urun['miktar']}"}), 200
 
 
 @app.route('/api/inventory/smart-clean', methods=['POST'])
@@ -270,8 +316,13 @@ def get_smart_recipes():
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
-    # DÜZELTİLDİ: akilli_menu_olustur artık user_email alıyor.
-    tarifler = akilli_menu_olustur(user_email)
+
+    # Kullanıcının envanter listesi hazırlanıp AI menüye gönderilir.
+    malzemeler = ai_icin_malzeme_listesi_hazirla(user_email)
+    if not malzemeler:
+        return jsonify({"success": True, "recipes": {"kaynak": "bos", "menuler": []}}), 200
+
+    tarifler = akilli_menu_olustur(malzemeler)
     return jsonify({"success": True, "recipes": tarifler}), 200
 
 
@@ -281,33 +332,19 @@ def get_smart_recipes():
 def create_menu():
     """AI ile rastgele günlük akıllı menü oluştur (Envanterden bağımsız)"""
     import random
-    try:
-        # 1. Gemini'nin her seferinde farklı ve yaratıcı menüler üretmesi için 
-        # rastgele bir havuzdan ilham kelimeleri seçiyoruz.
-        konseptler = [
-            "tavuk", "kırmızı et", "balık", "mevsim sebzeleri", 
-            "bakliyat", "mantar", "patlıcan", "kabak", "kıyma", 
-            "peynir", "deniz ürünleri", "makarna", "fırın yemekleri", "yöresel"
-        ]
-        # Havuzdan rastgele 3 konsept çek
-        ilham_kaynagi = random.sample(konseptler, 3) 
-        
-        # 2. Seçilen bu rastgele malzemeleri/konseptleri AI'a gönderiyoruz
-        menu = akilli_menu_olustur(ilham_kaynagi)
-        
-        # 3. Başarılı sonucu döndür
-        return jsonify({
-            "success": True,
-            "menu": menu,
-            "kullanilan_malzemeler": ilham_kaynagi # Sadece loglama/gösterim amaçlı
-        }), 200
-        
-    except Exception as e:
-        print(f"❌ AI Günlük Menü Hatası: {e}") 
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    konseptler = [
+        "tavuk", "kırmızı et", "balık", "mevsim sebzeleri",
+        "bakliyat", "mantar", "patlıcan", "kabak", "kıyma",
+        "peynir", "deniz ürünleri", "makarna", "fırın yemekleri", "yöresel"
+    ]
+    ilham_kaynagi = random.sample(konseptler, 3)
+    menu = akilli_menu_olustur(ilham_kaynagi)
+    return jsonify({
+        "success": True,
+        "menu": menu,
+        "kullanilan_malzemeler": ilham_kaynagi
+    }), 200
+
 
 @app.route('/api/menu/create-custom', methods=['POST'])
 @handle_errors
@@ -316,9 +353,6 @@ def create_custom_menu():
     malzemeler = data.get('malzemeler', [])
     if not malzemeler:
         return jsonify({"success": False, "error": "Malzeme listesi gerekli"}), 400
-    # Özel menü için malzeme listesi doğrudan verildiğinden email gerekmez;
-    # ancak Gemini'ye gönderilecek liste frontend'den geliyor.
-    from data_manager import get_recipes_from_gemini
     malzemeler_metni = ", ".join(malzemeler)
     try:
         menu = get_recipes_from_gemini(malzemeler_metni)
@@ -330,7 +364,6 @@ def create_custom_menu():
 @app.route('/api/chatbot/recipe', methods=['GET'])
 @handle_errors
 def get_chatbot_recipe():
-    # DÜZELTİLDİ: user_email alınıp rastgele_chatbot_tarifi'ne iletildi.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
@@ -341,7 +374,6 @@ def get_chatbot_recipe():
 @app.route('/api/inventory/strict-suggestions', methods=['GET'])
 @handle_errors
 def strict_inventory_suggestions():
-    # DÜZELTİLDİ: user_email alınıp sifir_ekstra_malzemeli_oneri'ye iletildi.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
@@ -353,15 +385,14 @@ def strict_inventory_suggestions():
 @app.route('/api/menu/detail', methods=['POST'])
 @handle_errors
 def get_recipe_details():
-    # DÜZELTİLDİ: user_email alınıp ai_tarif_detayi_getir'e iletildi.
-    data       = request.get_json()
+    data = request.get_json()
     yemek_adi  = data.get('yemek_adi', '').strip()
+    user_email = data.get('email', '').strip() or None
 
     if not yemek_adi:
         return jsonify({"success": False, "error": "Yemek adı belirtilmedi!"}), 400
 
-
-    tarif_detayi = ai_tarif_detayi_getir(yemek_adi)
+    tarif_detayi = ai_tarif_detayi_getir(yemek_adi, user_email)
     return jsonify({
         "success": True,
         "data": tarif_detayi,
@@ -372,11 +403,10 @@ def get_recipe_details():
 @app.route('/api/recipe/custom-ingredients', methods=['POST'])
 @handle_errors
 def get_custom_ingredients_recipe():
-    data       = request.get_json()
+    data = request.get_json()
     secilenler = data.get('malzemeler', [])
     if not secilenler:
-        return jsonify({"success": False,
-                        "error": "Lütfen en az bir malzeme seçin!"}), 400
+        return jsonify({"success": False, "error": "Lütfen en az bir malzeme seçin!"}), 400
     ozel_tarif = secili_malzemelerle_tek_tarif(secilenler)
     return jsonify({"success": True, "data": ozel_tarif}), 200
 
@@ -386,16 +416,18 @@ def get_custom_ingredients_recipe():
 @handle_errors
 def get_daily_logs():
     user_email = request.args.get('email', '').strip()
-    # Kullanıcıya özel log dosyasından kayıtlar döndürülebilir.
-    # Şimdilik boş liste; genişletmek için veriyi_yukle kullanılabilir.
-    return jsonify({"success": True, "kayitlar": []}), 200
+    if not user_email:
+        return jsonify({"success": True, "kayitlar": []}), 200
+
+    # Merkezi daily_log.json'dan kullanıcının kayıtları güvenli biçimde alınır.
+    kayitlar = kullanici_logunu_getir(user_email)
+    return jsonify({"success": True, "kayitlar": kayitlar}), 200
 
 
 @app.route('/api/calories', methods=['GET'])
 @handle_errors
 def get_calories():
-    # DÜZELTİLDİ: user_email alınıp bugunku_kaloriyi_getir'e iletildi.
-    user_email    = request.args.get('email', '').strip()
+    user_email = request.args.get('email', '').strip()
     bugunku_toplam = bugunku_kaloriyi_getir(user_email if user_email else None)
     return jsonify({
         "bugun": bugunku_toplam,
@@ -411,7 +443,6 @@ def add_calories():
     user_email = data.get('email', '').strip()
     yemek_adi  = data.get('yemek', 'Bilinmeyen Yemek')
     kalori     = data.get('kalori', 0)
-    # DÜZELTİLDİ: yemeği_gunluge_kaydet'e user_email iletildi.
     yemeği_gunluge_kaydet(yemek_adi, int(kalori), user_email if user_email else None)
     return jsonify({"success": True}), 200
 
@@ -434,24 +465,23 @@ def register():
             return jsonify({"success": False,
                             "message": "Bu e-posta zaten kayıtlı!"}), 400
 
-        users.append({"ad": ad, "email": email,
-                      "password": generate_password_hash(password)})
+        users.append({
+            "ad": ad,
+            "email": email,
+            "password": generate_password_hash(password)
+        })
+        kullanicilari_kaydet(users)
 
-        path = dosya_yolu_getir('users.json')
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(users, f, ensure_ascii=False, indent=2)
-            f.flush()
-
-        # Kullanıcının klasörünü ve inventory.json'unu hazır oluştur
-        dosya_yolu_getir('inventory.json', email)
+        # Yeni kullanıcı için merkezi inventory.json'a boş kayıt açılır.
+        # (kullanici_envanterini_kaydet setdefault ile güvenli şekilde ekler)
+        kullanici_envanterini_kaydet(email, [])
 
         print(f"✅ Kullanıcı kaydedildi: {email}")
         return jsonify({"success": True, "message": "Kayıt başarılı!"}), 201
 
     except Exception as e:
         print(f"❌ Kayıt Hatası: {e}")
-        return jsonify({"success": False,
-                        "message": f"Sunucu hatası: {e}"}), 500
+        return jsonify({"success": False, "message": f"Sunucu hatası: {e}"}), 500
 
 
 @app.route('/api/login', methods=['POST'])
@@ -478,19 +508,12 @@ def login():
 @app.route('/api/notifications', methods=['GET'])
 @handle_errors
 def get_notifications():
-    # DÜZELTİLDİ: user_email alınıp kullanıcıya özel inventory okunuyor.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
 
-    path = dosya_yolu_getir('inventory.json', user_email)
-    if not os.path.exists(path):
-        return jsonify({"success": True, "bildirimler": []}), 200
-
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    envanter   = data.get("envanter", [])
+    # Klasör veya dosya yolu kontrolü yok; merkezi inventory.json'dan okunur.
+    envanter    = kullanici_envanterini_getir(user_email)
     bildirimler = []
     bugun       = datetime.now()
 
@@ -524,7 +547,6 @@ def get_notifications():
 @app.route('/api/notifications/ai-insight', methods=['GET'])
 @handle_errors
 def get_ai_insight():
-    # DÜZELTİLDİ: user_email alınıp akilli_envanter_analizi'ne iletildi.
     user_email = request.args.get('email', '').strip()
     if not user_email:
         return jsonify({"success": False, "error": "Email gerekli"}), 400
@@ -545,10 +567,9 @@ def create_backup():
 @app.route('/api/ai/chat', methods=['POST'])
 @handle_errors
 def chat_with_remzi():
-    data            = request.get_json()
+    data             = request.get_json()
     kullanici_mesaji = data.get('mesaj', '')
-    # DÜZELTİLDİ: user_email alınıp remzi_ile_sohbet_et'e iletildi.
-    user_email      = data.get('email', '').strip()
+    user_email       = data.get('email', '').strip()
 
     print(f"Remzi'ye gelen mesaj: {kullanici_mesaji} (kullanıcı: {user_email})")
     gercek_cevap = remzi_ile_sohbet_et(kullanici_mesaji, user_email if user_email else None)
@@ -559,7 +580,6 @@ def chat_with_remzi():
 @app.route('/api/shopping-list/ai', methods=['POST'])
 @handle_errors
 def generate_ai_shopping_list():
-    # DÜZELTİLDİ: user_email alınıp ai_alisveris_listesi_olustur'a iletildi.
     data       = request.get_json(silent=True) or {}
     user_email = data.get('email', '').strip()
     gercek_liste = ai_alisveris_listesi_olustur(user_email if user_email else None)
@@ -583,12 +603,13 @@ def get_docs():
             "inventory_qty":       "/api/inventory/qty/<ad> [POST] ?email=&degisim=",
             "inventory_clean":     "/api/inventory/smart-clean [POST] ?email=",
             "smart_recipes":       "/api/recipes/smart [GET] ?email=",
-            "ai_menu_create":      "/api/menu/create [GET/POST] ?email=",
+            "ai_menu_create":      "/api/menu/create [GET/POST]",
             "ai_chat":             "/api/ai/chat [POST] body:{mesaj, email}",
             "notifications":       "/api/notifications [GET] ?email=",
             "ai_insight":          "/api/notifications/ai-insight [GET] ?email=",
             "calories":            "/api/calories [GET] ?email=",
             "calories_add":        "/api/calories/add [POST] body:{email, yemek, kalori}",
+            "daily_log":           "/api/daily-log [GET] ?email=",
         }
     }), 200
 

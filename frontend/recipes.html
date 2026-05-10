@@ -502,7 +502,7 @@
     import { renderHeader, renderChatbot } from './js/header.js';
     import { initPage }   from './js/auth.js';
     import { initRemzi, initDrawer } from './js/remzi.js';
-    import { MOCK_RECIPES, Favorites, createRecipeCard, initRecipeCardEvents } from './js/recipes.js?v=999';
+    import { MOCK_RECIPES, Favorites, createRecipeCard, initRecipeCardEvents } from './js/recipes.js';
 
     document.getElementById('app-header').innerHTML  = renderHeader('recipes');
     document.getElementById('chatbot-root').innerHTML = renderChatbot();
@@ -642,13 +642,16 @@
 
       if (urlQ) {
         const q = urlQ.toLowerCase();
-        recipes = recipes.filter(r => r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+        recipes = recipes.filter(r =>
+          (r.title || r.ad || '').toLowerCase().includes(q) ||
+          (r.desc  || r.aciklama || '').toLowerCase().includes(q)
+        );
       }
       if (activeFilters.cat && activeFilters.cat !== 'all') {
-        recipes = recipes.filter(r => r.tags.includes(activeFilters.cat));
+        recipes = recipes.filter(r => Array.isArray(r.tags) && r.tags.includes(activeFilters.cat));
       }
       if (activeFilters.diet) {
-        recipes = recipes.filter(r => r.tags.includes(activeFilters.diet));
+        recipes = recipes.filter(r => Array.isArray(r.tags) && r.tags.includes(activeFilters.diet));
       }
 
       if (activeSort === 'calories-asc')   recipes.sort((a, b) => a.calories - b.calories);
@@ -776,7 +779,34 @@
       e.target.disabled = true;
     });
 
-    renderCards();
+    // Tarifler hazır olunca kartları bas; zaten yüklüyse (cache) anında çalışır
+    let _recipesRendered = false;
+    let _recipesPoll = null;
+    function _renderCardsOnce() {
+      if (_recipesRendered) return;
+      _recipesRendered = true;
+      clearInterval(_recipesPoll);
+      renderCards();
+    }
+
+    if (MOCK_RECIPES.length > 0) {
+      _renderCardsOnce();
+    } else {
+      // Yükleniyor göstergesi
+      const grid = document.getElementById('recipeCards');
+      if (grid) grid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;">
+          <div style="font-size:2.5rem;margin-bottom:1rem;animation:spin 1.5s linear infinite;display:inline-block;">🍳</div>
+          <p style="color:var(--clr-text-muted);">Tarifler yükleniyor...</p>
+        </div>`;
+      window.addEventListener('smartrec:recipes-ready', _renderCardsOnce, { once: true });
+      window.addEventListener('tarifler-hazir',         _renderCardsOnce, { once: true });
+      // Fallback: event kaçırıldıysa polling ile yakala (her 50ms, max 10sn)
+      _recipesPoll = setInterval(() => {
+        if (MOCK_RECIPES.length > 0) _renderCardsOnce();
+      }, 50);
+      setTimeout(() => clearInterval(_recipesPoll), 10000);
+    }
   </script>
 </body>
 </html>

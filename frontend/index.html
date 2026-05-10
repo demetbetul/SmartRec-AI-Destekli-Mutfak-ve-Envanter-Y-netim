@@ -456,9 +456,11 @@
         e.preventDefault();
         e.stopPropagation();
 
-        const key   = 'smartrec_calories_log';
-        const log   = JSON.parse(localStorage.getItem(key) || '[]');
-        const today = new Date().toISOString().split('T')[0];
+        const _u     = Auth.getUser();
+        const _sfx   = _u?.email ? '_' + _u.email.replace('@','_at_').replace(/\./g,'_') : '';
+        const key    = `smartrec_calories_log${_sfx}`;
+        const log    = JSON.parse(localStorage.getItem(key) || '[]');
+        const today  = new Date().toISOString().split('T')[0];
         
         log.push({ 
           date: today, 
@@ -565,7 +567,11 @@
       </div>`;
 
       try {
-        const response = await fetch('http://localhost:5000/api/menu/create');
+        const user = Auth.getUser();
+        const menuUrl = user?.email
+          ? `http://localhost:5000/api/recipes/smart?email=${encodeURIComponent(user.email)}`
+          : 'http://localhost:5000/api/menu/create';
+        const response = await fetch(menuUrl);
         const data = await response.json();
 
         if (data.success && data.menu.menuler) {
@@ -575,7 +581,7 @@
             return isNaN(num) ? 0 : num;
           };
 
-          const menuCards = data.menu.menuler.map(menu => {
+          const menuCards = (data.menu || data.recipes)?.menuler.map(menu => {
             const toplamKalori = parseCal(menu.kaloriler?.baslangic_kalori)
               + parseCal(menu.kaloriler?.ana_yemek_kalori)
               + parseCal(menu.kaloriler?.tatli_kalori);
@@ -602,53 +608,96 @@
         }
       } catch (error) {
         console.error('API Hatası:', error);
-        // Hata: mock veriler (normal kart olarak göster)
-        const fallback = MOCK_RECIPES.slice(0, 3);
-        renderRecipeGrid('dailyCards', fallback, { showDetail: true });
+        // Hata durumunda: veriler hazırsa fallback kartlar, değilse bekle
+        const _showFallback = () => {
+          const fallback = MOCK_RECIPES.slice(0, 3);
+          if (fallback.length > 0) {
+            renderRecipeGrid('dailyCards', fallback, { showDetail: true });
+          } else {
+            const c = document.getElementById('dailyCards');
+            if (c) c.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--clr-text-muted);">Tarifler yüklenemedi. Sayfayı yenileyin.</div>`;
+          }
+        };
+        if (MOCK_RECIPES.length > 0) {
+          _showFallback();
+        } else {
+          window.addEventListener('smartrec:recipes-ready', _showFallback, { once: true });
+          window.addEventListener('tarifler-hazir',         _showFallback, { once: true });
+        }
       }
     }
 
     fetchDailyMenu();
 
     // ─── GÜNLÜK DEĞİŞEN TARİF SEÇİMİ FONKSİYONU ───
-// ✅ YENİ — cache sadece ID'leri saklar, puanı her zaman canlı MOCK_RECIPES'ten alır:
-function getDailyDiscovery(tag, count, cacheKey) {
-    const today = new Date().toDateString();
-    const cached = localStorage.getItem(cacheKey);
+    // MOCK_RECIPES henüz boş olabilir; bu yüzden 'smartrec:recipes-ready'
+    // event'ini dinleyerek tetikliyoruz. Event zaten geldiyse (sayfa geç yüklendiyse)
+    // MOCK_RECIPES.length kontrolü ile anında çalışır.
+    function getDailyDiscovery(tag, count, cacheKey) {
+      const today = new Date().toDateString();
+      const cached = localStorage.getItem(cacheKey);
 
-    if (cached) {
+      if (cached) {
         try {
-            const parsed = JSON.parse(cached);
-            if (parsed.date === today && Array.isArray(parsed.ids)) {
-                // ID listesini al, puanları MOCK_RECIPES'ten taze oku
-                const result = parsed.ids
-                    .map(id => MOCK_RECIPES.find(r => r.id === id))
-                    .filter(Boolean);
-                if (result.length > 0) return result;
-            }
+          const parsed = JSON.parse(cached);
+          if (parsed.date === today && Array.isArray(parsed.ids)) {
+            const result = parsed.ids
+              .map(id => MOCK_RECIPES.find(r => r.id === id))
+              .filter(Boolean);
+            if (result.length > 0) return result;
+          }
         } catch {}
+      }
+
+      const filtered = MOCK_RECIPES.filter(r => 
+        Array.isArray(r.tags) && r.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+      );
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+      const selection = shuffled.slice(0, count);
+
+      localStorage.setItem(cacheKey, JSON.stringify({
+        date: today,
+        ids: selection.map(r => r.id)
+      }));
+
+      return selection;
     }
 
-    const filtered = MOCK_RECIPES.filter(r => r.tags.includes(tag));
-    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-    const selection = shuffled.slice(0, count);
+    // ─── DİĞER TARİF KARTLARINI BAŞLAT ───
+    // Veriler hazır olunca çalışır; zaten yüklüyse anında.
+    function renderDiscoveryCards() {
+      // recipes.js'de normalize edilmiş slug etiketleri kullanıyoruz
+      const traditional = getDailyDiscovery('geleneksel', 8, 'smartrec_traditional_daily');
+      const healthy     = getDailyDiscovery('saglikli',   8, 'smartrec_healthy_daily');
 
-    // Cache'e sadece ID'leri kaydet, objenin tamamını değil:
-    localStorage.setItem(cacheKey, JSON.stringify({
-        date: today,
-        ids: selection.map(r => r.id)  // ← sadece ID
-    }));
+      renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
+      renderRecipeGrid('healthyCards',     healthy,     { showDetail: true });
+    }
 
-    return selection;
-}
-// ─── DİĞER TARİF KARTLARINI BAŞLAT ───
-// Geleneksel tariflerden bugün için 3 tane seç
-const traditional = getDailyDiscovery('geleneksel', 8, 'smartrec_traditional_daily');
-// Sağlıklı tariflerden bugün için 3 tane seç
-const healthy = getDailyDiscovery('saglikli', 8, 'smartrec_healthy_daily');
+    // ── Render tetikleyici: event'ten önce de sonra da güvenli çalışır ────────
+    // loadRecipes() modül yüklenince hemen başlar; import eden sayfa event'i
+    // kaçırabilir. Bu yüzden import sonrası her 50ms'de MOCK_RECIPES.length kontrol
+    // edilir (max 10 sn). Event gelirse interval temizlenir.
+    let _discoveryRendered = false;
+    function _renderOnce() {
+      if (_discoveryRendered) return;
+      _discoveryRendered = true;
+      clearInterval(_discoveryPoll);
+      renderDiscoveryCards();
+    }
 
-renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
-renderRecipeGrid('healthyCards', healthy, { showDetail: true });
+    let _discoveryPoll = null;
+    if (MOCK_RECIPES.length > 0) {
+      _renderOnce();
+    } else {
+      window.addEventListener('smartrec:recipes-ready', _renderOnce, { once: true });
+      window.addEventListener('tarifler-hazir',         _renderOnce, { once: true });
+      // Fallback: event kaçırıldıysa polling ile yakala
+      _discoveryPoll = setInterval(() => {
+        if (MOCK_RECIPES.length > 0) _renderOnce();
+      }, 50);
+      setTimeout(() => clearInterval(_discoveryPoll), 10000);
+    }
 
     // Arama
     document.getElementById('searchBtn')?.addEventListener('click', () => {

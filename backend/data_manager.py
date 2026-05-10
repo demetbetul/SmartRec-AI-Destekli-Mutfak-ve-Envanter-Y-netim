@@ -10,76 +10,169 @@ from deep_translator import GoogleTranslator
 import random
 import urllib.parse
 
-# .env dosyasındaki şifreleri yükle
+# ─── Ortam değişkenleri ────────────────────────────────────────────────────────
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY")
 SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY")
-NUTRITION_API_KEY = os.getenv("NUTRITION_API_KEY")
+NUTRITION_API_KEY   = os.getenv("NUTRITION_API_KEY")
 
-# API Keys Validasyon
 if not GEMINI_API_KEY:
     logging.warning("⚠️ GEMINI_API_KEY not found in .env file")
 if not SPOONACULAR_API_KEY:
     logging.warning("⚠️ SPOONACULAR_API_KEY not found in .env file")
 
-# Gemini ayarını bir kere yapıyoruz
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-# Dosyanın bulunduğu klasörü ana dizin olarak belirle
-# data_manager.py dosyasının başındaki yolu böyle güncelle:
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, 'data') # Eğer data klasörü app.py ile aynı yerdeyse
+# ─── Merkezi dizin tanımları ───────────────────────────────────────────────────
+# Kural 1: Tek DATA_DIR. Tüm yollar buradan türetilir; başka hiçbir yerde
+# sabit dosya yolu yoktur.
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR   = os.path.join(BASE_DIR, 'data')          # backend/data klasörü
 BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
 
-# Eğer backups klasörü yoksa otomatik oluştur
-if not os.path.exists(BACKUP_DIR):
-    os.makedirs(BACKUP_DIR)
+os.makedirs(DATA_DIR,   exist_ok=True)
+os.makedirs(BACKUP_DIR, exist_ok=True)
 
-# Profesyonel Loglama Ayarı
 logging.basicConfig(
-    filename=os.path.join(BASE_DIR, '..', 'app.log'), # Hataları app.log dosyasına yazar
+    filename=os.path.join(BASE_DIR, '..', 'app.log'),
     level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(message)s',
     encoding='utf-8'
 )
 
-# data_manager.py içindeki ilgili kısmı bununla değiştir:
+# ─── Dosya şablonları ──────────────────────────────────────────────────────────
+# Kural 3: Merkezi JSON yapısı. inventory ve daily_log artık tüm kullanıcıları
+# e-posta anahtarıyla tek dosyada tutar.
+DOSYA_SABLONLARI = {
+    "inventory.json":  {"envanterler": {}},     # {"envanterler": {"user@mail.com": [...]}}
+    "daily_log.json":  {"gunluk_kayitlar": {}},  # {"gunluk_kayitlar": {"user@mail.com": [...]}}
+    "recipes.json":    [],
+    "nutrition.json":  {},
+}
 
-# ─── Dosya yolu ────────────────────────────────────────────────────────────────
-# DÜZELTİLDİ: Tek ve doğru tanım. Önceki kodda üç kez tanımlanmıştı;
-# Python son tanımı geçerli sayar, ama bu kafa karıştırıcıydı.
-def dosya_yolu_getir(dosya_adi, email=None):
+# ─────────────────────────────────────────────────────────────────────────────
+# KURAL 4 — Fail-Safe: Dosya garantisi
+# ─────────────────────────────────────────────────────────────────────────────
+def dosyayi_garantile(dosya_adi: str) -> str:
     """
-    Eğer email verilmişse, dosyayı kişiye özel hale getirir.
-    Örn: inventory.json -> inventory_ahmet@gmail.com.json
-    recipes.json (genel tarifler) herkese ortaktır, değişmez.
+    DATA_DIR içindeki dosyanın tam yolunu döndürür.
+    Dosya yoksa boş şablonunu otomatik oluşturur (fail-safe).
     """
-    import os
-    
-    # Ortak olması gereken (herkese aynı görünen) dosyalar
-    ortak_dosyalar = ["recipes.json", "nutrition.json"]
-    
-    if email and dosya_adi not in ortak_dosyalar:
-        isim, uzanti = os.path.splitext(dosya_adi)
-        # Mail adresindeki geçersiz karakterleri temizle
-        guvenli_email = email.replace('@', '_at_').replace('.', '_')
-        dosya_adi = f"{isim}_{guvenli_email}{uzanti}"
-        
     yol = os.path.join(DATA_DIR, dosya_adi)
-    
-    # Eğer bu kişiye özel dosya henüz yoksa, otomatik olarak boş bir tane oluştur
-    if not os.path.exists(yol) and dosya_adi not in ortak_dosyalar:
+    if not os.path.exists(yol):
+        sablon = DOSYA_SABLONLARI.get(dosya_adi, {})
         with open(yol, 'w', encoding='utf-8') as f:
-            if "inventory" in dosya_adi:
-                json.dump({"envanter": []}, f)
-            elif "daily_log" in dosya_adi:
-                json.dump({"gunluk_kayitlar": []}, f)
-            else:
-                json.dump({}, f)
-                
+            json.dump(sablon, f, ensure_ascii=False, indent=2)
     return yol
 
+# ─────────────────────────────────────────────────────────────────────────────
+# KURAL 5 — DRY: Merkezi JSON okuma / yazma yardımcıları
+# ─────────────────────────────────────────────────────────────────────────────
+def load_json(dosya_adi: str) -> dict:
+    """Dosyayı garantileyip içeriğini döndürür."""
+    yol = dosyayi_garantile(dosya_adi)
+    try:
+        with open(yol, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        logging.error(f"load_json hatası ({dosya_adi}): {e}")
+        return DOSYA_SABLONLARI.get(dosya_adi, {})
+
+def save_json(dosya_adi: str, veri) -> bool:
+    """Veriyi DATA_DIR içindeki dosyaya yazar."""
+    yol = dosyayi_garantile(dosya_adi)
+    try:
+        with open(yol, 'w', encoding='utf-8') as f:
+            json.dump(veri, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        logging.error(f"save_json hatası ({dosya_adi}): {e}")
+        return False
+
+# ─────────────────────────────────────────────────────────────────────────────
+# YEDEKLEMEYİ PASSİFLEŞTİR — Akıllı yedekleme sistemi
+#
+# Eski davranış : veri_yedekle() her yerden elle çağrılıyordu; her işlemde
+#                 her dosya için sınırsız yedek birikiyordu.
+#
+# Yeni davranış : _kritik_yedek_al() yalnızca geri-alınamaz işlemler öncesinde
+#                 (envanter temizliği gibi) bu modül içinden otomatik tetiklenir.
+#                 Her dosya için en fazla MAX_YEDEK_SAYISI yedek tutulur;
+#                 eskiler otomatik silinir.
+# ─────────────────────────────────────────────────────────────────────────────
+MAX_YEDEK_SAYISI = 3   # Her dosya için tutulacak maksimum yedek adedi
+
+def _kritik_yedek_al(dosya_adi: str) -> None:
+    """
+    Tek bir dosyanın yedeğini alır ve BACKUP_DIR içinde en fazla
+    MAX_YEDEK_SAYISI yedek kalacak şekilde eskilerini temizler.
+
+    KULLANIM: Yalnızca bu modül içinden, geri-alınamaz işlemler öncesinde
+    çağrılır (örn. akilli_temizlik_yap). Dışarıdan doğrudan çağrılmaz.
+    """
+    kaynak = dosyayi_garantile(dosya_adi)
+    if not os.path.exists(kaynak):
+        return
+    try:
+        zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
+        kok           = dosya_adi.split('.')[0]              # "inventory"
+        yedek_adi     = f"{kok}_{zaman_damgasi}.json"
+        shutil.copy2(kaynak, os.path.join(BACKUP_DIR, yedek_adi))
+
+        # Bu dosyaya ait tüm yedekleri tarihe göre sırala; fazlasını sil
+        tum_yedekler = sorted(
+            f for f in os.listdir(BACKUP_DIR)
+            if f.startswith(kok + "_") and f.endswith(".json")
+        )
+        for eski in tum_yedekler[:max(0, len(tum_yedekler) - MAX_YEDEK_SAYISI)]:
+            os.remove(os.path.join(BACKUP_DIR, eski))
+
+        logging.info(f"Kritik yedek alındı: {yedek_adi}")
+    except Exception as e:
+        logging.error(f"Yedekleme hatası ({dosya_adi}): {e}")
+
+def veri_yedekle():
+    """
+    Manuel / harici çağrılar için korunan genel yedekleme fonksiyonu.
+    Her dosya için MAX_YEDEK_SAYISI (={max}) kuralına uyar; eski yedekler silinir.
+
+    !! Rutin işlemlerde (malzeme ekleme, log kaydetme vb.) ÇAĞRILMAZ. !!
+    Yalnızca admin paneli, bakım modu veya kritik batch senaryolarında
+    bilinçli olarak tetiklenmelidir.
+    """.format(max=MAX_YEDEK_SAYISI)
+    dosyalar = ['recipes.json', 'inventory.json', 'nutrition.json', 'daily_log.json']
+    for dosya in dosyalar:
+        _kritik_yedek_al(dosya)
+    print(f"🛡️ Manuel yedekleme tamamlandı. (Maks. {MAX_YEDEK_SAYISI} yedek/dosya)")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Kural 2 — Merkezi kullanıcı envanter/log erişimi
+# (Ayrı klasör ve inventory_{email}.json mantığı tamamen kaldırıldı)
+# ─────────────────────────────────────────────────────────────────────────────
+def kullanici_envanterini_getir(user_email: str) -> list:
+    """inventory.json içinden tek kullanıcının listesini döndürür."""
+    data = load_json("inventory.json")
+    return data.get("envanterler", {}).get(user_email, [])
+
+def kullanici_envanterini_kaydet(user_email: str, envanter: list) -> bool:
+    """inventory.json içinde tek kullanıcının listesini günceller."""
+    data = load_json("inventory.json")
+    data.setdefault("envanterler", {})[user_email] = envanter
+    return save_json("inventory.json", data)
+
+def kullanici_logunu_getir(user_email: str) -> list:
+    """daily_log.json içinden tek kullanıcının kayıtlarını döndürür."""
+    data = load_json("daily_log.json")
+    return data.get("gunluk_kayitlar", {}).get(user_email, [])
+
+def kullanici_logunu_kaydet(user_email: str, kayitlar: list) -> bool:
+    """daily_log.json içinde tek kullanıcının kayıtlarını günceller."""
+    data = load_json("daily_log.json")
+    data.setdefault("gunluk_kayitlar", {})[user_email] = kayitlar
+    return save_json("daily_log.json", data)
+
+# ─── Doğrulama ve temizlik ────────────────────────────────────────────────────
 def veri_dogrula(veri, tip):
     if tip == "envanter":
         for item in veri.get("envanter", []):
@@ -96,69 +189,65 @@ def veri_temizle(metin):
         return metin.strip().lower()
     return metin
 
-
-
-# 2. Veri yükleme fonksiyonuna user_email ekle
+# ─── Genel veri yükleme (geriye dönük uyumluluk) ─────────────────────────────
 def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
-    path = dosya_yolu_getir(dosya_adi, user_email)
+    """
+    recipes.json / nutrition.json gibi ortak dosyalar için kullanılır.
+    recipes.json {"tarifler": [...]} veya düz [...] yapısında olabilir;
+    her iki durumda da düz liste döndürür.
+    Kullanıcıya özel veriler için kullanici_envanterini_getir() tercih edin.
+    """
     try:
-        if not os.path.exists(path):
-            return [] if "recipes" in dosya_adi else {"envanter": []}
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return data
+        ham = load_json(dosya_adi)
+        if 'recipes' in dosya_adi:
+            # {"tarifler": [...]} → [...]  veya zaten liste ise doğrudan döndür
+            if isinstance(ham, dict):
+                return ham.get('tarifler', [])
+            elif isinstance(ham, list):
+                return ham
+            return []
+        return ham
     except Exception as e:
         logging.error(f"Yükleme hatası ({dosya_adi}): {e}")
-        return []
+        return [] if "recipes" in dosya_adi else {}
 
-# 3. Envanter ekleme fonksiyonunu güncelle
-# ─── Envanter ekleme ───────────────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email zorunlu parametre. Eski kodda raf_omru_gun ile
-# tuketim_suresi karışıktı; app.py'den gelen tuketim_suresi buraya iletilir.
+# ─── Envanter ekleme ──────────────────────────────────────────────────────────
 def envanter_malzeme_ekle(user_email, ad, miktar, birim="Adet",
                           kategori=None, tuketim_suresi=7):
     try:
         raf_omru_gun = int(tuketim_suresi) if tuketim_suresi else 7
-        path = dosya_yolu_getir('inventory.json', user_email)
-        data = veriyi_yukle('inventory.json', user_email)
-        envanter = data.get("envanter", [])
- 
+        envanter     = kullanici_envanterini_getir(user_email)
+
         temiz_ad = veri_temizle(ad)
-        skt = (datetime.now() + timedelta(days=raf_omru_gun)).strftime("%Y-%m-%d")
- 
+        skt      = (datetime.now() + timedelta(days=raf_omru_gun)).strftime("%Y-%m-%d")
+
         mevcut = next(
-            (item for item in envanter if veri_temizle(item["ad"]) == temiz_ad),
-            None
+            (item for item in envanter if veri_temizle(item["ad"]) == temiz_ad), None
         )
         if mevcut:
             mevcut["miktar"] += int(miktar)
-            mevcut["skt"] = skt
+            mevcut["skt"]     = skt
             if kategori:
                 mevcut["kategori"] = kategori
         else:
-            yeni = {"ad": temiz_ad, "miktar": int(miktar),
-                    "birim": birim, "skt": skt}
+            yeni = {"ad": temiz_ad, "miktar": int(miktar), "birim": birim, "skt": skt}
             if kategori:
                 yeni["kategori"] = kategori
             envanter.append(yeni)
- 
-        data["envanter"] = envanter
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        kullanici_envanterini_kaydet(user_email, envanter)
         return True, f"{temiz_ad} eklendi."
     except Exception as e:
         logging.error(f"Ekleme hatası: {e}")
         return False, str(e)
 
-
- 
-# ─── Tarif filtreleme ──────────────────────────────────────────────────────────
+# ─── Tarif filtreleme ─────────────────────────────────────────────────────────
 def akilli_tarif_filtrele(etiket=None, zorluk_seviyesi=None):
     try:
         tarifler = veriyi_yukle()
         sonuclar = []
         for tarif in tarifler:
-            etiket_ok  = (etiket is None) or (
+            etiket_ok = (etiket is None) or (
                 etiket.lower() in [veri_temizle(t) for t in tarif.get('etiketler', [])]
             )
             zorluk_ok = (zorluk_seviyesi is None) or (
@@ -171,31 +260,24 @@ def akilli_tarif_filtrele(etiket=None, zorluk_seviyesi=None):
         logging.error(f"Filtreleme hatası: {e}")
         return []
 
-
 def skt_kontrol(urun_tarihi):
     bugun = datetime.now()
     skt   = datetime.strptime(urun_tarihi, "%Y-%m-%d")
     return "⚠️ BOZULMUŞ!" if skt < bugun else "✅ Taze"
- 
 
-
-
-# ─── Eksik malzemeleri bul ─────────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+# ─── Eksik malzemeleri bul ────────────────────────────────────────────────────
 def eksik_malzemeleri_bul(tarif_id, user_email):
     try:
-        tarifler      = veriyi_yukle()
-        envanter_path = dosya_yolu_getir('inventory.json', user_email)
-        with open(envanter_path, 'r', encoding='utf-8') as f:
-            envanter_verisi = json.load(f)["envanter"]
- 
+        tarifler        = veriyi_yukle()
+        envanter_verisi = kullanici_envanterini_getir(user_email)
+
         secilen_tarif = next(
             (t for t in tarifler if t.get("id") == tarif_id), None
         )
         if not secilen_tarif:
             return []
- 
-        evdeki = [veri_temizle(item["ad"]) for item in envanter_verisi]
+
+        evdeki   = [veri_temizle(item["ad"]) for item in envanter_verisi]
         eksikler = [
             m for m in secilen_tarif.get("malzemeler", [])
             if veri_temizle(m) not in evdeki
@@ -204,107 +286,63 @@ def eksik_malzemeleri_bul(tarif_id, user_email):
     except Exception as e:
         logging.error(f"Eksik malzeme hatası: {e}")
         return []
-    
-# ─── AI için malzeme listesi ───────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+
+# ─── AI için malzeme listesi ──────────────────────────────────────────────────
 def ai_icin_malzeme_listesi_hazirla(user_email=None):
     try:
-        path = dosya_yolu_getir('inventory.json', user_email)
-        with open(path, 'r', encoding='utf-8') as f:
-            envanter_data = json.load(f)
-        return [veri_temizle(item["ad"])
-                for item in envanter_data.get("envanter", [])]
+        envanter = kullanici_envanterini_getir(user_email) if user_email else []
+        return [veri_temizle(item["ad"]) for item in envanter]
     except Exception as e:
         logging.error(f"AI malzeme listesi hatası: {e}")
         return []
-    
-# ─── Günlük kalori kaydı ───────────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+
+# ─── Günlük kalori kaydı ──────────────────────────────────────────────────────
 def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori, user_email=None):
-    log_dosyasi = dosya_yolu_getir('daily_log.json', user_email)
     tarih = datetime.now().strftime("%Y-%m-%d")
     try:
-        if not os.path.exists(log_dosyasi):
-            with open(log_dosyasi, 'w', encoding='utf-8') as f:
-                json.dump({"gunluk_kayitlar": []}, f)
- 
-        with open(log_dosyasi, 'r', encoding='utf-8') as f:
-            data = json.load(f)
- 
-        data["gunluk_kayitlar"].append({
-            "tarih": tarih,
-            "yemek": yemek_adi,
-            "kalori": toplam_kalori
-        })
- 
-        with open(log_dosyasi, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        kayitlar = kullanici_logunu_getir(user_email) if user_email else []
+        kayitlar.append({"tarih": tarih, "yemek": yemek_adi, "kalori": toplam_kalori})
+        kullanici_logunu_kaydet(user_email, kayitlar)
         print(f"✅ {yemek_adi} günlüğe kaydedildi.")
     except Exception as e:
         print(f"❌ Günlük kaydı hatası: {e}")
 
-# ─── Envanter güncelleme (yemek yapıldığında) ─────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
 def envanter_guncelle(yemek_adi, user_email):
     try:
-        tarifler     = veriyi_yukle()
-        envanter_path = dosya_yolu_getir('inventory.json', user_email)
-        with open(envanter_path, 'r', encoding='utf-8') as f:
-            envanter_data = json.load(f)
- 
+        tarifler = veriyi_yukle()
+        envanter = kullanici_envanterini_getir(user_email)
+
         secilen_tarif = next(
             (t for t in tarifler if t["ad"].lower() == yemek_adi.lower()), None
         )
         if secilen_tarif:
             for malzeme in secilen_tarif["malzemeler"]:
-                for stok in envanter_data["envanter"]:
+                for stok in envanter:
                     if veri_temizle(stok["ad"]) == veri_temizle(malzeme):
                         stok["miktar"] = max(0, stok["miktar"] - 1)
- 
-            with open(envanter_path, 'w', encoding='utf-8') as f:
-                json.dump(envanter_data, f, ensure_ascii=False, indent=2)
+            kullanici_envanterini_kaydet(user_email, envanter)
             print(f"✅ {yemek_adi} yapıldı, stoklar düşüldü.")
         else:
             print(f"⚠️ {yemek_adi} tarifi bulunamadı.")
     except Exception as e:
         print(f"❌ Veri güncelleme hatası: {e}")
- 
-        
-# ─── Yedekleme ─────────────────────────────────────────────────────────────────
-def veri_yedekle():
-    dosyalar      = ['recipes.json', 'inventory.json', 'nutrition.json']
-    zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
-    try:
-        for dosya in dosyalar:
-            kaynak = dosya_yolu_getir(dosya)
-            if os.path.exists(kaynak):
-                yedek_adi = f"{dosya.split('.')[0]}_{zaman_damgasi}.json"
-                shutil.copy2(kaynak, os.path.join(BACKUP_DIR, yedek_adi))
-        print(f"🛡️ Veriler '{zaman_damgasi}' etiketiyle yedeklendi.")
-    except Exception as e:
-        logging.error(f"Yedekleme hatası: {e}")
-        print("⚠️ Yedekleme sırasında hata oluştu, loglara bakın.")
-        
-# ─── Envanter istatistikleri ───────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+
+# ─── Envanter istatistikleri ─────────────────────────────────────────────────
 def envanter_istatistikleri(user_email):
     try:
-        path = dosya_yolu_getir('inventory.json', user_email)
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
- 
-        envanter = data.get("envanter", [])
+        envanter = kullanici_envanterini_getir(user_email)
         bugun    = datetime.now()
- 
-        kritik_stok    = [i["ad"] for i in envanter if i["miktar"] <= 2]
-        bozulmus = []
+
+        kritik_stok = [i["ad"] for i in envanter if i["miktar"] <= 2]
+        bozulmus    = []
         for i in envanter:
             try:
                 if datetime.strptime(i["skt"], "%Y-%m-%d") <= bugun:
                     bozulmus.append(i["ad"])
             except Exception:
                 pass
- 
+
         print("\n📊 VERİ ANALİZ RAPORU")
         print(f"🔹 Toplam Çeşit: {len(envanter)}")
         print(f"⚠️ Kritik Stok: {', '.join(kritik_stok) or 'Yok'}")
@@ -312,17 +350,79 @@ def envanter_istatistikleri(user_email):
         print("-" * 30)
     except Exception as e:
         logging.error(f"SKT Analiz hatası: {e}")
- 
 
+# ─── Akıllı temizlik (KRİTİK işlem — otomatik yedek alır) ───────────────────
+def akilli_temizlik_yap(user_email):
+    """
+    Süresi geçmiş ürünleri envanterden siler.
+    Silme geri alınamaz olduğundan işlem öncesinde otomatik kritik yedek alınır.
+    Bu, _kritik_yedek_al()'ın tetiklendiği nadir durumlardan biridir.
+    """
+    try:
+        _kritik_yedek_al("inventory.json")   # ← Otomatik, tek seferlik yedek
 
+        envanter   = kullanici_envanterini_getir(user_email)
+        bugun      = datetime.now()
+        kalanlar   = []
+        silinenler = []
+
+        for item in envanter:
+            try:
+                skt = datetime.strptime(item["skt"], "%Y-%m-%d")
+                if skt < bugun:
+                    silinenler.append(item["ad"])
+                else:
+                    kalanlar.append(item)
+            except Exception:
+                kalanlar.append(item)
+
+        kullanici_envanterini_kaydet(user_email, kalanlar)
+        return True, silinenler
+    except Exception as e:
+        logging.error(f"Temizlik hatası: {e}")
+        return False, []
+
+# ─── Günlük kaloriyi getir ────────────────────────────────────────────────────
+def bugunku_kaloriyi_getir(user_email=None):
+    tarih = datetime.now().strftime("%Y-%m-%d")
+    try:
+        kayitlar = kullanici_logunu_getir(user_email) if user_email else []
+        return sum(
+            item.get("kalori", 0)
+            for item in kayitlar
+            if item.get("tarih") == tarih
+        )
+    except Exception as e:
+        print(f"Kalori hesaplama hatası: {e}")
+        return 0
+
+# ─── Miktar güncelle ──────────────────────────────────────────────────────────
+def miktar_guncelle(user_email, urun_ad, degisim):
+    try:
+        envanter = kullanici_envanterini_getir(user_email)
+        temiz_ad = veri_temizle(urun_ad)
+        mevcut   = next(
+            (item for item in envanter if veri_temizle(item["ad"]) == temiz_ad), None
+        )
+        if mevcut:
+            mevcut["miktar"] += degisim
+            if mevcut["miktar"] <= 0:
+                envanter.remove(mevcut)
+            kullanici_envanterini_kaydet(user_email, envanter)
+            return True, "Güncellendi"
+        return False, "Ürün bulunamadı"
+    except Exception as e:
+        return False, str(e)
+
+# ─── Gemini / Spoonacular / Yerel tarif üretimi ──────────────────────────────
 def get_recipes_from_gemini(malzemeler_metni):
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
-    
-    Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır. 
+
+    Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır.
     Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt, bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle ve tüm menünün tahmini toplam hazırlanma süresini (Örn: "45 dk", "1 saat 15 dk") 'hazirlik_suresi' olarak belirt.
-    
+
     Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya açıklama yazma:
     {{
         "kaynak": "gemini",
@@ -349,11 +449,11 @@ def get_recipes_from_spoonacular(malzemeler_metni):
     except Exception as e:
         print(f"❌ Çeviri hatası: {e}")
         ingilizce = malzemeler_metni
- 
+
     url    = "https://api.spoonacular.com/recipes/findByIngredients"
     params = {"ingredients": ingilizce, "number": 9, "apiKey": SPOONACULAR_API_KEY}
     data   = requests.get(url, params=params).json()
- 
+
     menuler = []
     for i in range(3):
         menuler.append({
@@ -373,22 +473,22 @@ def get_recipes_from_local(malzemeler_listesi):
             {"id": 1, "baslangic": "Hazır Çorba", "ana_yemek": "Makarna",
              "tatli": "Meyve", "eksik_malzemeler": []}
         ]}
- 
-    cekilecek = min(9, len(tum_tarifler))
+
+    cekilecek  = min(9, len(tum_tarifler))
     secilenler = random.sample(tum_tarifler, cekilecek)
-    menuler = []
+    menuler    = []
     for i in range(3):
         b = i * 3
         menuler.append({
             "id": i + 1,
-            "baslangic": secilenler[b].get("ad", "Çorba")     if len(secilenler) > b   else "Günün Çorbası",
-            "ana_yemek": secilenler[b+1].get("ad", "Yemek")   if len(secilenler) > b+1 else "Günün Yemeği",
-            "tatli":     secilenler[b+2].get("ad", "Tatlı")   if len(secilenler) > b+2 else "Günün Tatlısı",
+            "baslangic": secilenler[b].get("ad", "Çorba")   if len(secilenler) > b   else "Günün Çorbası",
+            "ana_yemek": secilenler[b+1].get("ad", "Yemek") if len(secilenler) > b+1 else "Günün Yemeği",
+            "tatli":     secilenler[b+2].get("ad", "Tatlı") if len(secilenler) > b+2 else "Günün Tatlısı",
             "eksik_malzemeler": ["Bilinmiyor (Yerel Veri)"]
         })
     return {"kaynak": "yerel_veritabani", "menuler": menuler}
- 
 
+# ─── Kalori hesaplama ─────────────────────────────────────────────────────────
 def gemini_kalori_tahmini(yemek_adi):
     try:
         model  = genai.GenerativeModel('gemini-2.5-flash')
@@ -399,46 +499,31 @@ def gemini_kalori_tahmini(yemek_adi):
         return "0 kcal"
 
 def kalori_hesapla(yemek_adi):
-    """Sisteme zaten bağlı olan Spoonacular API ile kalori hesaplar, bulamazsa Gemini'ye sorar."""
+    """Spoonacular ile kalori hesaplar, bulamazsa Gemini'ye sorar."""
     print(f"📊 '{yemek_adi}' için kalori hesaplanıyor (Spoonacular)...")
-    
-    # 1. Yemek adını İngilizceye çevir
     try:
         ingilizce_yemek = GoogleTranslator(source='tr', target='en').translate(yemek_adi)
-    except:
-        ingilizce_yemek = yemek_adi 
-        
-    # 2. Spoonacular'a İstek At
-    url = "https://api.spoonacular.com/recipes/guessNutrition"
-    params = {
-        "title": ingilizce_yemek,
-        "apiKey": SPOONACULAR_API_KEY
-    }
-    
+    except Exception:
+        ingilizce_yemek = yemek_adi
+
+    url    = "https://api.spoonacular.com/recipes/guessNutrition"
+    params = {"title": ingilizce_yemek, "apiKey": SPOONACULAR_API_KEY}
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            data = response.json()
-            kalori_degeri = data.get('calories', {}).get('value', 0)
-            
-            # Spoonacular başarıyla bulduysa onu döndür
+            kalori_degeri = response.json().get('calories', {}).get('value', 0)
             if kalori_degeri > 0:
                 return f"{int(kalori_degeri)} kcal"
-                
-        # Eğer Spoonacular bulamadıysa veya 0 döndüyse Gemini'ye devret
-        print(f"⚠️ Spoonacular '{yemek_adi}' için kalori bulamadı. Gemini (AI) devrede!")
+        print(f"⚠️ Spoonacular '{yemek_adi}' için kalori bulamadı. Gemini devrede!")
         return gemini_kalori_tahmini(yemek_adi)
-        
     except Exception as e:
-        # Eğer internet koparsa veya Spoonacular çökerse yine Gemini'ye devret
-        print(f"⚠️ Spoonacular bağlantı hatası: {e}. Gemini (AI) devrede!")
+        print(f"⚠️ Spoonacular bağlantı hatası: {e}. Gemini devrede!")
         return gemini_kalori_tahmini(yemek_adi)
 
+# ─── Akıllı menü oluştur ──────────────────────────────────────────────────────
 def akilli_menu_olustur(malzemeler_listesi):
-    """Sistemin ana köprüsü. 3 farklı menüyü ve kalorileri tek bir JSON'da birleştirir."""
+    """Sistemin köprüsü. 3 farklı menüyü ve kalorileri tek bir JSON'da birleştirir."""
     malzemeler_metni = ", ".join(malzemeler_listesi)
-    
-    # 1. PLAN: GEMINI AI
     try:
         sonuc = get_recipes_from_gemini(malzemeler_metni)
     except Exception as e:
@@ -448,7 +533,7 @@ def akilli_menu_olustur(malzemeler_listesi):
         except Exception as e2:
             print(f"❌ Spoonacular da çöktü: {e2}")
             sonuc = get_recipes_from_local(malzemeler_listesi)
- 
+
     for menu in sonuc.get("menuler", []):
         menu["kaloriler"] = {
             "baslangic_kalori": kalori_hesapla(menu["baslangic"]),
@@ -462,18 +547,16 @@ def akilli_menu_olustur(malzemeler_listesi):
         }
     return sonuc
 
-# ─── Rastgele chatbot tarifi ───────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+# ─── Rastgele chatbot tarifi ──────────────────────────────────────────────────
 def rastgele_chatbot_tarifi(user_email):
     envanter_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
-    malzemeler_metni = (", ".join(envanter_listesi)
-                        if envanter_listesi else "temel ev malzemeleri")
- 
+    malzemeler_metni = ", ".join(envanter_listesi) if envanter_listesi else "temel ev malzemeleri"
+
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     Sen enerjik, esprili ve samimi bir yapay zeka mutfak şefisin.
     Kullanıcının dolabındaki malzemeler: {malzemeler_metni}
- 
+
     Elindeki malzemelerle yapılabilecek sürpriz tek tabaklık bir tarif öner.
     Cevabını SADECE JSON formatında ver:
     {{
@@ -497,19 +580,17 @@ def rastgele_chatbot_tarifi(user_email):
             "tarif_adi": "Sistem Hatası", "hazirlik_suresi": "?",
             "malzemeler": [], "adimlar": []
         }
-    
+
 # ─── AI tarif detayı ──────────────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
 def ai_tarif_detayi_getir(yemek_adi, user_email=None):
     envanter_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
-    malzemeler_metni = (", ".join(envanter_listesi)
-                        if envanter_listesi else "temel ev malzemeleri")
- 
+    malzemeler_metni = ", ".join(envanter_listesi) if envanter_listesi else "temel ev malzemeleri"
+
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     Sen profesyonel bir şefsin. Kullanıcı "{yemek_adi}" yapmak istiyor.
     Dolaptaki malzemeler: {malzemeler_metni}.
- 
+
     Yanıtı SADECE JSON formatında ver:
     {{
         "yemek_adi": "{yemek_adi}",
@@ -532,33 +613,26 @@ def ai_tarif_detayi_getir(yemek_adi, user_email=None):
             "porsiyon": "?", "kullanilan_malzemeler": [],
             "adimlar": ["Tarif yüklenirken hata oluştu, lütfen tekrar tıklayın."]
         }
- 
- 
-    
-# ─── Akıllı envanter analizi ──────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+
+# ─── Akıllı envanter analizi ─────────────────────────────────────────────────
 def akilli_envanter_analizi(user_email):
     try:
-        path = dosya_yolu_getir('inventory.json', user_email)
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
- 
-        envanter = data.get("envanter", [])
+        envanter = kullanici_envanterini_getir(user_email)
         if not envanter:
             return {
                 "durum": "iyi",
                 "ai_mesaji": "Dolabın tertemiz (çünkü bomboş)! Alışveriş zamanı.",
                 "kurtarilacak_urunler": []
             }
- 
-        ozet     = [{"ad": u.get("ad"), "skt": u.get("skt")}
-                    for u in envanter if u.get("ad") and u.get("skt")]
-        bugun    = datetime.now().strftime("%Y-%m-%d")
-        model    = genai.GenerativeModel('gemini-2.5-flash')
-        prompt   = f"""
+
+        ozet   = [{"ad": u.get("ad"), "skt": u.get("skt")}
+                  for u in envanter if u.get("ad") and u.get("skt")]
+        bugun  = datetime.now().strftime("%Y-%m-%d")
+        model  = genai.GenerativeModel('gemini-2.5-flash')
+        prompt = f"""
         Sen sevimli bir mutfak asistanısın. Bugünün tarihi: {bugun}.
         Dolaptaki ürünler ve SKT'leri: {ozet}
- 
+
         Tarihi geçmiş veya 1-3 gün kalmış ürünleri tespit et.
         Yanıtı SADECE JSON formatında ver:
         {{
@@ -580,7 +654,7 @@ def akilli_envanter_analizi(user_email):
             "kurtarilacak_urunler": []
         }
 
-# ─── Seçili malzemelerle tek tarif ────────────────────────────────────────────
+# ─── Seçili malzemelerle tek tarif ───────────────────────────────────────────
 def secili_malzemelerle_tek_tarif(secilen_malzemeler):
     malzemeler_metni = ", ".join(secilen_malzemeler)
     model  = genai.GenerativeModel('gemini-2.5-flash')
@@ -610,26 +684,19 @@ def secili_malzemelerle_tek_tarif(secilen_malzemeler):
             "yemek_adi": "Yaratıcı Tarif Bulunamadı", "hazirlik_suresi": "?",
             "adimlar": ["Lütfen tekrar deneyin."], "puf_noktasi": ""
         }
-    
+
+# ─── Alışveriş linkleri ───────────────────────────────────────────────────────
 def alisveris_linkleri_olustur(eksik_malzemeler):
-    """Eksik malzemeleri alır ve online market (Sanalmarket) arama linklerine dönüştürür."""
+    """Eksik malzemeleri Migros Sanal Market arama linklerine dönüştürür."""
     print("🛒 Alışveriş robotu eksikler için sepet linklerini hazırlıyor...")
     linkli_liste = []
-    
     for malzeme in eksik_malzemeler:
-        # Türkçe karakterleri (ş, ç, ö vb.) URL formatına (%C5%9F gibi) çeviririz
         url_uyumlu_isim = urllib.parse.quote(malzeme)
-        
-        # Migros Sanal Market altyapısını kullanıyoruz
-        arama_linki = f"https://www.migros.com.tr/arama?q={url_uyumlu_isim}"
-        
-        linkli_liste.append({
-            "malzeme": malzeme,
-            "satin_al_linki": arama_linki
-        })
-        
+        arama_linki     = f"https://www.migros.com.tr/arama?q={url_uyumlu_isim}"
+        linkli_liste.append({"malzeme": malzeme, "satin_al_linki": arama_linki})
     return linkli_liste
 
+# ─── Yemek fotoğrafı bul ─────────────────────────────────────────────────────
 def yemek_fotografi_bul(yemek_adi):
     varsayilan = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     try:
@@ -643,7 +710,7 @@ def yemek_fotografi_bul(yemek_adi):
                 return results[0]["image"]
     except Exception as e:
         print(f"⚠️ Spoonacular görsel hatası: {e}")
- 
+
     try:
         GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
         GOOGLE_CX      = os.getenv("GOOGLE_CX")
@@ -658,20 +725,20 @@ def yemek_fotografi_bul(yemek_adi):
                     return items[0]["link"]
     except Exception as e:
         print(f"⚠️ Google görsel hatası: {e}")
- 
+
     return varsayilan
 
+# ─── Remzi sohbet ─────────────────────────────────────────────────────────────
 def remzi_ile_sohbet_et(kullanici_mesaji, user_email=None):
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
-    malzemeler_metni   = (", ".join(malzemeler_listesi)
-                          if malzemeler_listesi else "temel ev malzemeleri")
- 
+    malzemeler_metni   = ", ".join(malzemeler_listesi) if malzemeler_listesi else "temel ev malzemeleri"
+
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     Sen SmartRec'in mutfak asistanı Remzi'sin. Samimi, yardımsever ve enerjik bir karakterin var.
     Kullanıcının mesajı: "{kullanici_mesaji}"
     Kullanıcının dolabındaki malzemeler: {malzemeler_metni}
- 
+
     Bir mutfak asistanı olarak cevap ver. Düz metin kullan, JSON veya markdown kullanma.
     """
     try:
@@ -679,15 +746,12 @@ def remzi_ile_sohbet_et(kullanici_mesaji, user_email=None):
     except Exception as e:
         print(f"❌ Remzi Sohbet Hatası: {e}")
         return "Şu an mutfakta ufak bir yoğunluk var, birazdan tekrar sorar mısın? 😅"
-    
-    
+
 # ─── AI alışveriş listesi ─────────────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
 def ai_alisveris_listesi_olustur(user_email=None):
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
-    malzemeler_metni   = (", ".join(malzemeler_listesi)
-                          if malzemeler_listesi else "Dolap tamamen boş.")
- 
+    malzemeler_metni   = ", ".join(malzemeler_listesi) if malzemeler_listesi else "Dolap tamamen boş."
+
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
     Sen pratik bir mutfak asistanısın. Dolaptaki malzemeler: {malzemeler_metni}
@@ -704,90 +768,13 @@ def ai_alisveris_listesi_olustur(user_email=None):
     except Exception as e:
         print(f"❌ Alışveriş listesi AI hatası: {e}")
         return ["⚠️ Sistem hatası oluştu.", "Lütfen tekrar deneyin."]
-    
-# DÜZELTİLDİ: "enventer" → "envanter" anahtar hatası düzeltildi.
-def miktar_guncelle(user_email, urun_ad, degisim):
-    try:
-        path = dosya_yolu_getir('inventory.json', user_email)
-        data = veriyi_yukle('inventory.json', user_email)
-        envanter = data.get("envanter", [])  # ← Düzeltildi: enventer → envanter
- 
-        temiz_ad = veri_temizle(urun_ad)
-        mevcut = next(
-            (item for item in envanter if veri_temizle(item["ad"]) == temiz_ad),
-            None
-        )
-        if mevcut:
-            mevcut["miktar"] += degisim
-            if mevcut["miktar"] <= 0:
-                envanter.remove(mevcut)
-            data["envanter"] = envanter
-            with open(path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            return True, "Güncellendi"
-        return False, "Ürün bulunamadı"
-    except Exception as e:
-        return False, str(e)
- 
- 
 
-# ─── Akıllı temizlik ───────────────────────────────────────────────────────────
-# DÜZELTİLDİ: "enventer" → "envanter" anahtar hatası düzeltildi.
-def akilli_temizlik_yap(user_email):
-    try:
-        path = dosya_yolu_getir('inventory.json', user_email)
-        data = veriyi_yukle('inventory.json', user_email)
- 
-        bugun    = datetime.now()
-        kalanlar = []
-        silinenler = []
- 
-        for item in data.get("envanter", []):  # ← Düzeltildi
-            try:
-                skt = datetime.strptime(item["skt"], "%Y-%m-%d")
-                if skt < bugun:
-                    silinenler.append(item["ad"])
-                else:
-                    kalanlar.append(item)
-            except Exception:
-                kalanlar.append(item)
- 
-        data["envanter"] = kalanlar
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        return True, silinenler
-    except Exception as e:
-        return False, []
-    
-def bugunku_kaloriyi_getir(user_email=None):
-    log_dosyasi = dosya_yolu_getir('daily_log.json', user_email)
-    tarih = datetime.now().strftime("%Y-%m-%d")
-    try:
-        if not os.path.exists(log_dosyasi):
-            with open(log_dosyasi, 'w', encoding='utf-8') as f:
-                json.dump({"gunluk_kayitlar": []}, f)
- 
-        with open(log_dosyasi, 'r', encoding='utf-8') as f:
-            data = json.load(f)
- 
-        return sum(
-            item.get("kalori", 0)
-            for item in data.get("gunluk_kayitlar", [])
-            if item.get("tarih") == tarih
-        )
-    except Exception as e:
-        print(f"Kalori hesaplama hatası: {e}")
-        return 0
-    
-# data_manager.py dosyasının en altına ekle:
-
-# ─── Sıfır ekstra malzemeli öneri ─────────────────────────────────────────────
-# DÜZELTİLDİ: user_email parametresi eklendi.
+# ─── Sıfır ekstra malzemeli öneri ────────────────────────────────────────────
 def sifir_ekstra_malzemeli_oneri(user_email=None):
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
     if not malzemeler_listesi:
         return []
- 
+
     malzemeler_metni = ", ".join(malzemeler_listesi)
     model  = genai.GenerativeModel('gemini-2.5-flash')
     prompt = f"""
@@ -811,13 +798,11 @@ def sifir_ekstra_malzemeli_oneri(user_email=None):
     except Exception as e:
         print(f"❌ Sıfır Ekstra Malzeme Hatası: {e}")
         return []
-    
+
+# ─── Entry point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    # Diyelim ki inventory.json'dan kullanıcının dolabındaki şu ürünleri okuduk:
     kullanici_dolabi = ["kıyma", "soğan", "sarımsak", "domates salçası", "makarna"]
-    
     print("Mutfak Envanteri Analiz Ediliyor...")
     final_menu = akilli_menu_olustur(kullanici_dolabi)
-    
     print("\n🍽️ OLUŞTURULAN MENÜ VERİSİ (JSON):")
     print(json.dumps(final_menu, indent=4, ensure_ascii=False))

@@ -207,3 +207,12 @@ marimo/_lsp/
 __marimo__/
 .env
 node_modules/
+
+backend/data/users.json
+backend/data/inventory.json
+backend/data/daily_log.json
+
+backups/
+backend/backups/
+
+backend/data/inventory_*.json

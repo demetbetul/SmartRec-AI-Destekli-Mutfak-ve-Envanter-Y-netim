@@ -446,7 +446,10 @@
 
     // Envanterden mock öneri üret (backend olmasa da çalışır)
     function _mockInventorySuggestions() {
-      const inv = JSON.parse(localStorage.getItem('smartrec_inventory') || '[]').map(i => i.ad.toLowerCase());
+      // Kullanıcıya özel key — remzi.js ile aynı mantık
+      const suffix = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
+      const invKey = `smartrec_inventory${suffix}`;
+      const inv = JSON.parse(localStorage.getItem(invKey) || '[]').map(i => i.ad.toLowerCase());
       let cards = [];
       if (inv.length) {
         const matched = MOCK_RECIPES
@@ -490,7 +493,8 @@
       try {
         const controller = new AbortController();
         const timeout    = setTimeout(() => controller.abort(), 3000);
-        const res  = await fetch('http://localhost:5000/api/inventory/strict-suggestions', { signal: controller.signal });
+        const emailParam = user?.email ? `?email=${encodeURIComponent(user.email)}` : '';
+        const res  = await fetch(`http://localhost:5000/api/inventory/strict-suggestions${emailParam}`, { signal: controller.signal });
         clearTimeout(timeout);
         const data = await res.json();
         if (data.success && data.data && data.data.length > 0) {

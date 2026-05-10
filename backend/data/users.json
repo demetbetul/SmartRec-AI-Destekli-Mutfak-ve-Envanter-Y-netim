@@ -13,5 +13,20 @@
     "ad": "Esmanur Muşlu",
     "email": "esmanurmuslu68@gmail.com",
     "password": "scrypt:32768:8:1$ynk2IOAF52TkcDzH$097b3fdae8a5c6a2da2df0f97aab03200c4e70e1b2065bf13a61c734b0e25cb5c2070cc511f950fc2610b3bb8abd7a5a5b7e54180196cd166a5f0071ccafe4ca"
+  },
+  {
+    "ad": "sali",
+    "email": "sali@gmail.com",
+    "password": "scrypt:32768:8:1$wkn56Ma34ZVZowoo$7d967da1abe7d6c3538c6f0f0b57ef3b8e84c3b57ada8944d44316187c3a14fcdb74750a44e75a8bc1db40e08cd195fa8bd10a7de0b9c59e1d56dc115cf8225f"
+  },
+  {
+    "ad": "zaliy",
+    "email": "zaliy@gmail.com",
+    "password": "scrypt:32768:8:1$zRfv283esqueU7mT$ee1d642b0ec060aad886a19b0bec6c2c74c7a86eb0c66060373b39b3d692de74ed60b0ac246bfab1e7918219e4bb931eb400e306f4f49d095a68187ed7a25500"
+  },
+  {
+    "ad": "saliha",
+    "email": "saliha@gmail.com",
+    "password": "scrypt:32768:8:1$GU8Z8tUVCNt45nRL$fa283d111bbca8b581bf96ace4f8f46c9f5c2bd136fec324b8b7a3b2cd2443cb73e133b3ebb3e8c77eefb3e374521aa31baafc4b61b62bc907593c2b6350a1e1"
   }
 ]

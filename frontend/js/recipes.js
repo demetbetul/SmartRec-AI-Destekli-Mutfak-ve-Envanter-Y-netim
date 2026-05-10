@@ -66,76 +66,198 @@ window.addEventListener('smartrec:auth-change', () => {
   });
 });
 
-// ─── JSON'DAN DİNAMİK VERİ ÇEKME ─────────────────────────────────────────────
+// ─── Veri yükleme ─────────────────────────────────────────────────────────────
+// MOCK_RECIPES dışarıdan okunabilir ama asla senkron erişilmemeli.
+// Veriler yüklenince 'smartrec:recipes-ready' event'i fırlatılır.
+// Sayfalar bu event'i dinleyerek renderlarını tetiklemeli.
 export let MOCK_RECIPES = [];
 
-try {
-  const response = await fetch('../data/recipes.json?v=' + new Date().getTime());
-  const data     = await response.json();
+/** Backend'den tarif çeker. Başarısız olursa ../data/recipes.json'a düşer. */
+export async function loadRecipes() {
+  if (MOCK_RECIPES.length > 0) return MOCK_RECIPES;
 
-  MOCK_RECIPES = data.tarifler.map(t => {
-    let rawTags = [...(t.etiketler || []), t.kategori, t.zorluk];
-    rawTags = [...new Set(rawTags.filter(Boolean))];
+  let hamListe = [];
 
-    return {
-      id        : t.id,
-      title     : t.ad.charAt(0).toUpperCase() + t.ad.slice(1),
-      desc      : t.aciklama,
-      image     : t.resim_url || t.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-      time      : t.toplam_sure || t.hazirlanma_suresi || "30 dk",
-      difficulty: t.zorluk ? (t.zorluk.charAt(0).toUpperCase() + t.zorluk.slice(1)) : "Orta",
-      calories  : t.kalori || 0,
+  try {
+    // 1. Önce Backend'i dene
+    const res = await fetch('http://localhost:5000/api/recipes');
+    const data = await res.json();
+    if (data.success && data.tarifler) {
+      hamListe = Array.isArray(data.tarifler) ? data.tarifler : Object.values(data.tarifler);
+    }
+  } catch {
+    // 2. Backend yoksa yerel JSON'a bak (farklı klasör yapıları için sırayla dene)
+    const jsonPaths = ['./data/recipes.json', '../data/recipes.json', './recipes.json'];
+    for (const path of jsonPaths) {
+      try {
+        const res  = await fetch(path);
+        if (!res.ok) continue;
+        const data = await res.json();
+        hamListe = data.tarifler || [];
+        if (hamListe.length > 0) break;
+      } catch { /* sonraki yolu dene */ }
+    }
+    if (hamListe.length === 0) {
+      console.error('❌ Tarifler yüklenemedi: Backend kapalı ve yerel JSON bulunamadı.');
+    }
+  }
 
-      tags: rawTags.map(tag => {
-        let lower = String(tag).toLowerCase();
-        if (lower === 'ana yemek') return 'ana-menu';
-        if (lower === 'çorba')     return 'corba';
-        if (lower === 'tatlı')     return 'tatli';
-        if (lower === 'sağlıklı') return 'saglikli';
-        if (lower === 'kahvaltı') return 'kahvalti';
-        const charMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', ' ': '-' };
-        return lower.replace(/[çğıöşü ]/g, m => charMap[m] || m);
-      }),
+  // ─── TÜRKÇE → İNGİLİZCE ALAN EŞLEŞTİRME ───────────────────────────────────
+  // JSON'daki etiketleri URL-slug formatına normalize eder (Türkçe karakter → ASCII)
+  function _slugify(str) {
+    if (!str) return '';
+    return str
+      .toLocaleLowerCase('tr-TR')
+      .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+      .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
 
-      tagLabels: rawTags.map(tag => {
-        let lower = String(tag).toLowerCase();
-        let emoji = '🏷️';
-        if (lower === 'çorba')                  emoji = '🍲';
-        else if (lower === 'ana yemek')          emoji = '🍽️';
-        else if (lower === 'tatlı')              emoji = '🍮';
-        else if (lower === 'salata')             emoji = '🥗';
-        else if (lower === 'kahvaltı')           emoji = '🍳';
-        else if (lower === 'vejetaryen')         emoji = '🌿';
-        else if (lower === 'vegan')              emoji = '🌱';
-        else if (lower === 'sağlıklı')           emoji = '💚';
-        else if (lower === 'geleneksel')         emoji = '🫕';
-        else if (lower === 'kolay' || lower === 'pratik') emoji = '⚡';
-        return `${emoji} ${tag.charAt(0).toUpperCase() + tag.slice(1)}`;
-      }),
+  // JSON'daki Türkçe etiket → frontend'in beklediği slug eşlem tablosu
+  const ETKET_SLUG_MAP = {
+    'kahvaltı':    'kahvalti',
+    'çorba':       'corba',
+    'salata':      'salata',
+    'tatlı':       'tatli',
+    'içecek':      'icecek',
+    'ana yemek':   'ana-menu',
+    'ana-yemek':   'ana-menu',
+    'vejetaryen':  'vejetaryen',
+    'vegan':       'vegan',
+    'glutensiz':   'glutensiz',
+    'sağlıklı':    'saglikli',
+    'sportif':     'sportif',
+    'pratik':      'pratik',
+    'kolay':       'kolay',
+    'geleneksel':  'geleneksel',
+    'dünya mutfağı': 'dunya-mutfagi',
+  };
 
-      emoji      : '✨',
-      score: t.puan != null ? parseFloat(t.puan).toFixed(1) : "—",
-      ingredients: t.malzemeler
-        ? t.malzemeler.map(m => typeof m === 'object' ? `${m.miktar} ${m.birim} ${m.isim}` : m)
-        : [],
-      steps: t.hazirlanis || []
-    };
+  function _normalizeTags(etiketler = []) {
+    const slugs = new Set();
+    etiketler.forEach(et => {
+      const lower = (et || '').toLocaleLowerCase('tr-TR').trim();
+      const mapped = ETKET_SLUG_MAP[lower];
+      if (mapped) slugs.add(mapped);
+      // slug haline de ekle (hem orijinal hem normalize erişim için)
+      slugs.add(_slugify(lower));
+    });
+    return [...slugs].filter(Boolean);
+  }
+
+  // Malzemeleri obje dizisinden string dizisine çevirir
+  function _malzemeStr(malzemeler = []) {
+    return malzemeler.map(m => {
+      if (typeof m === 'string') return m;
+      const { miktar = '', birim = '', isim = '' } = m;
+      return [miktar, birim, isim].filter(Boolean).join(' ').trim();
+    });
+  }
+
+  // Zorluk Türkçe normalize
+  function _zorluk(z) {
+    const map = { kolay: 'Kolay', orta: 'Orta', zor: 'Zor', 'çok zor': 'Zor' };
+    return map[(z || '').toLocaleLowerCase('tr-TR').trim()] || 'Orta';
+  }
+
+  // Etiketlerin görünen etiket adları (badge'ler için)
+  const SLUG_LABEL_MAP = {
+    'kahvalti':    '☕ Kahvaltı',
+    'corba':       '🍲 Çorba',
+    'salata':      '🥗 Salata',
+    'tatli':       '🍮 Tatlı',
+    'icecek':      '🥤 İçecek',
+    'ana-menu':    '🍽 Ana Yemek',
+    'vejetaryen':  '🌿 Vejetaryen',
+    'vegan':       '🌱 Vegan',
+    'glutensiz':   '🚫🌾 Glutensiz',
+    'saglikli':    '💚 Sağlıklı',
+    'sportif':     '💪 Sportif',
+    'pratik':      '⚡ Pratik',
+    'kolay':       '⚡ Kolay',
+    'geleneksel':  '🫕 Geleneksel',
+  };
+
+  // ⚠️ KRİTİK: MOCK_RECIPES = [...] ile yeniden atama YAPILMAZ.
+  // ES module 'export let' değişkeni başka dosyalara live binding olarak aktarılır;
+  // = ile yeniden atama referansı koparır → diğer dosyalar hâlâ boş diziyi görür.
+  // Çözüm: aynı dizi referansına in-place yaz (length=0 + push).
+  MOCK_RECIPES.length = 0;
+  hamListe.forEach(t => {
+    const tags    = _normalizeTags(t.etiketler);
+    const katSlug = _slugify((t.kategori || '').toLocaleLowerCase('tr-TR').trim());
+    const katMap  = ETKET_SLUG_MAP[(t.kategori || '').toLocaleLowerCase('tr-TR').trim()];
+    if (katSlug && !tags.includes(katSlug)) tags.push(katSlug);
+    if (katMap  && !tags.includes(katMap))  tags.push(katMap);
+
+    const tagLabels = [...new Set(tags)]
+      .map(slug => SLUG_LABEL_MAP[slug])
+      .filter(Boolean)
+      .slice(0, 3);
+
+    MOCK_RECIPES.push({
+      // ── Orijinal Türkçe alanlar (geriye dönük uyumluluk)
+      id:         t.id,
+      ad:         t.ad        || 'İsimsiz Tarif',
+      aciklama:   t.aciklama  || '',
+      sure:       t.toplam_sure || t.hazirlanma_suresi || '30 dk',
+      zorluk:     _zorluk(t.zorluk),
+      kalori:     typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
+      puan:       t.puan      || '4.5',
+      kategori:   t.kategori  || 'Genel',
+      etiketler:  t.etiketler || [],
+
+      // ── Frontend'in beklediği İngilizce alanlar ─────────────────────────────
+      title:      t.ad        || 'İsimsiz Tarif',
+      desc:       t.aciklama  || '',
+      time:       t.toplam_sure || t.hazirlanma_suresi || '30 dk',
+      difficulty: _zorluk(t.zorluk),
+      calories:   typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
+      score:      parseFloat(t.puan) || 4.5,
+      image:      t.resim_url || t.thumbnail_url
+                  || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80',
+      emoji:      '🍽',
+
+      // ── Filtreleme / badge alanları
+      tags,
+      tagLabels,
+
+      // ── Detay paneli alanları
+      ingredients: _malzemeStr(t.malzemeler || []),
+      steps:       Array.isArray(t.hazirlanis) ? t.hazirlanis : [],
+
+      // ── Orijinal ham veri
+      _raw: t,
+    });
   });
 
-  console.log("✅ Tarifler JSON'dan başarıyla çekildi!", MOCK_RECIPES);
-} catch (error) {
-  console.error("❌ JSON çekilemedi. Yolu kontrol et ('../data/recipes.json').", error);
+  console.log('✅ Türkçe→İngilizce veri eşlemesi tamamlandı:', MOCK_RECIPES.length, 'tarif');
+
+  // Her iki event ismi de fırlatılır: recipes.js kendi içinde 'tarifler-hazir',
+  // index.html ve recipes.html 'smartrec:recipes-ready' dinlediği için ikisini de gönder.
+  window.dispatchEvent(new CustomEvent('tarifler-hazir',        { detail: MOCK_RECIPES }));
+  window.dispatchEvent(new CustomEvent('smartrec:recipes-ready', { detail: MOCK_RECIPES }));
+  
+  return MOCK_RECIPES;
 }
 
+// Modül yüklenince otomatik başlat
+loadRecipes();
 
 // ─── Kalori Kayıt ─────────────────────────────────────────────────────────────
 export function logCalories(recipeId) {
   const recipe = MOCK_RECIPES.find(r => r.id === recipeId);
   if (!recipe) return;
-  const key   = 'smartrec_calories_log';
-  const log   = JSON.parse(localStorage.getItem(key) || '[]');
-  const today = new Date().toISOString().split('T')[0];
-  log.push({ date: today, recipeId, title: recipe.title, calories: recipe.calories, ts: Date.now() });
+  const user    = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
+  const suffix  = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
+  const key     = `smartrec_calories_log${suffix}`;
+  const log     = JSON.parse(localStorage.getItem(key) || '[]');
+  const today   = new Date().toISOString().split('T')[0];
+  // title ve calories alanları artık map'te var; ad/kalori Türkçe alanlar fallback olarak
+  const recipeTitle    = recipe.title    || recipe.ad    || 'Bilinmeyen Tarif';
+  const recipeCalories = recipe.calories ?? recipe.kalori ?? 0;
+
+  log.push({ date: today, recipeId, title: recipeTitle, calories: recipeCalories, ts: Date.now() });
   localStorage.setItem(key, JSON.stringify(log));
   window.dispatchEvent(new CustomEvent('smartrec:calorie-logged', { detail: { recipe } }));
 
@@ -146,8 +268,8 @@ export function logCalories(recipeId) {
       headers: { 'Content-Type': 'application/json' },
       body   : JSON.stringify({
         email   : user?.email || '',
-        yemek   : recipe.title,
-        kalori  : recipe.calories
+        yemek   : recipeTitle,
+        kalori  : recipeCalories
       })
     }).catch(() => {});
   } catch {}
@@ -209,7 +331,18 @@ export function openRecipeDetail(recipeId) {
   const diffColor  = recipe.difficulty === 'Kolay' ? '#2D7A4F'
                    : recipe.difficulty === 'Zor'   ? '#C0392B' : '#6B5E4E';
 
-  const ingredientsList = recipe.ingredients.map(ing =>
+  // title/desc/time/calories/score alanları artık map'te garantili; yine de fallback
+  const rTitle    = recipe.title    || recipe.ad       || 'İsimsiz Tarif';
+  const rDesc     = recipe.desc     || recipe.aciklama || '';
+  const rTime     = recipe.time     || recipe.sure     || '—';
+  const rCalories = recipe.calories ?? recipe.kalori   ?? 0;
+  const rScore    = recipe.score    || recipe.puan     || '—';
+  const rDiff     = recipe.difficulty || recipe.zorluk || 'Orta';
+  const rImage    = recipe.image    || recipe.resim    || '';
+  // ingredients: her zaman string dizisi (map zaten dönüştürdü)
+  const rIngredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+
+  const ingredientsList = rIngredients.map(ing =>
     `<li style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid #f5f5f5;font-size:0.88rem;">
        <span style="width:7px;height:7px;border-radius:50%;background:var(--clr-accent);flex-shrink:0"></span>${ing}
      </li>`
@@ -236,23 +369,23 @@ export function openRecipeDetail(recipeId) {
 
   panel.innerHTML = `
     <div style="position:relative;flex-shrink:0;">
-      <img src="${recipe.image}" alt="${recipe.title}" style="width:100%;height:240px;object-fit:cover;display:block;" onerror="this.style.display='none'">
+      <img src="${rImage}" alt="${rTitle}" style="width:100%;height:240px;object-fit:cover;display:block;" onerror="this.style.display='none'">
       <button onclick="window.closeRecipeDetail()" aria-label="Geri" style="position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);">←</button>
-      <span style="position:absolute;bottom:1rem;right:1rem;background:#fff;border-radius:50px;padding:0.3rem 0.85rem;font-size:0.75rem;font-weight:700;color:${diffColor};box-shadow:0 2px 8px rgba(0,0,0,0.1);">${recipe.difficulty}</span>
+      <span style="position:absolute;bottom:1rem;right:1rem;background:#fff;border-radius:50px;padding:0.3rem 0.85rem;font-size:0.75rem;font-weight:700;color:${diffColor};box-shadow:0 2px 8px rgba(0,0,0,0.1);">${rDiff}</span>
     </div>
     <div style="padding:1.5rem;flex:1;overflow-y:auto;">
       <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.75rem;">${(recipe.tagLabels||[]).map(l=>`<span class="recipe-tag">${l}</span>`).join('')}</div>
-      <h2 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:0.5rem;color:var(--clr-text);">${recipe.title}</h2>
-      <p style="color:var(--clr-text-muted);font-size:0.9rem;line-height:1.6;margin-bottom:1.25rem;">${recipe.desc}</p>
+      <h2 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:0.5rem;color:var(--clr-text);">${rTitle}</h2>
+      <p style="color:var(--clr-text-muted);font-size:0.9rem;line-height:1.6;margin-bottom:1.25rem;">${rDesc}</p>
       <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">⏱</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Süre</div><div style="font-size:0.9rem;font-weight:700;">${recipe.time}</div></div>
-        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">🔥</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Kalori</div><div style="font-size:0.9rem;font-weight:700;">${recipe.calories} kcal</div></div>
-        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">★</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Puan</div><div style="font-size:0.9rem;font-weight:700;">${recipe.score}</div></div>
+        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">⏱</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Süre</div><div style="font-size:0.9rem;font-weight:700;">${rTime}</div></div>
+        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">🔥</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Kalori</div><div style="font-size:0.9rem;font-weight:700;">${rCalories} kcal</div></div>
+        <div style="background:var(--clr-bg);border-radius:12px;padding:0.75rem 1.1rem;text-align:center;flex:1;min-width:80px;"><div style="font-size:1.1rem;margin-bottom:2px;">★</div><div style="font-size:0.75rem;color:var(--clr-text-muted);">Puan</div><div style="font-size:0.9rem;font-weight:700;">${rScore}</div></div>
       </div>
       <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">🧂 Malzemeler</h3>
-      <ul style="list-style:none;padding:0;margin:0 0 1.5rem;">${ingredientsList}</ul>
+      <ul style="list-style:none;padding:0;margin:0 0 1.5rem;">${ingredientsList || '<li style="font-size:0.85rem;color:var(--clr-text-muted);">Malzeme bilgisi bulunamadı.</li>'}</ul>
       <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">👩‍🍳 Yapılışı</h3>
-      <ol style="list-style:none;padding:0;margin:0 0 1.5rem;">${stepsList}</ol>
+      <ol style="list-style:none;padding:0;margin:0 0 1.5rem;">${stepsList || '<li style="font-size:0.85rem;color:var(--clr-text-muted);">Yapılış adımları bulunamadı.</li>'}</ol>
       <div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-top:1rem;border-top:1.5px solid var(--clr-border);">${missingBtnHtml}${cookedBtnHtml}${favBtnHtml}</div>
       ${!isLoggedIn ? `<div style="margin-top:1rem;background:#FFF5F0;border:1.5px solid var(--clr-accent-light);border-radius:12px;padding:1rem;text-align:center;"><p style="font-size:0.85rem;color:var(--clr-text-muted);margin-bottom:0.6rem;">Favorileme, kalori takibi ve alışveriş listesi için üye olun.</p><div style="display:flex;gap:0.5rem;justify-content:center;"><a href="login.html" class="btn btn--primary btn--sm">Giriş Yap</a><a href="login.html?tab=register" class="btn btn--outline btn--sm">Kayıt Ol</a></div></div>` : ''}
     </div>`;
@@ -263,7 +396,7 @@ export function openRecipeDetail(recipeId) {
       btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
       try {
         const { addMissingToShopping } = await import('./remzi.js');
-        addMissingToShopping(recipe.ingredients);
+        addMissingToShopping(rIngredients);
         btn.textContent = '✅ Eklendi!';
       } catch {
         btn.textContent = '⚠️ Hata'; btn.disabled = false;
@@ -290,7 +423,7 @@ export function openRecipeDetail(recipeId) {
         body   : JSON.stringify({
           email   : user?.email || '',
           recipeId: recipe.id,
-          title   : recipe.title,
+          title   : rTitle,
           favorited: nowFav
         })
       }).catch(() => {});

@@ -173,7 +173,6 @@
 
     if (!Auth.isLoggedIn()) {
       Auth.requireAuth('dashboard.html');
-      throw new Error('AUTH_REQUIRED');
     }
 
     const user = Auth.getUser();
@@ -193,7 +192,7 @@
     }
     const LS_INV   = () => `smartrec_inventory${_userSuffix()}`;
     const LS_SHOP  = () => `smartrec_shopping${_userSuffix()}`;
-    const LS_CAL   = 'smartrec_calories_log';
+    const LS_CAL   = `smartrec_calories_log${_userSuffix()}`;  // kullanıcıya özel
     const LS_GOAL  = 'smartrec_cal_goal';
 
     function getInv()   { try { return JSON.parse(localStorage.getItem(LS_INV())  || '[]'); } catch { return []; } }
@@ -281,17 +280,33 @@
           if (idx < 0) return;
           if (btn.dataset.action === 'plus')  items[idx].miktar = (items[idx].miktar || 1) + 1;
           if (btn.dataset.action === 'minus') items[idx].miktar = Math.max(0, (items[idx].miktar || 1) - 1);
+          const degisim = btn.dataset.action === 'plus' ? 1 : -1;
+          const itemAd  = items[idx]?.ad;
           if (items[idx].miktar === 0) items.splice(idx, 1);
           saveInv(items);
           renderInventory();
+          // Backend'e miktar değişimini bildir
+          if (user?.email && itemAd) {
+            fetch(`http://localhost:5000/api/inventory/qty/${encodeURIComponent(itemAd)}?email=${encodeURIComponent(user.email)}&degisim=${degisim}`, {
+              method: 'POST'
+            }).catch(() => {});
+          }
         });
       });
 
       container.querySelectorAll('.del-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const items = getInv().filter(i => String(i.id) !== btn.dataset.id);
-          saveInv(items);
+          const all     = getInv();
+          const item    = all.find(i => String(i.id) === btn.dataset.id);
+          const updated = all.filter(i => String(i.id) !== btn.dataset.id);
+          saveInv(updated);
           renderInventory();
+          // Backend'den de sil
+          if (user?.email && item) {
+            fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
+              method: 'DELETE'
+            }).catch(() => {});
+          }
         });
       });
 
@@ -318,12 +333,29 @@
     saveInventoryBtn?.addEventListener('click', () => {
       const name = inputAd?.value.trim();
       if (!name) { inputAd?.focus(); return; }
-      const items = getInv();
-      items.push({ id: Date.now(), ad: name, miktar: Number(inputMiktar?.value) || 1, skt: inputSKT?.value || '' });
+      const skt    = inputSKT?.value || '';
+      const miktar = Number(inputMiktar?.value) || 1;
+      const items  = getInv();
+      items.push({ id: Date.now(), ad: name, miktar, skt });
       saveInv(items);
       cancelInventoryBtn.click();
       renderInventory();
       _toast(`✅ "${name}" dolaba eklendi.`, 'success');
+
+      // Backend'e de yaz (oturum açıksa)
+      if (user?.email) {
+        // SKT girilmişse gün farkını hesapla, girilmemişse 7 gün default
+        let tuketim_suresi = 7;
+        if (skt) {
+          const diff = Math.ceil((new Date(skt) - new Date()) / 86400000);
+          tuketim_suresi = Math.max(1, diff);
+        }
+        fetch('http://localhost:5000/api/inventory/add', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ email: user.email, ad: name, miktar, tuketim_suresi })
+        }).catch(() => {});
+      }
     });
 
     [inputAd, inputSKT, inputMiktar].forEach((inp, i, arr) => {
@@ -334,8 +366,8 @@
 
     // Akıllı temizlik
     document.getElementById('smartCleanBtn')?.addEventListener('click', () => {
-      const items = getInv();
-      const today = todayStr();
+      const items   = getInv();
+      const today   = todayStr();
       const expired = items.filter(i => i.skt && i.skt < today).map(i => i.ad);
       const fresh   = items.filter(i => !i.skt || i.skt >= today);
       if (!expired.length) {
@@ -346,6 +378,12 @@
         saveInv(fresh);
         renderInventory();
         _toast(`🧹 ${expired.length} ürün temizlendi.`, 'success');
+        // Backend'i de temizle
+        if (user?.email) {
+          fetch(`http://localhost:5000/api/inventory/smart-clean?email=${encodeURIComponent(user.email)}`, {
+            method: 'POST'
+          }).catch(() => {});
+        }
       }
     });
 
@@ -724,6 +762,26 @@
     renderInventory();
     renderCalorie();
     renderShopping();
+
+    // Backend'den güncel envanteri çek ve localStorage ile birleştir
+    if (user?.email) {
+      fetch(`http://localhost:5000/api/inventory?email=${encodeURIComponent(user.email)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.envanter) && data.envanter.length > 0) {
+            // Backend verisini localStorage formatına dönüştür ve kaydet
+            const backendItems = data.envanter.map((item, i) => ({
+              id   : item.id || (Date.now() + i),
+              ad   : item.ad,
+              miktar: item.miktar,
+              skt  : item.skt || ''
+            }));
+            saveInv(backendItems);
+            renderInventory();
+          }
+        })
+        .catch(() => {}); // Backend kapalıysa localStorage verisiyle devam et
+    }
 
     // ══════════════════════════════════════════════════════
     // [2] ENVANTER ARAMA & SKT SIRALAMA

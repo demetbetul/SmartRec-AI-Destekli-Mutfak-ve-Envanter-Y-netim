@@ -210,7 +210,32 @@
         </div>`;
     }
 
+    // Sayfa ilk açıldığında veriler hazır olmayabilir, bu yüzden polling ve event listener kullanıyoruz.
+let _favsRendered = false;
+
+function _renderFavsOnce() {
+    if (_favsRendered) return;
+    if (MOCK_RECIPES.length === 0) return; // Veri hala boşsa bekle
+    _favsRendered = true;
     render();
+}
+
+if (MOCK_RECIPES.length > 0) {
+    _renderFavsOnce();
+} else {
+    // 2. Verilerin yüklenmesini bekle
+    window.addEventListener('smartrec:recipes-ready', _renderFavsOnce, { once: true });
+    window.addEventListener('tarifler-hazir', _renderFavsOnce, { once: true });
+
+    // 3. Fallback: Event kaçırılırsa her 100ms'de bir kontrol et
+    const _checkInterval = setInterval(() => {
+        if (MOCK_RECIPES.length > 0) {
+            _renderFavsOnce();
+            clearInterval(_checkInterval);
+        }
+    }, 100);
+    setTimeout(() => clearInterval(_checkInterval), 5000); // 5 saniye sonra aramayı bırak
+}
   </script>
 </body>
 </html>

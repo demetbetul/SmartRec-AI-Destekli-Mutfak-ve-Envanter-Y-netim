@@ -1,1 +1,38 @@
-{"envanter": []}
+{
+  "envanterler": {
+    "sali@gmail.com": [
+      {
+        "ad": "mantı",
+        "miktar": 2,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "pirzorla",
+        "miktar": 13,
+        "birim": "Adet",
+        "skt": "2026-08-28"
+      },
+      {
+        "ad": "yumurta",
+        "miktar": 124,
+        "birim": "Adet",
+        "skt": "2026-12-31"
+      },
+      {
+        "ad": "makarna",
+        "miktar": 5,
+        "birim": "Adet",
+        "skt": "2026-11-29"
+      },
+      {
+        "ad": "un",
+        "miktar": 10,
+        "birim": "Adet",
+        "skt": "2027-03-03"
+      }
+    ],
+    "zaliy@gmail.com": [],
+    "saliha@gmail.com": []
+  }
+}

@@ -140,7 +140,10 @@
     if (!Auth.requireAuth()) { /* yönlendirilecek */ }
 
     // ─── Veri ────────────────────────────────────────────────────────────
-    const LOG_KEY  = 'smartrec_calories_log';
+    const user     = Auth.getUser();
+    // Kullanıcıya özel kalori log anahtarı (logout sonrası karışmaması için)
+    const userSuffix = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
+    const LOG_KEY  = `smartrec_calories_log${userSuffix}`;
     const GOAL_KEY = 'smartrec_cal_goal';
     const today    = new Date().toISOString().split('T')[0];
     const DAYS     = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
@@ -252,6 +255,16 @@
       document.getElementById('manualName').value = '';
       document.getElementById('manualCal').value  = '';
       refresh();
+
+      // Backend'e de kaydet
+      const user = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
+      if (user?.email) {
+        fetch('http://localhost:5000/api/calories/add', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ email: user.email, yemek: name, kalori: cal })
+        }).catch(() => {});
+      }
     });
 
     // Hedef düzenle
@@ -262,6 +275,24 @@
 
     // Tarif sayfasından gelen event
     window.addEventListener('smartrec:calorie-logged', refresh);
+
+    // Backend'den güncel log çek ve localStorage ile senkronize et
+    if (user?.email) {
+      fetch(`http://localhost:5000/api/calories?email=${encodeURIComponent(user.email)}`)
+        .then(r => r.json())
+        .then(data => {
+          // Backend bugünkü toplam kaloriyi dönüyor; log'u zaten localStorage'da tutuyoruz.
+          // Eğer localStorage boşsa ve backend'de veri varsa, günü doldur.
+          const existing = getLog().filter(i => i.date === today);
+          if (!existing.length && data.bugun && data.bugun > 0) {
+            const log = getLog();
+            log.push({ date: today, recipeId: null, title: 'Önceki kayıtlar', calories: data.bugun, ts: Date.now() });
+            saveLog(log);
+            refresh();
+          }
+        })
+        .catch(() => {});
+    }
 
     refresh();
   </script>

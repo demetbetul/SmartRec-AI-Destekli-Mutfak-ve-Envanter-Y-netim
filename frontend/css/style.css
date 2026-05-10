@@ -6,21 +6,15 @@
 
 /* ─── CSS Değişkenleri ─────────────────────── */
 :root {
-  --clr-bg:            #F5F0E8;
+  --clr-bg:            #FAF8F7; 
   --clr-bg-card:       #FFFFFF;
-  --clr-bg-hero:       #F2E8DC;
-  --clr-accent:        #C44B1C;
-  --clr-accent-dark:   #A33A10;
-  --clr-accent-light:  #E8C5B0;
-  --clr-text:          #1A1208;
-  --clr-text-muted:    #6B5E4E;
-  --clr-border:        #E8DDD0;
-  --clr-green:         #2D7A4F;
-  --clr-orange-warn:   #D4720A;
-  --clr-red-danger:    #C0392B;
-  --clr-green-bg:      #E8F5EE;
-  --clr-orange-bg:     #FEF3E2;
-  --clr-red-bg:        #FDECEA;
+  --clr-bg-hero:       #F5EFED;
+  --clr-accent:        #A52A2A; 
+  --clr-accent-dark:   #7A1F1F;
+  --clr-accent-light:  #F2D7D7;
+  --clr-text:          #1C1414;
+  --clr-text-muted:    #665252;
+  --clr-border:        #EDE4E4; 
 
   --shadow-sm:  0 2px 8px rgba(0,0,0,0.06);
   --shadow-md:  0 4px 20px rgba(0,0,0,0.10);
@@ -1519,4 +1513,7 @@ input, select, button, textarea { font-family: var(--font-body); }
     border: none !important;
   }
   .select-modern { width: 100%; }
+}
+.recipe-card__title {
+    text-transform: capitalize;
 }

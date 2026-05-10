@@ -258,20 +258,19 @@ function _renderInventory() {
 
   list.querySelectorAll('.drawer__item-del').forEach(btn => {
     btn.addEventListener('click', () => {
-      const updated = getInventory().filter(i => String(i.id) !== btn.dataset.id);
+      const all     = getInventory();
+      const item    = all.find(i => String(i.id) === btn.dataset.id); // sil öncesi bul
+      const updated = all.filter(i => String(i.id) !== btn.dataset.id);
       _saveInventory(updated);
       _renderInventory();
       _dispatchInventoryChange();
 
       // Backend'den de sil
       const user = Auth.getUser();
-      if (user?.email) {
-        const item = getInventory().find(i => String(i.id) === btn.dataset.id);
-        if (item) {
-          fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
-            method: 'DELETE'
-          }).catch(() => {});
-        }
+      if (user?.email && item) {
+        fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
+          method: 'DELETE'
+        }).catch(() => {});
       }
     });
   });
