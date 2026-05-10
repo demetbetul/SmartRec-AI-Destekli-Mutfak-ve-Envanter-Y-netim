@@ -1,12 +1,42 @@
-
-
 import { Auth } from './auth.js';
+
+// ─── HAFIZA YÖNETİMİ (Pişirildi ve Eklendi Durumları İçin) ────────────────────
+function isCookedToday(id) {
+  const today = new Date().toISOString().split('T')[0];
+  return localStorage.getItem(`pisirildi_${id}_${today}`) === 'true';
+}
+
+function markAsCooked(id) {
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem(`pisirildi_${id}_${today}`, 'true');
+}
+
+// GEÇİCİ HAFIZA: Live Server sayfayı zorla yenilese bile butonların yeşil kalması için
+const sessionAdded = new Set();
+function isAddedToList(id) {
+  return sessionAdded.has(id);
+}
+function markAsAdded(id) {
+  sessionAdded.add(id);
+}
 
 function _favKey() {
   const user = Auth.getUser();
   if (!user?.email) return 'smartrec_favorites_guest';
   const suffix = user.email.replace('@', '_at_').replace(/\./g, '_');
   return `smartrec_favorites_${suffix}`;
+}
+
+// ─── Temel Malzeme Filtresi (Tuz, Su vb. Listeye Eklenmesin Diye) ───────────
+function filtreleTemelMalzemeler(malzemelerListesi) {
+  if (!malzemelerListesi) return [];
+  const atilacaklar = ['tuz', 'su', 'karabiber', 'zeytinyağı', 'sıvı yağ', 'sıvıyağ', 'ayçiçek yağı', 'yağ', 'şeker'];
+  return malzemelerListesi.filter(malzeme => {
+    const kucuk = malzeme.toLowerCase().trim();
+    // Tam kelime eşleşmesi veya cümlenin bununla bitmesi ("1 çay kaşığı tuz")
+    // "1 su bardağı un" içindeki "su" kelimesi silinmesin diye endsWith kullanıyoruz!
+    return !atilacaklar.some(t => kucuk === t || kucuk.endsWith(' ' + t));
+  });
 }
 
 // ─── Favori Yönetimi ──────────────────────────────────────────────────────────
@@ -52,14 +82,12 @@ export async function loadRecipes() {
   let hamListe = [];
 
   try {
-    // 1. Önce Backend'i dene
     const res = await fetch('http://localhost:5000/api/recipes');
     const data = await res.json();
     if (data.success && data.tarifler) {
       hamListe = Array.isArray(data.tarifler) ? data.tarifler : Object.values(data.tarifler);
     }
   } catch {
-    // 2. Backend yoksa yerel JSON'a bak (farklı klasör yapıları için sırayla dene)
     const jsonPaths = ['./data/recipes.json', '../data/recipes.json', './recipes.json'];
     for (const path of jsonPaths) {
       try {
@@ -68,7 +96,7 @@ export async function loadRecipes() {
         const data = await res.json();
         hamListe = data.tarifler || [];
         if (hamListe.length > 0) break;
-      } catch { /* sonraki yolu dene */ }
+      } catch { }
     }
     if (hamListe.length === 0) {
       console.error('❌ Tarifler yüklenemedi: Backend kapalı ve yerel JSON bulunamadı.');
@@ -84,24 +112,15 @@ export async function loadRecipes() {
       .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   }
 
-  // JSON'daki Türkçe etiket → frontend'in beklediği slug eşlem tablosu
   const ETKET_SLUG_MAP = {
-    'kahvaltı':    'kahvalti',
-    'çorba':       'corba',
-    'salata':      'salata',
-    'tatlı':       'tatli',
-    'içecek':      'icecek',
-    'ana yemek':   'ana-menu',
-    'ana-yemek':   'ana-menu',
-    'vejetaryen':  'vejetaryen',
-    'vegan':       'vegan',
-    'glutensiz':   'glutensiz',
-    'sağlıklı':    'saglikli',
-    'sportif':     'sportif',
-    'pratik':      'pratik',
-    'kolay':       'kolay',
-    'geleneksel':  'geleneksel',
-    'dünya mutfağı': 'dunya-mutfagi',
+    'kahvaltı':    'kahvalti', 'çorba':       'corba',
+    'salata':      'salata',   'tatlı':       'tatli',
+    'içecek':      'icecek',   'ana yemek':   'ana-menu',
+    'ana-yemek':   'ana-menu', 'vejetaryen':  'vejetaryen',
+    'vegan':       'vegan',    'glutensiz':   'glutensiz',
+    'sağlıklı':    'saglikli', 'sportif':     'sportif',
+    'pratik':      'pratik',   'kolay':       'kolay',
+    'geleneksel':  'geleneksel', 'dünya mutfağı': 'dunya-mutfagi',
   };
 
   function _normalizeTags(etiketler = []) {
@@ -110,48 +129,37 @@ export async function loadRecipes() {
       const lower = (et || '').toLocaleLowerCase('tr-TR').trim();
       const mapped = ETKET_SLUG_MAP[lower];
       if (mapped) slugs.add(mapped);
-      // slug haline de ekle (hem orijinal hem normalize erişim için)
       slugs.add(_slugify(lower));
     });
     return [...slugs].filter(Boolean);
   }
 
-  // ✅ YENİ — miktar 0/boş/anlamsızsa sadece isim göster:
+  // ✅ ARKADAŞININ EKLEDİĞİ ÖZELLİK — miktar 0/boş/anlamsızsa sadece isim göster:
   function _malzemeStr(malzemeler = []) {
     return malzemeler.map(m => {
       if (typeof m === 'string') return m.trim();
       const { miktar, birim = '', isim = '' } = m;
       const miktarSayi = parseFloat(miktar);
-      // Miktar 0, boş veya NaN ise sadece ismi yaz
       if (!miktar || isNaN(miktarSayi) || miktarSayi <= 0) {
         return isim.trim();
       }
       return [miktar, birim, isim].filter(Boolean).join(' ').trim();
-    }).filter(s => s.length > 0); // boş stringleri at
+    }).filter(s => s.length > 0); 
   }
 
-  // Zorluk Türkçe normalize
   function _zorluk(z) {
     const map = { kolay: 'Kolay', orta: 'Orta', zor: 'Zor', 'çok zor': 'Zor' };
     return map[(z || '').toLocaleLowerCase('tr-TR').trim()] || 'Orta';
   }
 
-  // Etiketlerin görünen etiket adları (badge'ler için)
   const SLUG_LABEL_MAP = {
-    'kahvalti':    '☕ Kahvaltı',
-    'corba':       '🍲 Çorba',
-    'salata':      '🥗 Salata',
-    'tatli':       '🍮 Tatlı',
-    'icecek':      '🥤 İçecek',
-    'ana-menu':    '🍽 Ana Yemek',
-    'vejetaryen':  '🌿 Vejetaryen',
-    'vegan':       '🌱 Vegan',
-    'glutensiz':   '🚫🌾 Glutensiz',
-    'saglikli':    '💚 Sağlıklı',
-    'sportif':     '💪 Sportif',
-    'pratik':      '⚡ Pratik',
-    'kolay':       '⚡ Kolay',
-    'geleneksel':  '🫕 Geleneksel',
+    'kahvalti':    '☕ Kahvaltı', 'corba':       '🍲 Çorba',
+    'salata':      '🥗 Salata',   'tatli':       '🍮 Tatlı',
+    'icecek':      '🥤 İçecek',   'ana-menu':    '🍽 Ana Yemek',
+    'vejetaryen':  '🌿 Vejetaryen', 'vegan':       '🌱 Vegan',
+    'glutensiz':   '🚫🌾 Glutensiz', 'saglikli':    '💚 Sağlıklı',
+    'sportif':     '💪 Sportif',  'pratik':      '⚡ Pratik',
+    'kolay':       '⚡ Kolay',    'geleneksel':  '🫕 Geleneksel',
   };
 
   MOCK_RECIPES.length = 0;
@@ -168,39 +176,33 @@ export async function loadRecipes() {
       .slice(0, 3);
 
     MOCK_RECIPES.push({
-      // ── Orijinal Türkçe alanlar (geriye dönük uyumluluk)
       id:         t.id,
       ad:         t.ad        || 'İsimsiz Tarif',
       aciklama:   t.aciklama  || '',
       sure:       t.toplam_sure || t.hazirlanma_suresi || '30 dk',
       zorluk:     _zorluk(t.zorluk),
       kalori:     typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
-      puan:       t.puan      || '4.5',
       kategori:   t.kategori  || 'Genel',
       etiketler:  t.etiketler || [],
 
-      // ── Frontend'in beklediği İngilizce alanlar ─────────────────────────────
       title:      t.ad        || 'İsimsiz Tarif',
       desc:       t.aciklama  || '',
       time:       t.toplam_sure || t.hazirlanma_suresi || '30 dk',
       difficulty: _zorluk(t.zorluk),
       calories:   typeof t.kalori === 'number' ? t.kalori : (parseInt(t.kalori) || 0),
-      // ✅ YENİ — JSON'daki gerçek değeri kullan, yoksa "—" göster:
+      
+      // ✅ ARKADAŞININ EKLEDİĞİ ÖZELLİK — JSON'daki gerçek değeri kullan:
       score: t.puan != null ? parseFloat(t.puan) : null,
       puan:  t.puan != null ? String(t.puan) : '—',
+      
       image:      t.resim_url || t.thumbnail_url
                   || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80',
       emoji:      '🍽',
 
-      // ── Filtreleme / badge alanları
       tags,
       tagLabels,
-
-      // ── Detay paneli alanları
       ingredients: _malzemeStr(t.malzemeler || []),
       steps:       Array.isArray(t.hazirlanis) ? t.hazirlanis : [],
-
-      // ── Orijinal ham veri
       _raw: t,
     });
   });
@@ -212,7 +214,6 @@ export async function loadRecipes() {
   return MOCK_RECIPES;
 }
 
-// Modül yüklenince otomatik başlat
 loadRecipes();
 
 // ─── Kalori Kayıt ─────────────────────────────────────────────────────────────
@@ -224,7 +225,6 @@ export function logCalories(recipeId) {
   const key     = `smartrec_calories_log${suffix}`;
   const log     = JSON.parse(localStorage.getItem(key) || '[]');
   const today   = new Date().toISOString().split('T')[0];
-  // title ve calories alanları artık map'te var; ad/kalori Türkçe alanlar fallback olarak
   const recipeTitle    = recipe.title    || recipe.ad    || 'Bilinmeyen Tarif';
   const recipeCalories = recipe.calories ?? recipe.kalori ?? 0;
 
@@ -237,11 +237,7 @@ export function logCalories(recipeId) {
     fetch('http://localhost:5000/api/calories/add', {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({
-        email   : user?.email || '',
-        yemek   : recipeTitle,
-        kalori  : recipeCalories
-      })
+      body   : JSON.stringify({ email: user?.email || '', yemek: recipeTitle, kalori: recipeCalories })
     }).catch(() => {});
   } catch {}
 }
@@ -300,18 +296,18 @@ export function openRecipeDetail(recipeId) {
   const diffColor  = recipe.difficulty === 'Kolay' ? '#2D7A4F'
                    : recipe.difficulty === 'Zor'   ? '#C0392B' : '#6B5E4E';
 
-  // title/desc/time/calories/score alanları artık map'te garantili; yine de fallback
   const rTitle    = recipe.title    || recipe.ad       || 'İsimsiz Tarif';
   const rDesc     = recipe.desc     || recipe.aciklama || '';
   const rTime     = recipe.time     || recipe.sure     || '—';
   const rCalories = recipe.calories ?? recipe.kalori   ?? 0;
-  // ✅ YENİ:
+  
+  // ✅ ARKADAŞININ EKLEDİĞİ YENİ ÖZELLİK:
   const rScore = (recipe.score != null && recipe.score > 0)
     ? parseFloat(recipe.score).toFixed(1)
     : (recipe.puan && recipe.puan !== '—' ? recipe.puan : '—');
+    
   const rDiff     = recipe.difficulty || recipe.zorluk || 'Orta';
   const rImage    = recipe.image    || recipe.resim    || '';
-  // ingredients: her zaman string dizisi (map zaten dönüştürdü)
   const rIngredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
 
   const ingredientsList = rIngredients.map(ing =>
@@ -327,17 +323,25 @@ export function openRecipeDetail(recipeId) {
      </li>`
   ).join('');
 
+  // HAFIZA KONTROLLERİ (SENİN KODUN)
+  const zatenPisirildi = isCookedToday(recipe.id);
+  const zatenEklendi = isAddedToList(recipe.id);
+
   const missingBtnHtml = isLoggedIn
-    ? `<button id="detailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;">🛒 Eksikleri Ekle</button>`
-    : `<button class="btn btn--outline btn--sm guest-action-btn" style="flex:1;" data-msg="Eksik malzemeleri listeye eklemek için giriş yapın.">🛒 Eksikleri Ekle</button>`;
+    ? (zatenEklendi
+        ? `<button type="button" id="detailMissingBtn" class="btn btn--outline btn--sm" style="flex:1; background:#2D7A4F; color:white; border:none;" disabled>✅ Eklendi</button>`
+        : `<button type="button" id="detailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;">🛒 Eksikleri Ekle</button>`)
+    : `<button type="button" class="btn btn--outline btn--sm guest-action-btn" style="flex:1;" data-msg="Eksik malzemeleri listeye eklemek için giriş yapın.">🛒 Eksikleri Ekle</button>`;
 
   const cookedBtnHtml = isLoggedIn
-    ? `<button id="detailCookedBtn" class="btn btn--success btn--sm" style="flex:1;">✅ Pişirdim</button>`
-    : `<button class="btn btn--success btn--sm guest-action-btn" style="flex:1;opacity:0.7;" data-msg="Yaptım olarak işaretlemek için giriş yapın.">✅ Pişirdim</button>`;
+    ? (zatenPisirildi 
+        ? `<button type="button" id="detailCookedBtn" class="btn btn--success btn--sm" style="flex:1; background:#2D7A4F; cursor:not-allowed; opacity:0.8; color:white; border:none;" disabled>✅ Pişirildi</button>`
+        : `<button type="button" id="detailCookedBtn" class="btn btn--success btn--sm" style="flex:1;">✅ Pişirdim</button>`)
+    : `<button type="button" class="btn btn--success btn--sm guest-action-btn" style="flex:1;opacity:0.7;" data-msg="Yaptım olarak işaretlemek için giriş yapın.">✅ Pişirdim</button>`;
 
   const favBtnHtml = isLoggedIn
-    ? `<button id="detailFavBtn" class="btn btn--ghost btn--sm" style="min-width:40px;${isFav ? 'color:#C44B1C;' : ''}" aria-label="Favorilere ekle">${isFav ? '♥' : '♡'}</button>`
-    : `<button class="btn btn--ghost btn--sm guest-action-btn" style="min-width:40px;" data-msg="Favorilere eklemek için giriş yapın." aria-label="Favorilere ekle">♡</button>`;
+    ? `<button type="button" id="detailFavBtn" class="btn btn--ghost btn--sm" style="min-width:40px;${isFav ? 'color:#C44B1C;' : ''}" aria-label="Favorilere ekle">${isFav ? '♥' : '♡'}</button>`
+    : `<button type="button" class="btn btn--ghost btn--sm guest-action-btn" style="min-width:40px;" data-msg="Favorilere eklemek için giriş yapın." aria-label="Favorilere ekle">♡</button>`;
 
   panel.innerHTML = `
     <div style="position:relative;flex-shrink:0;">
@@ -363,31 +367,63 @@ export function openRecipeDetail(recipeId) {
     </div>`;
 
   if (isLoggedIn) {
-    document.getElementById('detailMissingBtn')?.addEventListener('click', async () => {
+    document.getElementById('detailMissingBtn')?.addEventListener('click', async (e) => {
+      e.preventDefault(); 
+      e.stopPropagation();
       const btn = document.getElementById('detailMissingBtn');
+      if (isAddedToList(recipe.id)) return;
+      
       btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
       try {
         const { addMissingToShopping } = await import('./remzi.js');
-        addMissingToShopping(rIngredients);
-        btn.textContent = '✅ Eklendi!';
+        
+        // YENİ EKLENEN FİLTRE: Tuz, su gibi maddeleri atar
+        const eksikler = filtreleTemelMalzemeler(rIngredients);
+        addMissingToShopping(eksikler);
+        
+        markAsAdded(recipe.id); 
+        
+        btn.textContent = '✅ Eklendi';
+        btn.style.background = '#2D7A4F'; btn.style.color = 'white'; btn.style.border = 'none';
+
+        // ARKA PLANDAKİ KARTI DA ANINDA YEŞİL YAPAR
+        document.querySelectorAll(`.missing-btn[data-id="${recipe.id}"]`).forEach(b => {
+          b.textContent = '✅ Eklendi'; b.disabled = true;
+          b.style.background = '#2D7A4F'; b.style.color = 'white'; b.style.border = 'none';
+        });
       } catch {
         btn.textContent = '⚠️ Hata'; btn.disabled = false;
       }
     });
 
-    document.getElementById('detailCookedBtn')?.addEventListener('click', () => {
-      logCalories(recipe.id);
+    document.getElementById('detailCookedBtn')?.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      e.stopPropagation();
+      if (isCookedToday(recipe.id)) return;
+      
+      logCalories(recipe.id); 
+      markAsCooked(recipe.id); 
+      
       const btn = document.getElementById('detailCookedBtn');
-      btn.textContent = '✅ Kaydedildi'; btn.disabled = true;
-      btn.style.background = '#2D7A4F';
+      btn.textContent = '✅ Pişirildi'; btn.disabled = true;
+      btn.style.background = '#2D7A4F'; btn.style.color = 'white'; 
+      btn.style.border = 'none'; btn.style.cursor = 'not-allowed'; btn.style.opacity = '0.8';
+
+      // ARKA PLANDAKİ KARTI DA ANINDA YEŞİL YAPAR
+      document.querySelectorAll(`.cooked-btn[data-id="${recipe.id}"]`).forEach(b => {
+        b.textContent = '✅ Pişirildi'; b.disabled = true;
+        b.style.background = '#2D7A4F'; b.style.color = 'white'; 
+        b.style.border = 'none'; b.style.cursor = 'not-allowed'; b.style.opacity = '0.8';
+      });
     });
 
     const favBtn = document.getElementById('detailFavBtn');
-    favBtn?.addEventListener('click', () => {
+    favBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const nowFav = Favorites.toggle(recipe.id);
       favBtn.textContent  = nowFav ? '♥' : '♡';
       favBtn.style.color  = nowFav ? '#C44B1C' : '';
-      // Backend'e de gönder (opsiyonel)
       const user = Auth.getUser();
       fetch('http://localhost:5000/api/favorites/toggle', {
         method : 'POST',
@@ -399,7 +435,6 @@ export function openRecipeDetail(recipeId) {
           favorited: nowFav
         })
       }).catch(() => {});
-      // Kart ikonunu güncelle
       document.querySelectorAll(`.recipe-card[data-id="${recipe.id}"] .fav-btn`).forEach(b => {
         b.textContent = nowFav ? '♥' : '♡';
         b.style.color = nowFav ? '#C44B1C' : '';
@@ -409,7 +444,11 @@ export function openRecipeDetail(recipeId) {
   }
 
   panel.querySelectorAll('.guest-action-btn').forEach(btn => {
-    btn.addEventListener('click', () => _showAuthToast(btn.dataset.msg));
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      _showAuthToast(btn.dataset.msg);
+    });
   });
 
   panel.style.right = '0';
@@ -425,28 +464,39 @@ window.closeRecipeDetail = closeRecipeDetail;
 export function createRecipeCard(recipe, opts = {}) {
   const { showDetail = true, showMissing = false, showCooked = false } = opts;
   const isLoggedIn = Auth.isLoggedIn();
-  // DÜZELTİLDİ: Favorites.has() doğru kullanıcı anahtarını kullanır.
   const isFav      = isLoggedIn && Favorites.has(recipe.id);
+  
+  // HAFIZA KONTROLLERİ
+  const zatenPisirildi = isCookedToday(recipe.id);
+  const zatenEklendi = isAddedToList(recipe.id);
+
   const tagBadges  = (recipe.tagLabels || []).map(l => `<span class="recipe-tag">${l}</span>`).join('');
   const diffClass  = recipe.difficulty === 'Kolay' ? 'recipe-tag--green'
                    : recipe.difficulty === 'Zor'   ? 'recipe-tag--red' : 'recipe-tag--gray';
   const imgMarkup  = recipe.image ? `<img class="recipe-card__img-el" src="${recipe.image}" alt="${recipe.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
   const placeholder = `<div class="recipe-card__img-placeholder" style="${recipe.image ? 'display:none' : ''}"><span class="placeholder-icon">${recipe.emoji}</span><span class="placeholder-label">Görsel Yükleniyor</span></div>`;
-  const detailBtn  = showDetail ? `<button class="btn btn--primary detail-btn" data-id="${recipe.id}">Detayları Gör</button>` : '';
+  const detailBtn  = showDetail ? `<button type="button" class="btn btn--primary detail-btn" data-id="${recipe.id}">Detayları Gör</button>` : '';
+  
   const missingBtn = showMissing && recipe.ingredients?.length
     ? (isLoggedIn
-        ? `<button class="btn btn--outline btn--sm missing-btn" data-id="${recipe.id}">🛒 Eksikleri Ekle</button>`
-        : `<button class="btn btn--outline btn--sm guest-gate-btn" data-msg="Eksik malzemeleri listeye eklemek için giriş yapın.">🛒 Eksikleri Ekle</button>`)
+        ? (zatenEklendi
+            ? `<button type="button" class="btn btn--outline btn--sm missing-btn" data-id="${recipe.id}" style="background:#2D7A4F; color:white; border:none;" disabled>✅ Eklendi</button>`
+            : `<button type="button" class="btn btn--outline btn--sm missing-btn" data-id="${recipe.id}">🛒 Eksikleri Ekle</button>`)
+        : `<button type="button" class="btn btn--outline btn--sm guest-gate-btn" data-msg="Eksik malzemeleri listeye eklemek için giriş yapın.">🛒 Eksikleri Ekle</button>`)
     : '';
+    
   const cookedBtn  = showCooked
     ? (isLoggedIn
-        ? `<button class="btn btn--success btn--sm cooked-btn" data-id="${recipe.id}">✅ Pişirdim</button>`
-        : `<button class="btn btn--success btn--sm guest-gate-btn" style="opacity:0.7;" data-msg="Yaptım olarak işaretlemek için giriş yapın.">✅ Pişirdim</button>`)
+        ? (zatenPisirildi
+            ? `<button type="button" class="btn btn--success btn--sm cooked-btn" data-id="${recipe.id}" style="background:#2D7A4F; cursor:not-allowed; opacity:0.8; color:white; border:none;" disabled>✅ Pişirildi</button>`
+            : `<button type="button" class="btn btn--success btn--sm cooked-btn" data-id="${recipe.id}">✅ Pişirdim</button>`)
+        : `<button type="button" class="btn btn--success btn--sm guest-gate-btn" style="opacity:0.7;" data-msg="Yaptım olarak işaretlemek için giriş yapın.">✅ Pişirdim</button>`)
     : '';
+    
   const favBtn     = showDetail
     ? (isLoggedIn
-        ? `<button class="btn btn--ghost fav-btn${isFav ? ' fav-btn--active' : ''}" aria-label="Favorilere ekle" style="${isFav ? 'color:#C44B1C;' : ''}">${isFav ? '♥' : '♡'}</button>`
-        : `<button class="btn btn--ghost guest-gate-btn" aria-label="Favorilere ekle" data-msg="Favorilere eklemek için giriş yapın.">♡</button>`)
+        ? `<button type="button" class="btn btn--ghost fav-btn${isFav ? ' fav-btn--active' : ''}" aria-label="Favorilere ekle" style="${isFav ? 'color:#C44B1C;' : ''}">${isFav ? '♥' : '♡'}</button>`
+        : `<button type="button" class="btn btn--ghost guest-gate-btn" aria-label="Favorilere ekle" data-msg="Favorilere eklemek için giriş yapın.">♡</button>`)
     : '';
 
   return `
@@ -479,11 +529,16 @@ export function initRecipeCardEvents(container, recipes) {
 
 function _initCardEvents(container, recipes) {
   container.querySelectorAll('.detail-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); openRecipeDetail(Number(btn.dataset.id)); });
+    btn.addEventListener('click', e => { 
+      e.preventDefault(); 
+      e.stopPropagation(); 
+      openRecipeDetail(Number(btn.dataset.id)); 
+    });
   });
 
   container.querySelectorAll('.fav-btn').forEach(btn => {
     btn.addEventListener('click', e => {
+      e.preventDefault();
       e.stopPropagation();
       const id = Number(btn.closest('.recipe-card')?.dataset.id);
       if (!id) return;
@@ -496,14 +551,25 @@ function _initCardEvents(container, recipes) {
 
   container.querySelectorAll('.missing-btn').forEach(btn => {
     btn.addEventListener('click', async e => {
+      e.preventDefault(); // SAYFA YENİLENMESİNİ ENGELLER
       e.stopPropagation();
-      const recipe = recipes.find(r => r.id === Number(btn.dataset.id));
+      const id = Number(btn.dataset.id);
+      if (isAddedToList(id)) return;
+      
+      const recipe = recipes.find(r => r.id === id);
       if (!recipe?.ingredients) return;
+      
       btn.textContent = '⏳ Ekleniyor...'; btn.disabled = true;
       try {
         const { addMissingToShopping } = await import('./remzi.js');
-        addMissingToShopping(recipe.ingredients);
-        btn.textContent = '✅ Eklendi!';
+        
+        // YENİ EKLENEN FİLTRE: Tuz, su gibi maddeleri atar
+        const eksikler = filtreleTemelMalzemeler(recipe.ingredients);
+        addMissingToShopping(eksikler);
+        
+        markAsAdded(id); 
+        btn.textContent = '✅ Eklendi';
+        btn.style.background = '#2D7A4F'; btn.style.color = 'white'; btn.style.border = 'none';
       } catch {
         btn.textContent = '⚠️ Hata'; btn.disabled = false;
       }
@@ -512,15 +578,31 @@ function _initCardEvents(container, recipes) {
 
   container.querySelectorAll('.cooked-btn').forEach(btn => {
     btn.addEventListener('click', e => {
+      e.preventDefault(); // SAYFA YENİLENMESİNİ ENGELLER
       e.stopPropagation();
-      logCalories(Number(btn.dataset.id));
-      btn.textContent = '✅ Kaydedildi';
+      const id = Number(btn.dataset.id);
+      
+      if (isCookedToday(id)) return;
+      
+      logCalories(id);
+      markAsCooked(id); 
+      
+      btn.textContent = '✅ Pişirildi';
       btn.disabled    = true;
+      btn.style.background = '#2D7A4F';
+      btn.style.color = 'white';
+      btn.style.border = 'none';
+      btn.style.cursor = 'not-allowed';
+      btn.style.opacity = '0.8';
     });
   });
 
   container.querySelectorAll('.guest-gate-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); _showAuthToast(btn.dataset.msg); });
+    btn.addEventListener('click', e => { 
+      e.preventDefault(); 
+      e.stopPropagation(); 
+      _showAuthToast(btn.dataset.msg); 
+    });
   });
 }
 

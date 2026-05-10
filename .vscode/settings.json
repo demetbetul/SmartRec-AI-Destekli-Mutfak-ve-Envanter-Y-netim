@@ -12,5 +12,8 @@
   },
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
-  }
+  },
+  "liveServer.settings.ignoreFiles": [
+    "**/*.json"
+  ]
 }
