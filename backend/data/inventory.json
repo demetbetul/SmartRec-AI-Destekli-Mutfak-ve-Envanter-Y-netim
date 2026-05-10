@@ -30,6 +30,50 @@
         "miktar": 1,
         "birim": "Adet",
         "skt": "2026-05-17"
+      },
+      {
+        "ad": "0.5 su bardağı su",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "500 gr süzme yoğurt",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "500 gr hamsi (temizlenmiş)",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      }
+    ],
+    "sali@gmail.com": [
+      {
+        "ad": "kaşar peyniri (1 su bardağı, rendelenmiş)",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "taze biberiye (3-4 dal)",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "taze kekik (2-3 dal, alternatif olarak yarım çay kaşığı kuru kekik)",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "zeytinyağı (5 yemek kaşığı)",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-17"
       }
     ]
   }

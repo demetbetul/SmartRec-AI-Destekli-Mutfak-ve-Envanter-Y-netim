@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
+    /* Auth flash önleyici: giriş kontrolü tamamlanana kadar içeriği gizle */
+    body.auth-pending { visibility: hidden; }
     .cal-layout { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
     .cal-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
     .cal-card { background: var(--color-surface,#fff); border-radius: 1rem; padding: 1.25rem 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
@@ -38,7 +40,7 @@
     .cal-manual__row input { flex:1; min-width:140px; padding:.6rem 1rem; border:1px solid #ddd; border-radius:.5rem; font-size:.9rem; }
   </style>
 </head>
-<body>
+<body class="auth-pending">
   <div id="app-header"></div>
 
   <main class="main-content">
@@ -131,13 +133,21 @@
     import { initPage, Auth } from './js/auth.js';
     import { initRemzi, initDrawer } from './js/remzi.js';
 
+    // ── Auth kontrolü ÖNCE: flash önlemek için sayfa görünür olmadan redirect ──
+    if (!Auth.isLoggedIn()) {
+      sessionStorage.setItem('redirect_after_login', 'calories.html');
+      window.location.replace('login.html');
+      throw new Error('redirect');
+    }
+
+    // Giriş onaylandı — sayfayı göster
+    document.body.classList.remove('auth-pending');
+
     document.getElementById('app-header').innerHTML   = renderHeader('calories');
     document.getElementById('chatbot-root').innerHTML = renderChatbot();
     initPage();
     initDrawer();
     initRemzi();
-
-    if (!Auth.requireAuth()) { /* yönlendirilecek */ }
 
     // ─── Veri ────────────────────────────────────────────────────────────
     const user     = Auth.getUser();
@@ -256,8 +266,6 @@
       document.getElementById('manualCal').value  = '';
       refresh();
 
-      // Backend'e de kaydet
-      const user = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
       if (user?.email) {
         fetch('http://localhost:5000/api/calories/add', {
           method : 'POST',

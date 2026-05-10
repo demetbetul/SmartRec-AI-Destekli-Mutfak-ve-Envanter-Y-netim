@@ -1,4 +1,3 @@
-
 const LS_USER = 'smartrec_user';
 
 export const Auth = {
@@ -30,7 +29,9 @@ export const Auth = {
       const page = returnTo || window.location.pathname.split('/').pop() || 'index.html';
       sessionStorage.setItem('redirect_after_login', page);
       window.location.href = 'login.html';
+      return false;
     }
+    return true;
   }
 };
 
@@ -82,12 +83,12 @@ function _applyAuthUI() {
 let _bound = false;
 function _bindHeaderEvents() {
   if (_bound) return;
+  _bound = true;
 
   const avatarBtn = document.getElementById('userAvatarBtn');
   const dropdown  = document.getElementById('profileDropdown');
 
   if (avatarBtn && dropdown) {
-    _bound = true; 
 
     avatarBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -129,7 +130,8 @@ function _bindHeaderEvents() {
   });
 
   const header = document.getElementById('header');
-  if (header) {
+  if (header && !header.dataset.scrollBound) {
+    header.dataset.scrollBound = 'true';
     const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll(); 

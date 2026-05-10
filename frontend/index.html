@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Header inject edilene kadar boş div'i gizle — layout shift önler */
+    #app-header:empty { visibility: hidden; min-height: 64px; }
+  </style>
 </head>
 <body>
 
@@ -160,7 +164,9 @@
       const overlay = document.getElementById('menuDetailOverlay');
       const isLoggedIn = Auth.isLoggedIn();
 
-      const log = JSON.parse(localStorage.getItem('smartrec_calories_log') || '[]');
+      const _logUser = Auth.getUser();
+      const _logSuffix = _logUser?.email ? '_' + _logUser.email.replace('@','_at_').replace(/\./g,'_') : '';
+      const log = JSON.parse(localStorage.getItem('smartrec_calories_log' + _logSuffix) || '[]');
       const today = new Date().toISOString().split('T')[0];
       const isAlreadyCooked = log.some(item => item.date === today && item.recipeId === (5000 + menu.id));
 
@@ -352,7 +358,7 @@
                 <span>${a.replace(/^\d+\.\s*/, '')}</span>
               </div>`).join('');
 
-          const isCookedNow = JSON.parse(localStorage.getItem('smartrec_calories_log') || '[]')
+          const isCookedNow = JSON.parse(localStorage.getItem('smartrec_calories_log' + _logSuffix) || '[]')
                               .some(item => item.date === new Date().toISOString().split('T')[0] && item.recipeId === (5000 + menu.id));
 
           content.innerHTML = `
@@ -499,28 +505,68 @@
 
     // ─── Özel AI Menü Kartı Oluşturucu ─────────────────────────────────────────
     function createMenuCard(menu) {
-      const diffClass = menu.difficulty === 'Kolay' ? 'recipe-tag--green' : menu.difficulty === 'Zor' ? 'recipe-tag--red' : 'recipe-tag--gray';
+      const courses = menu._raw;
+      const baslangic  = courses?.baslangic  || '';
+      const anaYemek   = courses?.ana_yemek  || '';
+      const tatli      = courses?.tatli      || '';
+
       return `
-<article class="recipe-card" data-id="${menu.id}" data-menu="true">
-  <div class="recipe-card__img-wrap">
-    <img class="recipe-card__img-el" src="${menu.image}" alt="${menu.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-    <div class="recipe-card__img-placeholder" style="display:none"><span class="placeholder-icon">✨</span><span class="placeholder-label">Görsel Yükleniyor</span></div>
-    <span class="recipe-card__badge ${diffClass}">${menu.difficulty}</span>
+<article class="menu-card" data-id="${menu.id}" data-menu="true" style="
+  background:#fff;
+  border-radius:1.25rem;
+  overflow:hidden;
+  box-shadow:0 2px 16px rgba(0,0,0,0.08);
+  display:flex;
+  flex-direction:column;
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+  cursor:pointer;
+" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.13)'"
+   onmouseleave="this.style.transform='';this.style.boxShadow='0 2px 16px rgba(0,0,0,0.08)'">
+
+  <!-- Görsel -->
+  <div style="position:relative;height:180px;overflow:hidden;flex-shrink:0;">
+    <img src="${menu.image}" alt="${menu.title}" loading="lazy"
+      style="width:100%;height:100%;object-fit:cover;display:block;"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;width:100%;height:100%;background:linear-gradient(135deg,#FFF3EC,#fde8d8);align-items:center;justify-content:center;font-size:3rem;">🍽</div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 40%,rgba(0,0,0,0.5) 100%);"></div>
+    <!-- AI rozeti -->
+    <span style="position:absolute;top:0.75rem;left:0.75rem;background:var(--clr-accent,#C44B1C);color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:.05em;padding:0.2rem 0.65rem;border-radius:50px;">✨ AI MENÜ</span>
+    <!-- Zorluk rozeti -->
+    <span style="position:absolute;top:0.75rem;right:0.75rem;background:rgba(255,255,255,0.92);color:#444;font-size:0.68rem;font-weight:600;padding:0.2rem 0.65rem;border-radius:50px;">${menu.difficulty || 'Orta'}</span>
   </div>
-  <div class="recipe-card__body">
-    <div class="recipe-card__tags">
-      <span class="recipe-tag" style="background:var(--clr-accent);color:#fff;">✨ AI Menü</span>
-    </div>
-    <h3 class="recipe-card__title">${menu.title}</h3>
-    <p class="recipe-card__desc" style="font-size:0.84rem;line-height:1.55;">${menu.desc}</p>
+
+  <!-- Gövde -->
+  <div style="padding:1.1rem 1.25rem 0.75rem;flex:1;display:flex;flex-direction:column;gap:0.6rem;">
+    <h3 style="font-family:var(--font-display,'Playfair Display'),serif;font-size:1.05rem;font-weight:800;color:var(--clr-text,#1A1208);margin:0;line-height:1.3;">${menu.title}</h3>
+
+    <!-- Öğünler listesi -->
+    ${baslangic || anaYemek || tatli ? `
+    <div style="display:flex;flex-direction:column;gap:0.3rem;">
+      ${baslangic ? `<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--clr-text-muted,#888);"><span style="font-size:1rem;">🥣</span><span>${baslangic}</span></div>` : ''}
+      ${anaYemek  ? `<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--clr-text,#1A1208);font-weight:600;"><span style="font-size:1rem;">🥘</span><span>${anaYemek}</span></div>` : ''}
+      ${tatli     ? `<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--clr-text-muted,#888);"><span style="font-size:1rem;">🍰</span><span>${tatli}</span></div>` : ''}
+    </div>` : `<p style="font-size:0.83rem;color:var(--clr-text-muted,#888);line-height:1.5;margin:0;">${menu.desc}</p>`}
   </div>
-  <div class="recipe-card__meta">
-    <span class="meta-item">⏱ <strong>${menu.time}</strong></span>
-    <span class="meta-item">🔥 <strong>${menu.calories || '—'}</strong> kcal</span>
-    <span class="flavor-score">✨ AI</span>
+
+  <!-- Meta satırı -->
+  <div style="display:flex;align-items:center;gap:1rem;padding:0.6rem 1.25rem;border-top:1px solid #f0f0f0;">
+    <span style="font-size:0.8rem;color:var(--clr-text-muted,#888);">⏱ <strong style="color:var(--clr-text,#1A1208);">${menu.time}</strong></span>
+    <span style="font-size:0.8rem;color:var(--clr-text-muted,#888);">🔥 <strong style="color:var(--clr-accent,#C44B1C);">${menu.calories || '—'} kcal</strong></span>
+    <span style="margin-left:auto;font-size:0.78rem;color:#aaa;">✨ ${menu.score}</span>
   </div>
-  <div class="recipe-card__footer">
-    <button class="btn btn--primary detail-btn menu-detail-btn" data-id="${menu.id}" style="flex:1;">Detayları Gör</button>
+
+  <!-- Buton -->
+  <div style="padding:0.75rem 1.25rem 1.1rem;">
+    <button class="menu-detail-btn" data-id="${menu.id}" style="
+      width:100%;padding:0.65rem 1rem;
+      background:var(--clr-accent,#C44B1C);color:#fff;
+      border:none;border-radius:0.75rem;
+      font-size:0.88rem;font-weight:700;font-family:inherit;
+      cursor:pointer;transition:opacity 0.15s;
+    " onmouseenter="this.style.opacity='0.88'" onmouseleave="this.style.opacity='1'">
+      Menü Detayları →
+    </button>
   </div>
 </article>`;
     }
@@ -542,10 +588,12 @@
 
 
     // ─── AI Günlük Menü Yükle ───────────────────────────────────────────────────
+    const MENU_CACHE_KEY = 'smartrec_ai_menu_cache_v2';
+    const MENU_TODAY = new Date().toDateString();
+
     async function fetchDailyMenu() {
       const container = document.getElementById('dailyCards');
-      const MENU_CACHE_KEY = 'smartrec_ai_menu_cache_v2';
-      const today = new Date().toDateString();
+      const today = MENU_TODAY;
 
       // 1. Önbellek kontrolü
       const cachedData = localStorage.getItem(MENU_CACHE_KEY);
@@ -575,61 +623,69 @@
         const response = await fetch(menuUrl);
         const data = await response.json();
 
-        if (data.success && data.menu.menuler) {
-          const parseCal = (val) => {
-            if (!val) return 0;
-            const num = parseInt(String(val).replace(/[^0-9]/g, ''));
-            return isNaN(num) ? 0 : num;
-          };
+        if (data.success) {
+          // Backend /api/recipes/smart → data.recipes, /api/menu/create → data.menu
+          const menuData = data.recipes || data.menu;
 
-          const menuCards = (data.menu || data.recipes)?.menuler.map(menu => {
-            const toplamKalori = parseCal(menu.kaloriler?.baslangic_kalori)
-              + parseCal(menu.kaloriler?.ana_yemek_kalori)
-              + parseCal(menu.kaloriler?.tatli_kalori);
-            return {
-              id: 5000 + menu.id,
-              title: `Menü Seçeneği ${menu.id}`,
-              desc: `🥣 ${menu.baslangic} &nbsp;·&nbsp; 🥘 ${menu.ana_yemek} &nbsp;·&nbsp; 🍰 ${menu.tatli}`,
-              image: menu.gorseller?.ana_yemek_foto || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
-              time: menu.hazirlik_suresi || "45 dk",
-              difficulty: menu.zorluk || 'Orta',
-              calories: toplamKalori || 0,
-              score: _menuScore(menu.id),
-              tags: ['Tam Menü'],
-              emoji: '✨',
-              ingredients: menu.eksik_malzemeler || [],
-              _raw: menu
-            };
-          });
+          // Envanter boşsa backend "bos" kaynağıyla boş liste döndürür → /api/menu/create'e düş
+          if (!menuData || !menuData.menuler || menuData.menuler.length === 0) {
+            const fallbackRes  = await fetch('http://localhost:5000/api/menu/create');
+            const fallbackData = await fallbackRes.json();
+            const fallbackMenu = fallbackData.menu || fallbackData.recipes;
+            if (fallbackMenu?.menuler?.length > 0) {
+              _buildAndRenderMenuCards(fallbackMenu.menuler);
+            } else {
+              throw new Error('Menü listesi boş geldi');
+            }
+            return;
+          }
 
-          // 3. Önbelleğe al
-          localStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ date: today, menuCards }));
-          window._aiMenuCards = menuCards;
-          renderMenuGrid('dailyCards', menuCards);
+          _buildAndRenderMenuCards(menuData.menuler);
         }
       } catch (error) {
         console.error('API Hatası:', error);
-        // Hata durumunda: veriler hazırsa fallback kartlar, değilse bekle
-        const _showFallback = () => {
-          const fallback = MOCK_RECIPES.slice(0, 3);
-          if (fallback.length > 0) {
-            renderRecipeGrid('dailyCards', fallback, { showDetail: true });
-          } else {
-            const c = document.getElementById('dailyCards');
-            if (c) c.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--clr-text-muted);">Tarifler yüklenemedi. Sayfayı yenileyin.</div>`;
-          }
-        };
-        if (MOCK_RECIPES.length > 0) {
-          _showFallback();
-        } else {
-          window.addEventListener('smartrec:recipes-ready', _showFallback, { once: true });
-          window.addEventListener('tarifler-hazir',         _showFallback, { once: true });
-        }
+        const c = document.getElementById('dailyCards');
+        if (c) c.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">👨‍🍳</div>
+            <h3 style="color:var(--clr-accent,#C44B1C);font-family:var(--font-display),serif;margin-bottom:0.5rem;">AI Menüler Şu An Hazırlanamıyor</h3>
+            <p style="color:var(--clr-text-muted,#888);font-size:0.88rem;margin-bottom:1.25rem;">Sunucuya bağlanılamadı. Lütfen birkaç saniye sonra tekrar deneyin.</p>
+            <button onclick="window.fetchDailyMenu()" style="background:var(--clr-accent,#C44B1C);color:#fff;border:none;padding:0.6rem 1.5rem;border-radius:0.75rem;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit;">🔄 Tekrar Dene</button>
+          </div>`;
       }
     }
 
-    fetchDailyMenu();
+    function _buildAndRenderMenuCards(menuler) {
+      const today = MENU_TODAY;
+      const parseCal = (val) => {
+        if (!val) return 0;
+        const num = parseInt(String(val).replace(/[^0-9]/g, ''));
+        return isNaN(num) ? 0 : num;
+      };
+      const menuCards = menuler.map(menu => ({
+        id: 5000 + menu.id,
+        title: `Menü Seçeneği ${menu.id}`,
+        desc: `🥣 ${menu.baslangic} &nbsp;·&nbsp; 🥘 ${menu.ana_yemek} &nbsp;·&nbsp; 🍰 ${menu.tatli}`,
+        image: menu.gorseller?.ana_yemek_foto || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
+        time: menu.hazirlik_suresi || '45 dk',
+        difficulty: menu.zorluk || 'Orta',
+        calories: parseCal(menu.kaloriler?.baslangic_kalori)
+                + parseCal(menu.kaloriler?.ana_yemek_kalori)
+                + parseCal(menu.kaloriler?.tatli_kalori),
+        score: _menuScore(menu.id),
+        tags: ['Tam Menü'],
+        emoji: '✨',
+        ingredients: menu.eksik_malzemeler || [],
+        _raw: menu
+      }));
+      localStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ date: today, menuCards }));
+      window._aiMenuCards = menuCards;
+      renderMenuGrid('dailyCards', menuCards);
+    }
 
+    // fetchDailyMenu'yu window scope'a al ki retry butonu erişebilsin
+    window.fetchDailyMenu = fetchDailyMenu;
+    fetchDailyMenu();
     // ─── GÜNLÜK DEĞİŞEN TARİF SEÇİMİ FONKSİYONU ───
     // MOCK_RECIPES henüz boş olabilir; bu yüzden 'smartrec:recipes-ready'
     // event'ini dinleyerek tetikliyoruz. Event zaten geldiyse (sayfa geç yüklendiyse)

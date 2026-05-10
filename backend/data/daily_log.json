@@ -1,14 +1,16 @@
 {
-  "gunluk_kayitlar": [
-    {
-      "tarih": "2026-04-20",
-      "yemek": "Kuru Fasulye",
-      "kalori": 600
-    },
-    {
-      "tarih": "2026-05-07",
-      "yemek": "Fırında Sebzeli İzmir Köfte ve Pirinç Pilavı",
-      "kalori": 300
-    }
-  ]
+  "gunluk_kayitlar": {
+    "sali@gmail.com": [
+      {
+        "tarih": "2026-05-10",
+        "yemek": "menemen",
+        "kalori": 240
+      },
+      {
+        "tarih": "2026-05-10",
+        "yemek": "mercimek çorbası",
+        "kalori": 300
+      }
+    ]
+  }
 }
