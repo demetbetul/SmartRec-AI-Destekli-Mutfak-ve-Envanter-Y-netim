@@ -66,10 +66,6 @@ window.addEventListener('smartrec:auth-change', () => {
   });
 });
 
-// ─── Veri yükleme ─────────────────────────────────────────────────────────────
-// MOCK_RECIPES dışarıdan okunabilir ama asla senkron erişilmemeli.
-// Veriler yüklenince 'smartrec:recipes-ready' event'i fırlatılır.
-// Sayfalar bu event'i dinleyerek renderlarını tetiklemeli.
 export let MOCK_RECIPES = [];
 
 /** Backend'den tarif çeker. Başarısız olursa ../data/recipes.json'a düşer. */

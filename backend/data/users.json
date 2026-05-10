@@ -2,7 +2,6 @@
   {
     "ad": "Duygu Güldali",
     "email": "guldaliduygu123@gmail.com",
-<<<<<<< Updated upstream
     "password": "scrypt:32768:8:1$RcyzwSeULcSVEbld$58c78374e778c79e586f6299f1ddfb2e65991e8fb827b78be89a948391c2181e50687e15ca5fb7a76f173bfa7e762bdb60f468acf808bdbca09cb5444b20aa1c"
   },
   {
@@ -29,8 +28,5 @@
     "ad": "saliha",
     "email": "saliha@gmail.com",
     "password": "scrypt:32768:8:1$GU8Z8tUVCNt45nRL$fa283d111bbca8b581bf96ace4f8f46c9f5c2bd136fec324b8b7a3b2cd2443cb73e133b3ebb3e8c77eefb3e374521aa31baafc4b61b62bc907593c2b6350a1e1"
-=======
-    "password": "scrypt:32768:8:1$B9Joq5eyDKns289y$f423fdc8a1c1c4f303da2eb75d21dc20ea37de35971308c2e33a9ced0dddbad42ce8bb88cb01c4aa47e9ac464428da1ee3f8f635032abf0c7b57d129c95d9385"
->>>>>>> Stashed changes
   }
 ]
