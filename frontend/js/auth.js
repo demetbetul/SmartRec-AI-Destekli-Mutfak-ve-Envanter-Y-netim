@@ -10,7 +10,10 @@ export const Auth = {
   isLoggedIn() { return !!this.getUser(); },
 
   login(userData) {
-    localStorage.setItem(LS_USER, JSON.stringify(userData));
+    const current = localStorage.getItem(LS_USER);
+    const next = JSON.stringify(userData);
+    if (current === next) return; // ← Değişiklik yoksa event atma!
+    localStorage.setItem(LS_USER, next);
     window.dispatchEvent(new CustomEvent('smartrec:auth-change', { detail: { user: userData } }));
   },
 

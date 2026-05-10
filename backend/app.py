@@ -49,6 +49,8 @@ from data_manager import (
     veri_yedekle,
     # ── Gemini menü (özel menü endpoint'i için) ───────────
     get_recipes_from_gemini,
+    # ── Envantere özel AI öneri (remzi.html sağ kart) ────
+    envanter_icin_ai_tarif_oner,
 )
 
 app = Flask(__name__)
@@ -561,6 +563,27 @@ def create_backup():
     veri_yedekle()
     return jsonify({"success": True,
                     "message": "Veriler başarıyla yedeklendi"}), 201
+
+
+# ==================== ENVANTERE ÖZEL AI ÖNERİSİ (remzi.html sağ kart) ====================
+@app.route('/api/inventory/strict-suggestions', methods=['GET'])
+@handle_errors
+def get_inventory_suggestions():
+    """
+    Kullanıcının envanterindeki malzemelere göre Gemini'den
+    ana yemek + çorba + tatlı önerir.
+    remzi.html'deki fetchInventorySuggestions() bu endpoint'i çağırır.
+    """
+    user_email = request.args.get('email', '').strip()
+    if not user_email:
+        return jsonify({"success": False, "error": "Email parametresi gerekli"}), 400
+
+    tarifler = envanter_icin_ai_tarif_oner(user_email)
+
+    if not tarifler:
+        return jsonify({"success": False, "data": [], "message": "Öneri üretilemedi"}), 200
+
+    return jsonify({"success": True, "data": tarifler}), 200
 
 
 # ==================== AI SOHBET (Remzi) ====================

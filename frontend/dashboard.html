@@ -506,8 +506,41 @@
       if (e.key === 'Enter') document.getElementById('addShopBtn').click();
     });
     document.getElementById('clearCheckedShopBtn')?.addEventListener('click', () => {
-      saveShop(getShop().filter(i => !i.checked));
+      const all     = getShop();
+      const checked = all.filter(i => i.checked);
+      const rest    = all.filter(i => !i.checked);
+
+      if (!checked.length) { _toast('İşaretli ürün yok.', 'warn'); return; }
+
+      // İşaretlileri envantere ekle
+      const inv = getInv();
+      checked.forEach(shopItem => {
+        const ad = shopItem.ad.trim();
+        const existing = inv.find(i => i.ad.toLowerCase() === ad.toLowerCase());
+        if (existing) {
+          existing.miktar = (existing.miktar || 1) + 1; // zaten varsa miktarı artır
+        } else {
+          inv.push({ id: Date.now() + Math.random(), ad, miktar: 1, skt: '' });
+        }
+      });
+      saveInv(inv);
+      renderInventory();
+      window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
+
+      // Backend'e de yaz
+      if (user?.email) {
+        checked.forEach(shopItem => {
+          fetch('http://localhost:5000/api/inventory/add', {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify({ email: user.email, ad: shopItem.ad.trim(), miktar: 1, tuketim_suresi: 7 })
+          }).catch(() => {});
+        });
+      }
+
+      saveShop(rest);
       renderShopping();
+      _toast(`✅ ${checked.length} ürün envantere eklendi.`, 'success');
     });
 
     // ── ALIŞVERİŞ LİSTESİ PNG İNDİR ─────────────────────────────────

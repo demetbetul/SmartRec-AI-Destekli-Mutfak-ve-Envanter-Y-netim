@@ -423,8 +423,9 @@
 
     // ─── SAĞ KART: Envantere Özel Menü (günlük cache + mock fallback) ──────────
     const invEl = document.getElementById('remziInvList');
-    const INV_CACHE_KEY  = 'smartrec_inv_suggestions_cache';
-    const INV_CACHE_DATE = 'smartrec_inv_suggestions_date';
+    const _userSlug = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
+    const INV_CACHE_KEY  = `smartrec_inv_suggestions_cache${_userSlug}`;
+    const INV_CACHE_DATE = `smartrec_inv_suggestions_date${_userSlug}`;
 
     function renderInventoryCards(recipes) {
       if (!invEl) return;
@@ -452,7 +453,14 @@
       let cards = [];
       if (inv.length) {
         const matched = MOCK_RECIPES
-          .map(r => ({ ...r, matchCount: r.ingredients.filter(ing => inv.some(n => n.includes(ing.toLowerCase()))).length }))
+          .map(r => ({
+            ...r,
+            matchCount: r.ingredients.filter(ing => {
+              const ingLow = ing.toLowerCase();
+              // Her iki yönde kontrol: "yumurta" ↔ "3 adet yumurta"
+              return inv.some(n => n.includes(ingLow) || ingLow.includes(n));
+            }).length
+          }))
           .filter(r => r.matchCount > 0)
           .sort((a, b) => b.matchCount - a.matchCount);
         const pick = (tag) => matched.find(r => r.tags.includes(tag));
@@ -484,6 +492,10 @@
             return;
           } catch { /* bozuksa devam */ }
         }
+      } else {
+        // Yenile butonuna basıldıysa eski cache'i sil
+        localStorage.removeItem(INV_CACHE_KEY);
+        localStorage.removeItem(INV_CACHE_DATE);
       }
 
       invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Öneriler yükleniyor... 🍳</p>';

@@ -799,6 +799,92 @@ def sifir_ekstra_malzemeli_oneri(user_email=None):
         print(f"❌ Sıfır Ekstra Malzeme Hatası: {e}")
         return []
 
+# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
+def envanter_icin_ai_tarif_oner(user_email=None):
+    """
+    Kullanıcının envanterindeki malzemelere göre Gemini'den
+    ana yemek, çorba ve tatlı önerir.
+    remzi.html'deki menu-card-h formatıyla uyumlu obje listesi döndürür:
+    [{ id, title, image, time, calories, tags, tagLabels, ingredients, score }]
+    """
+    malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
+
+    if not malzemeler_listesi:
+        malzemeler_metni = "temel ev malzemeleri (un, yağ, yumurta, soğan, domates)"
+    else:
+        malzemeler_metni = ", ".join(malzemeler_listesi)
+
+    model  = genai.GenerativeModel('gemini-2.5-flash')
+    prompt = f"""
+Sen Türk mutfağı uzmanı bir şefsin. Kullanıcının dolabında şu malzemeler var: {malzemeler_metni}
+
+Bu malzemeleri kullanarak 3 farklı tarif öner: bir ANA YEMEK, bir ÇORBA ve bir TATLI.
+Mümkün olduğunca bu malzemeleri kullan ama temel mutfak malzemeleri (tuz, su, yağ vb.) varsayılan olabilir.
+
+Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
+[
+  {{
+    "title": "Tarif Adı",
+    "category": "ana-menu",
+    "time": "30 dk",
+    "calories": 450,
+    "score": "9.2",
+    "ingredients": ["malzeme1", "malzeme2"]
+  }},
+  {{
+    "title": "Çorba Adı",
+    "category": "corba",
+    "time": "20 dk",
+    "calories": 180,
+    "score": "8.8",
+    "ingredients": ["malzeme1", "malzeme2"]
+  }},
+  {{
+    "title": "Tatlı Adı",
+    "category": "tatli",
+    "time": "25 dk",
+    "calories": 320,
+    "score": "9.0",
+    "ingredients": ["malzeme1", "malzeme2"]
+  }}
+]
+"""
+    KATEGORI_LABEL = {
+        'ana-menu': '🍽️ Ana Yemek',
+        'corba':    '🍲 Çorba',
+        'tatli':    '🍮 Tatlı',
+    }
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(response_mime_type="application/json")
+        )
+        tarifler = json.loads(response.text)
+
+        # Fotoğraf ekle ve frontend formatına dönüştür
+        result = []
+        for i, t in enumerate(tarifler):
+            cat = t.get("category", "ana-menu")
+            result.append({
+                "id":         -(i + 1),          # negatif id → AI üretimi olduğu belli olur
+                "title":      t.get("title", "Tarif"),
+                "image":      yemek_fotografi_bul(t.get("title", "")),
+                "time":       t.get("time", "30 dk"),
+                "calories":   t.get("calories", 400),
+                "score":      t.get("score", "9.0"),
+                "tags":       [cat],
+                "tagLabels":  [KATEGORI_LABEL.get(cat, "🍽️ Öneri")],
+                "ingredients": t.get("ingredients", []),
+                "desc":       f"Envanterinize göre AI önerisi"
+            })
+        return result
+
+    except Exception as e:
+        logging.error(f"Envanter AI tarif hatası: {e}")
+        return []
+
+
 # ─── Entry point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     kullanici_dolabi = ["kıyma", "soğan", "sarımsak", "domates salçası", "makarna"]
