@@ -195,7 +195,13 @@
     const LS_CAL   = `smartrec_calories_log${_userSuffix()}`;  
     const LS_GOAL  = 'smartrec_cal_goal';
 
-    function getInv()   { try { return JSON.parse(localStorage.getItem(LS_INV())  || '[]'); } catch { return []; } }
+   function getInv() { 
+  try { 
+    let items = JSON.parse(localStorage.getItem(LS_INV()) || '[]'); 
+    // 🌟 SIFIR OLANLARI HER ZAMAN FİLTRELE
+    return items.filter(i => Number(i.miktar) > 0);
+  } catch { return []; } 
+}
     function saveInv(d) { localStorage.setItem(LS_INV(),  JSON.stringify(d)); }
     function getShop()  { try { return JSON.parse(localStorage.getItem(LS_SHOP()) || '[]'); } catch { return []; } }
     function saveShop(d) {
@@ -796,12 +802,15 @@
         .then(data => {
           if (data.success && Array.isArray(data.envanter) && data.envanter.length > 0) {
             // Backend verisini localStorage formatına dönüştür ve kaydet
-            const backendItems = data.envanter.map((item, i) => ({
-              id   : item.id || (Date.now() + i),
-              ad   : item.ad,
-              miktar: item.miktar,
-              skt  : item.skt || ''
-            }));
+            // 🌟 BURADA DA 0 OLANLARI FİLTRELEYİP ÇÖPE ATIYORUZ
+            const backendItems = data.envanter
+              .filter(item => Number(item.miktar) > 0)
+              .map((item, i) => ({
+                id   : item.id || (Date.now() + i),
+                ad   : item.ad,
+                miktar: item.miktar,
+                skt  : item.skt || ''
+              }));
             saveInv(backendItems);
             renderInventory();
           }
