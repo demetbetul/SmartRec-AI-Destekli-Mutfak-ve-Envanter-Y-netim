@@ -806,76 +806,78 @@ def sifir_ekstra_malzemeli_oneri(user_email=None):
         return []
 
 # ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
+# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
+# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
 def envanter_icin_ai_tarif_oner(user_email=None):
-    """
-    Kullanıcının envanterindeki malzemelere göre Gemini'den tamamen özgür ve serbest tarifler önerir.
-    """
-    try:
-        # Malzemeleri çek ve TEK SATIRDA güvenli bir şekilde metne çevir. 
-        # (Eğer list boşsa direkt temel malzemeleri yaz)
-        malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
-        malzemeler_metni = ", ".join(malzemeler_listesi) if malzemeler_listesi else "temel ev malzemeleri (un, yağ, yumurta, soğan, domates)"
+    malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
 
-        model  = genai.GenerativeModel('gemini-2.5-flash')
-        prompt = f"""
-Sen inanılmaz yaratıcı ve pratik bir şefsin. Kullanıcının dolabında SADECE şu malzemeler var: {malzemeler_metni}
+    if not malzemeler_listesi:
+        return []
 
-Dışarıdan ekstra hiçbir malzeme satın almayı gerektirmeyecek, TAMAMEN eldeki malzemelerle (tuz, yağ, su gibi temel şeyler hariç) yapılabilecek 3 FARKLI RASTGELE TARİF öner. 
-Bu tarifler herhangi bir türde olabilir: Kahvaltılık, Atıştırmalık, Meze, Salata, Ana Yemek, Tatlı, İçecek vs. Hiçbir kategori sınırın yok!
+    malzemeler_metni = ", ".join(malzemeler_listesi)
 
-Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma. 'kategori_adi' kısmına yemeğin türünü (Örn: Salata, Atıştırmalık, Sıcak Başlangıç) kendin yaratıcı bir şekilde yaz:
+    model  = genai.GenerativeModel('gemini-2.5-flash')
+    prompt = f"""
+Sen Türk mutfağı uzmanı bir şefsin. Kullanıcının dolabında şu malzemeler var: {malzemeler_metni}
+
+Bu malzemeleri kullanarak 3 farklı tarif öner: bir ANA YEMEK, bir ÇORBA ve bir TATLI.
+Mümkün olduğunca bu malzemeleri kullan ama temel mutfak malzemeleri (tuz, su, yağ vb.) varsayılan olabilir.
+
+Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
 [
   {{
     "title": "Tarif Adı",
-    "kategori_adi": "Atıştırmalık",
-    "time": "15 dk",
-    "calories": 180,
-    "score": "9.2",
-    "ingredients": ["malzeme1", "malzeme2"]
-  }},
-  {{
-    "title": "Tarif Adı 2",
-    "kategori_adi": "Ana Yemek",
+    "category": "ana-menu",
     "time": "30 dk",
     "calories": 450,
-    "score": "8.8",
-    "ingredients": ["malzeme1", "malzeme2"]
-  }},
-  {{
-    "title": "Tarif Adı 3",
-    "kategori_adi": "Meze",
-    "time": "10 dk",
-    "calories": 150,
-    "score": "9.0",
-    "ingredients": ["malzeme1", "malzeme2"]
+    "score": "9.2",
+    "ingredients": ["malzeme1", "malzeme2"],
+    "steps": ["1. Adım...", "2. Adım...", "3. Adım..."] 
   }}
 ]
 """
+    KATEGORI_LABEL = {
+        'ana-menu': '🍽️ Ana Yemek',
+        'corba':    '🍲 Çorba',
+        'tatli':    '🍮 Tatlı',
+    }
+
+    try:
         response = model.generate_content(
             prompt,
             generation_config=genai.GenerationConfig(response_mime_type="application/json")
         )
+        
+        import json
+        import time
         tarifler = json.loads(response.text)
 
         result = []
+        base_id = int(time.time()) # ✅ ÇÖZÜM 1: HER TARİFE EŞSİZ KİMLİK!
+        
         for i, t in enumerate(tarifler):
-            cat_name = t.get("kategori_adi", "Öneri")
+            cat = t.get("category", "ana-menu")
+            
+            # ✅ ÇÖZÜM 2: YAPAY ZEKA İSİM DEĞİŞTİRİRSE HEPSİNİ YAKALA
+            adims = t.get("steps") or t.get("adimlar") or t.get("yapilisi") or t.get("hazirlanis") or ["1. Tüm malzemeleri hazırlayın.", "2. Afiyetle tüketin."]
+            
             result.append({
-                "id":         -(i + 1),
+                "id":         -(base_id + i), # Asla çakışmayan ID
                 "title":      t.get("title", "Tarif"),
                 "image":      yemek_fotografi_bul(t.get("title", "")),
                 "time":       t.get("time", "30 dk"),
                 "calories":   t.get("calories", 400),
                 "score":      t.get("score", "9.0"),
-                "tags":       ["ai-oneri"],
-                "tagLabels":  [f"💡 {cat_name}"],
-                "ingredients": t.get("ingredients", []),
-                "desc":       "Envanterinize göre AI önerisi"
+                "tags":       [cat],
+                "tagLabels":  [KATEGORI_LABEL.get(cat, "🍽️ Öneri")],
+                "ingredients": t.get("ingredients") or t.get("malzemeler") or [],
+                "steps":      adims, # Garantiye alınmış adımlar
+                "desc":       f"Envanterinize göre AI önerisi"
             })
         return result
 
     except Exception as e:
-        print(f"🔥 KESİN HATA DETAYI: {e}")
+        logging.error(f"Envanter AI tarif hatası: {e}")
         return []
 
 

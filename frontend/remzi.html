@@ -175,7 +175,6 @@
     </section>
 
     <div class="remzi-grid">
-      <!-- SOL KART: Sana Özel Menü (AI YOK — DB'den rastgele) -->
       <section class="remzi-panel">
         <div class="remzi-panel__header">
           <h3>🎲 Sana Özel Menü</h3>
@@ -188,7 +187,6 @@
         </div>
       </section>
 
-      <!-- SAĞ KART: Envantere Özel Menü (AI önerisi) -->
       <section class="remzi-panel">
         <div class="remzi-panel__header">
           <h3>🧊 Envantere Özel Tarifler</h3>
@@ -232,7 +230,6 @@
     const firstName = (user?.ad || user?.name || 'Kullanıcı').trim().split(' ')[0];
 
     if (!isLoggedIn) {
-      // Misafir modu — chat alanını gate ile değiştir
       document.getElementById('chatToolbar').style.display = 'none';
       document.getElementById('quickPromptsRow').style.display = 'none';
       document.getElementById('chatInputRow').style.display = 'none';
@@ -250,11 +247,9 @@
           </div>
         </div>`;
     } else {
-      // Giriş yapılmış — chat aktif
       const chatBody = document.getElementById('remziChatBody');
       const userInput = document.getElementById('remziPageInput');
       const sendBtn = document.getElementById('remziPageSend');
-      // remzi.html içindeki mevcut chatContext satırını bul ve şununla değiştir:
       let chatContext = "Senin adın Remzi, SmartRec'in samimi ve enerjik mutfak asistanısın. \n\nÇOK ÖNEMLİ KURAL: Eğer kullanıcı sadece 'Selam', 'Merhaba', 'Nasılsın' gibi sohbet başlatıcı şeyler yazdıysa KESİNLİKLE hemen yemek tarifi verme! Sadece sıcak bir şekilde selamını al ve 'Selam! Bugün mutfakta sana nasıl yardımcı olabilirim, ne pişirelim?' gibi doğal bir soru sor. \n\nSADECE kullanıcı açıkça yemek önerisi istediğinde veya 'Ne pişireyim?' dediğinde tarif sun. Tarif verirken de hep aynı şeyleri tekrarlama, yaratıcı alternatifler üret. \n\nÇOK ÖNEMLİ: Eğer sana gönderilen envanter listesi boşsa, 'Envanterin şu an boş' de ve tarif verme. Sadece envanterdeki malzemeleri kullan, olmayanları varmış gibi hayal etme!\n\nAşağıdaki sohbet geçmişine bakarak doğal bir sohbet sürdür:\n\n";
 
       function _appendMsg(text, type) {
@@ -266,7 +261,6 @@
         chatBody.scrollTop = chatBody.scrollHeight;
         return wrap;
       }
-      
       
       async function handleChat(msgText) {
         const text = typeof msgText === 'string' ? msgText : '';
@@ -294,7 +288,6 @@
           if (typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
           const botReply = data.reply || data.cevap || 'Bir yanıt alınamadı.';
           
-          // 4. BOTUN VERDİĞİ CEVABI DA HAFIZAYA YAZ Kİ BİR SONRAKİNDE UNUTMASIN
           chatContext += "Remzi: " + botReply + "\n\n";
           
           _appendMsg(botReply.replace(/\n/g, '<br>'), 'bot');
@@ -316,7 +309,6 @@
       });
     }
 
-    // Her iki kart için ortak menu-card-h oluşturucu (recipe objesi alır)
     const createMenuCard = (recipe, categoryLabel) => `
       <div class="menu-card-h" data-id="${recipe.id}" style="cursor:pointer;">
         <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img"
@@ -329,16 +321,16 @@
         <div class="menu-card-h__arrow">›</div>
       </div>`;
 
-    // ─── SOL KART: Sana Özel Menü (AI YOK — DB'den rastgele, günlük sabit) ────
+    // ─── SOL KART: Sana Özel Menü (Günlük Sabit) ──────────────────────────────────
     const dailyEl = document.getElementById('remziDailyList');
-    const DAILY_CACHE_KEY    = 'smartrec_remzi_daily_cache';
-    const DAILY_CACHE_DATE   = 'smartrec_remzi_daily_date';
+    // ✅ ÇÖZÜM 3: Eski bozuk hafızayı patlatmak için anahtarı v2 yaptık!
+    const DAILY_CACHE_KEY    = 'smartrec_remzi_daily_v2_cache';
+    const DAILY_CACHE_DATE   = 'smartrec_remzi_daily_v2_date';
 
     function _todayStr() {
-      return new Date().toISOString().split('T')[0]; // "2025-05-09"
+      return new Date().toISOString().split('T')[0]; 
     }
 
-    // Deterministik pseudo-random: gün + seed string → sayı
     function _seededRandom(seed) {
       let h = 0;
       for (let i = 0; i < seed.length; i++) h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
@@ -365,23 +357,21 @@
     function renderDailyMenu(forceRefresh = false) {
       if (!dailyEl) return;
 
-      // Cache varsa MOCK_RECIPES beklenmeden aninda render
       if (!forceRefresh) {
         const cachedDate = localStorage.getItem(DAILY_CACHE_DATE);
         const cachedData = localStorage.getItem(DAILY_CACHE_KEY);
         if (cachedDate === _todayStr() && cachedData) {
           try {
-            const recipes = JSON.parse(cachedData); // tam obje: [{recipe, label}, ...]
+            const recipes = JSON.parse(cachedData);
             if (recipes.length) {
               dailyEl.innerHTML = recipes.map(r => createMenuCard(r.recipe, r.label)).join('');
               _attachDailyClicks();
-              return; // MOCK_RECIPES beklenmez
+              return; 
             }
-          } catch { /* bozuksa devam */ }
+          } catch { }
         }
       }
 
-      // MOCK_RECIPES henuz dolmamissa polling ile bekle
       if (!MOCK_RECIPES.length) {
         let attempts = 0;
         const poll = setInterval(() => {
@@ -407,7 +397,6 @@
       const corba = _pickSeeded(corbalar,    ana   ? [ana.id]   : [],              'corba' + refreshSalt);
       const tatli = _pickSeeded(tatlilar,    [ana?.id, corba?.id].filter(Boolean), 'tatli' + refreshSalt);
 
-      // Cache'e TAM OBJELERI kaydet — sonraki yukleme MOCK_RECIPES beklemez
       const toCache = [
         ana   ? { recipe: ana,   label: '🍽️ Ana Yemek' } : null,
         corba ? { recipe: corba, label: '🍲 Çorba'       } : null,
@@ -424,36 +413,45 @@
       _attachDailyClicks();
     }
 
-    // Yenile butonu: manuel guncelleme (forceRefresh=true)
     document.getElementById('refreshDailyBtn')?.addEventListener('click', () => renderDailyMenu(true));
-
-    // Sayfa yuklenince hemen calistir — cache varsa aninda, yoksa MOCK_RECIPES bekler
     renderDailyMenu(false);
 
-    // ─── SAĞ KART: Envantere Özel Menü (günlük cache + mock fallback) ──────────
+    // ─── SAĞ KART: Envantere Özel Menü (Yapay Zeka) ───────────────────────────────
     const invEl = document.getElementById('remziInvList');
     const _userSlug = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
-    const INV_CACHE_KEY  = `smartrec_inv_suggestions_cache${_userSlug}`;
-    const INV_CACHE_DATE = `smartrec_inv_suggestions_date${_userSlug}`;
+    // ✅ ÇÖZÜM 4: Eski bozuk AI hafızasını patlatmak için anahtarı v2 yaptık!
+    const INV_CACHE_KEY  = `smartrec_inv_v2_cache${_userSlug}`;
+    const INV_CACHE_DATE = `smartrec_inv_v2_date${_userSlug}`;
 
     function renderInventoryCards(recipes) {
       if (!invEl) return;
       const getLabel = (r) => {
-        if (r.tags.includes('corba'))    return '🍲 Çorba';
-        if (r.tags.includes('tatli'))    return '🍮 Tatlı';
-        if (r.tags.includes('ana-menu')) return '🍽️ Ana Yemek';
+        if (r.tags && r.tags.includes('corba'))    return '🍲 Çorba';
+        if (r.tags && r.tags.includes('tatli'))    return '🍮 Tatlı';
+        if (r.tags && r.tags.includes('ana-menu')) return '🍽️ Ana Yemek';
         return r.tagLabels?.[0] || '🧊 Envanter Önerisi';
       };
       invEl.innerHTML = recipes.map(r => createMenuCard(r, getLabel(r))).join('');
+      
       invEl.querySelectorAll('.menu-card-h').forEach(card => {
         card.addEventListener('click', () => {
           const id = Number(card.dataset.id);
+          
+          const aiRecipe = recipes.find(x => x.id === id);
+          if (aiRecipe) {
+            const existingIdx = MOCK_RECIPES.findIndex(x => x.id === id);
+            if (existingIdx !== -1) {
+              MOCK_RECIPES[existingIdx] = aiRecipe; 
+            } else {
+              MOCK_RECIPES.push(aiRecipe);
+            }
+          }
+          
           openRemziRecipeDetail(id);
         });
       });
     }
 
-    // Envanterden mock öneri üret (backend olmasa da çalışır)
     function _mockInventorySuggestions() {
       const suffix = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
       const invKey = `smartrec_inventory${suffix}`;
@@ -462,30 +460,37 @@
       
       if (inv.length === 0) return [];
 
-      // Evde her zaman bulunduğu varsayılan temel malzemeler (Eksik sayılmazlar)
-      const temelMalzemeler = ['tuz', 'su', 'yağ', 'zeytinyağı', 'sıvı yağ', 'karabiber', 'pul biber', 'şeker',];
+      const temelMalzemeler = ['tuz', 'su', 'yağ', 'zeytinyağı', 'sıvı yağ', 'karabiber', 'pul biber', 'şeker'];
 
       const tamUyanlar = MOCK_RECIPES.filter(r => {
-      const recipeIngredients = r.ingredients || []; 
-      if (recipeIngredients.length === 0) return false;
+        const recipeIngredients = r.ingredients || []; 
+        if (recipeIngredients.length === 0) return false;
 
-    // Her bir malzeme için kontrol: Bende var mı yoksa temel bir ürün mü?
-      return recipeIngredients.every(ing => {
-       const ingLow = ing.toLowerCase().trim();
-       const bendeVar = inv.some(n => ingLow.includes(n) || n.includes(ingLow));
-       const temelMutfakUrunu = temelMalzemeler.some(t => ingLow.includes(t));
-      
-       return bendeVar || temelMutfakUrunu; // Sadece ikisinden biriyse tarif geçerli
+        return recipeIngredients.every(ing => {
+         const ingLow = ing.toLowerCase().trim();
+         const bendeVar = inv.some(n => ingLow.includes(n) || n.includes(ingLow));
+         const temelMutfakUrunu = temelMalzemeler.some(t => ingLow.includes(t));
+         return bendeVar || temelMutfakUrunu; 
+        });
       });
-    });
 
-    return tamUyanlar.sort(() => Math.random() - 0.5).slice(0, 3);
- }
+      return tamUyanlar.sort(() => Math.random() - 0.5).slice(0, 3);
+    }
 
     async function fetchInventorySuggestions(forceRefresh = false) {
       if (!invEl) return;
       if (!isLoggedIn) {
         invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Öneriler için giriş yapın.</p>';
+        return;
+      }
+
+      if (getInventory().length === 0) {
+        invEl.innerHTML = `
+          <div style="padding:2.5rem 1.5rem; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:0.75rem;">🧊</div>
+            <b style="color:var(--clr-text); font-size:1.1rem; display:block; margin-bottom:0.5rem;">Envanterin Bomboş!</b>
+            <p style="color:#64748b; font-size:0.9rem; line-height:1.6;">Sana özel harika tarifler önerebilmem için lütfen yukarıdaki <b style="color:var(--clr-accent);">Düzenle →</b> butonuna basarak mutfağına malzeme ekle.</p>
+          </div>`;
         return;
       }
 
@@ -505,10 +510,9 @@
 
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 90000); // Bekleme süresi 20 saniyeye çıkarıldı
+        const timeout = setTimeout(() => controller.abort(), 90000); 
         const emailParam = user?.email ? `?email=${encodeURIComponent(user.email)}` : '';
         
-        // Akıllı tarifler için doğru API adresi kullanıldı
         const res = await fetch(`http://localhost:5000/api/inventory/ai-suggestions${emailParam}`, { signal: controller.signal });
         clearTimeout(timeout);
         const jsonRes = await res.json();
@@ -528,7 +532,7 @@
         localStorage.setItem(INV_CACHE_DATE, _todayStr());
         renderInventoryCards(cards);
       } else {
-        invEl.innerHTML = '<p style="padding:1.5rem;color:#64748b;font-size:0.9rem;text-align:center;"><b>Tam eşleşen tarif bulunamadı.</b><br><br>Dolabındaki malzemelerle (Domates, Patates, Yumurta vb.) harika şeyler yapabilirsin! Remzi\'ye "Elimdekilerle ne pişirebilirim?" diye sormayı dene.</p>';
+        invEl.innerHTML = '<p style="padding:1.5rem;color:#64748b;font-size:0.9rem;text-align:center;"><b>Tam eşleşen tarif bulunamadı.</b><br><br>Dolabındaki malzemelerle harika şeyler yapabilirsin! Remzi\'ye "Elimdekilerle ne pişirebilirim?" diye sormayı dene.</p>';
       }
     }
 
@@ -544,12 +548,10 @@
       drawer?.setAttribute('aria-hidden', 'false');
     });
 
-    // remzi.html'e özel: recipe detail sidebar açar (recipes.js openRecipeDetail ile aynı)
     window.openRemziRecipeDetail = function(recipeId) {
       openRecipeDetail(recipeId);
     };
 
-    // ─── KARTLARA TIKLAYINCA REMZİ'YE TARİF SORDURAN FONKSİYON ──────────────
     window.askRemziForRecipe = function(yemekAdi) {
       const input      = document.getElementById('remziPageInput');
       const sendBtn    = document.getElementById('remziPageSend');
