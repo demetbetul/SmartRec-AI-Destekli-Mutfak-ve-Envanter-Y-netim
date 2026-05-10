@@ -80,7 +80,31 @@
     "guldaliduygu123@gmail.com": [
       {
         "ad": "domates",
+        "miktar": 13,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "patates",
         "miktar": 6,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "soğan",
+        "miktar": 3,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "yumurta",
+        "miktar": 7,
+        "birim": "Adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "sucuk",
+        "miktar": 3,
         "birim": "Adet",
         "skt": "2026-05-17"
       }

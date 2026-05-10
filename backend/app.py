@@ -571,7 +571,7 @@ def create_backup():
 
 
 # ==================== ENVANTERE ÖZEL AI ÖNERİSİ (remzi.html sağ kart) ====================
-@app.route('/api/inventory/strict-suggestions', methods=['GET'])
+@app.route('/api/inventory/ai-suggestions', methods=['GET'])
 @handle_errors
 def get_inventory_suggestions():
     """

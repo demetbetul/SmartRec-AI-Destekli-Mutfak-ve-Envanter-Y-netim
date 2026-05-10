@@ -191,7 +191,7 @@
       <!-- SAĞ KART: Envantere Özel Menü (AI önerisi) -->
       <section class="remzi-panel">
         <div class="remzi-panel__header">
-          <h3>🧊 Envantere Özel Menü</h3>
+          <h3>🧊 Envantere Özel Tarifler</h3>
           <div style="display: flex; gap: 0.75rem; align-items: center;">
             <button id="refreshInvBtn" style="font-size:0.8rem; color:var(--clr-text-muted); font-weight:600; background:none; border:none; cursor:pointer;" title="Yeni tarifler üret">🔄 Yenile</button>
             <button id="openInventoryBtn" style="font-size:0.8rem; color:var(--clr-accent); font-weight:600; background:none; border:none; cursor:pointer;">Düzenle →</button>
@@ -455,34 +455,32 @@
 
     // Envanterden mock öneri üret (backend olmasa da çalışır)
     function _mockInventorySuggestions() {
-      // Kullanıcıya özel key — remzi.js ile aynı mantık
       const suffix = user?.email ? '_' + user.email.replace('@','_at_').replace(/\./g,'_') : '';
       const invKey = `smartrec_inventory${suffix}`;
-      const inv = JSON.parse(localStorage.getItem(invKey) || '[]').map(i => i.ad.toLowerCase());
-      let cards = [];
-      if (inv.length) {
-        const matched = MOCK_RECIPES
-          .map(r => ({
-            ...r,
-            matchCount: r.ingredients.filter(ing => {
-              const ingLow = ing.toLowerCase();
-              // Her iki yönde kontrol: "yumurta" ↔ "3 adet yumurta"
-              return inv.some(n => n.includes(ingLow) || ingLow.includes(n));
-            }).length
-          }))
-          .filter(r => r.matchCount > 0)
-          .sort((a, b) => b.matchCount - a.matchCount);
-        const pick = (tag) => matched.find(r => r.tags.includes(tag));
-        cards = [pick('ana-menu'), pick('corba'), pick('tatli')].filter(Boolean);
-      }
-      // Envanter boşsa veya eşleşme yoksa rastgele 3 tarif öner
-      if (!cards.length) {
-        const pool = [...MOCK_RECIPES].sort(() => _seededRandom(_todayStr() + 'inv') - 0.5);
-        const pick2 = (tag) => pool.find(r => r.tags.includes(tag));
-        cards = [pick2('ana-menu'), pick2('corba'), pick2('tatli')].filter(Boolean);
-      }
-      return cards;
-    }
+      const invData = JSON.parse(localStorage.getItem(invKey) || '[]');
+      const inv = invData.map(i => (i.ad || '').toLowerCase().trim());
+      
+      if (inv.length === 0) return [];
+
+      // Evde her zaman bulunduğu varsayılan temel malzemeler (Eksik sayılmazlar)
+      const temelMalzemeler = ['tuz', 'su', 'yağ', 'zeytinyağı', 'sıvı yağ', 'karabiber', 'pul biber', 'şeker',];
+
+      const tamUyanlar = MOCK_RECIPES.filter(r => {
+      const recipeIngredients = r.ingredients || []; 
+      if (recipeIngredients.length === 0) return false;
+
+    // Her bir malzeme için kontrol: Bende var mı yoksa temel bir ürün mü?
+      return recipeIngredients.every(ing => {
+       const ingLow = ing.toLowerCase().trim();
+       const bendeVar = inv.some(n => ingLow.includes(n) || n.includes(ingLow));
+       const temelMutfakUrunu = temelMalzemeler.some(t => ingLow.includes(t));
+      
+       return bendeVar || temelMutfakUrunu; // Sadece ikisinden biriyse tarif geçerli
+      });
+    });
+
+    return tamUyanlar.sort(() => Math.random() - 0.5).slice(0, 3);
+ }
 
     async function fetchInventorySuggestions(forceRefresh = false) {
       if (!invEl) return;
@@ -491,48 +489,46 @@
         return;
       }
 
-      // Günlük cache kontrolü
-      if (!forceRefresh) {
+      if (forceRefresh) {
+        localStorage.removeItem(INV_CACHE_KEY);
+        localStorage.removeItem(INV_CACHE_DATE);
+      } else {
         const cachedDate = localStorage.getItem(INV_CACHE_DATE);
         const cachedData = localStorage.getItem(INV_CACHE_KEY);
         if (cachedDate === _todayStr() && cachedData) {
-          try {
-            renderInventoryCards(JSON.parse(cachedData));
-            return;
-          } catch { /* bozuksa devam */ }
-        }
-      } else {
-        // Yenile butonuna basıldıysa eski cache'i sil
-        localStorage.removeItem(INV_CACHE_KEY);
-        localStorage.removeItem(INV_CACHE_DATE);
-      }
-
-      invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Öneriler yükleniyor... 🍳</p>';
-
-      // Önce backend'i dene (3 saniye timeout)
-      try {
-        const controller = new AbortController();
-        const timeout    = setTimeout(() => controller.abort(), 3000);
-        const emailParam = user?.email ? `?email=${encodeURIComponent(user.email)}` : '';
-        const res  = await fetch(`http://localhost:5000/api/inventory/strict-suggestions${emailParam}`, { signal: controller.signal });
-        clearTimeout(timeout);
-        const data = await res.json();
-        if (data.success && data.data && data.data.length > 0) {
-          localStorage.setItem(INV_CACHE_KEY,  JSON.stringify(data.data));
-          localStorage.setItem(INV_CACHE_DATE, _todayStr());
-          renderInventoryCards(data.data);
+          renderInventoryCards(JSON.parse(cachedData));
           return;
         }
-      } catch { /* backend kapalı veya timeout — mock'a geç */ }
+      }
 
-      // Mock fallback
+      invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Şahsi dolabına göre tarifler aranıyor... 🍳</p>';
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90000); // Bekleme süresi 20 saniyeye çıkarıldı
+        const emailParam = user?.email ? `?email=${encodeURIComponent(user.email)}` : '';
+        
+        // Akıllı tarifler için doğru API adresi kullanıldı
+        const res = await fetch(`http://localhost:5000/api/inventory/ai-suggestions${emailParam}`, { signal: controller.signal });
+        clearTimeout(timeout);
+        const jsonRes = await res.json();
+        
+        if (jsonRes.success && Array.isArray(jsonRes.data) && jsonRes.data.length > 0) {
+          localStorage.setItem(INV_CACHE_KEY, JSON.stringify(jsonRes.data));
+          localStorage.setItem(INV_CACHE_DATE, _todayStr());
+          renderInventoryCards(jsonRes.data);
+          return;
+        }
+      } catch (e) { console.warn("AI Yanıt Vermedi, Yerel Listeye Bakılıyor."); }
+
       const cards = _mockInventorySuggestions();
-      if (cards.length) {
-        localStorage.setItem(INV_CACHE_KEY,  JSON.stringify(cards));
+      
+      if (cards.length > 0) {
+        localStorage.setItem(INV_CACHE_KEY, JSON.stringify(cards));
         localStorage.setItem(INV_CACHE_DATE, _todayStr());
         renderInventoryCards(cards);
       } else {
-        invEl.innerHTML = '<p style="padding:1rem;color:#888;font-size:0.9rem;text-align:center;">Envanter boş — malzeme ekleyerek öneri alın.</p>';
+        invEl.innerHTML = '<p style="padding:1.5rem;color:#64748b;font-size:0.9rem;text-align:center;"><b>Tam eşleşen tarif bulunamadı.</b><br><br>Dolabındaki malzemelerle (Domates, Patates, Yumurta vb.) harika şeyler yapabilirsin! Remzi\'ye "Elimdekilerle ne pişirebilirim?" diye sormayı dene.</p>';
       }
     }
 
