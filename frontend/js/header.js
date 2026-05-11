@@ -104,10 +104,21 @@ export function renderChatbot() {
   </div>
 
   <!-- Envanter Paneli -->
-  <div class="drawer__panel" id="tabInventory">
+ <div class="drawer__panel" id="tabInventory">
     <div class="drawer__add-row">
       <input type="text"   id="invItemName"   placeholder="Malzeme adı"  class="drawer-input" />
-      <input type="number" id="invItemQty"    placeholder="Adet"         class="drawer-input drawer-input--sm" min="1" />
+      
+      <input type="number" id="invItemQty" placeholder="Miktar" class="drawer-input drawer-input--sm" min="1" style="max-width:70px; padding:0.4rem;" />
+      <select id="invItemUnit" class="drawer-input drawer-input--sm" style="max-width:80px; padding:0.4rem; cursor:pointer;">
+        <option value="adet">Adet</option>
+        <option value="gr">Gram</option>
+        <option value="kg">Kg</option>
+        <option value="ml">Mililitre</option>
+        <option value="lt">Litre</option>
+        <option value="paket">Paket</option>
+        <option value="demet">Demet</option>
+      </select>
+
       <input type="date"   id="invItemExpiry"                             class="drawer-input" />
       <button class="btn btn--primary btn--sm" id="addInventoryBtn">Ekle</button>
     </div>

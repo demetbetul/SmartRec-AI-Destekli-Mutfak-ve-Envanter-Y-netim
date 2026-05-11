@@ -25,10 +25,8 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # ─── Merkezi dizin tanımları ───────────────────────────────────────────────────
-# Kural 1: Tek DATA_DIR. Tüm yollar buradan türetilir; başka hiçbir yerde
-# sabit dosya yolu yoktur.
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR   = os.path.join(BASE_DIR, 'data')          # backend/data klasörü
+DATA_DIR   = os.path.join(BASE_DIR, 'data')          
 BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
 
 os.makedirs(DATA_DIR,   exist_ok=True)
@@ -42,17 +40,15 @@ logging.basicConfig(
 )
 
 # ─── Dosya şablonları ──────────────────────────────────────────────────────────
-# Kural 3: Merkezi JSON yapısı. inventory ve daily_log artık tüm kullanıcıları
-# e-posta anahtarıyla tek dosyada tutar.
 DOSYA_SABLONLARI = {
-    "inventory.json":  {"envanterler": {}},     # {"envanterler": {"user@mail.com": [...]}}
-    "daily_log.json":  {"gunluk_kayitlar": {}},  # {"gunluk_kayitlar": {"user@mail.com": [...]}}
+    "inventory.json":  {"envanterler": {}},    
+    "daily_log.json":  {"gunluk_kayitlar": {}}, 
     "recipes.json":    [],
     "nutrition.json":  {},
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# KURAL 4 — Fail-Safe: Dosya garantisi
+# — Fail-Safe: Dosya garantisi
 # ─────────────────────────────────────────────────────────────────────────────
 def dosyayi_garantile(dosya_adi: str) -> str:
     """
@@ -67,7 +63,7 @@ def dosyayi_garantile(dosya_adi: str) -> str:
     return yol
 
 # ─────────────────────────────────────────────────────────────────────────────
-# KURAL 5 — DRY: Merkezi JSON okuma / yazma yardımcıları
+# — DRY: Merkezi JSON okuma / yazma yardımcıları
 # ─────────────────────────────────────────────────────────────────────────────
 def load_json(dosya_adi: str) -> dict:
     """Dosyayı garantileyip içeriğini döndürür."""
@@ -101,7 +97,7 @@ def save_json(dosya_adi: str, veri) -> bool:
 #                 Her dosya için en fazla MAX_YEDEK_SAYISI yedek tutulur;
 #                 eskiler otomatik silinir.
 # ─────────────────────────────────────────────────────────────────────────────
-MAX_YEDEK_SAYISI = 3   # Her dosya için tutulacak maksimum yedek adedi
+MAX_YEDEK_SAYISI = 3  
 
 def _kritik_yedek_al(dosya_adi: str) -> None:
     """
@@ -116,11 +112,10 @@ def _kritik_yedek_al(dosya_adi: str) -> None:
         return
     try:
         zaman_damgasi = datetime.now().strftime("%Y%m%d_%H%M%S")
-        kok           = dosya_adi.split('.')[0]              # "inventory"
+        kok           = dosya_adi.split('.')[0]           
         yedek_adi     = f"{kok}_{zaman_damgasi}.json"
         shutil.copy2(kaynak, os.path.join(BACKUP_DIR, yedek_adi))
 
-        # Bu dosyaya ait tüm yedekleri tarihe göre sırala; fazlasını sil
         tum_yedekler = sorted(
             f for f in os.listdir(BACKUP_DIR)
             if f.startswith(kok + "_") and f.endswith(".json")
@@ -147,8 +142,7 @@ def veri_yedekle():
     print(f"🛡️ Manuel yedekleme tamamlandı. (Maks. {MAX_YEDEK_SAYISI} yedek/dosya)")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Kural 2 — Merkezi kullanıcı envanter/log erişimi
-# (Ayrı klasör ve inventory_{email}.json mantığı tamamen kaldırıldı)
+#  Merkezi kullanıcı envanter/log erişimi
 # ─────────────────────────────────────────────────────────────────────────────
 def kullanici_envanterini_getir(user_email: str) -> list:
     """inventory.json içinden tek kullanıcının listesini döndürür."""
@@ -200,7 +194,6 @@ def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
     try:
         ham = load_json(dosya_adi)
         if 'recipes' in dosya_adi:
-            # {"tarifler": [...]} → [...]  veya zaten liste ise doğrudan döndür
             if isinstance(ham, dict):
                 return ham.get('tarifler', [])
             elif isinstance(ham, list):
@@ -308,26 +301,88 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori, user_email=None):
         print(f"❌ Günlük kaydı hatası: {e}")
 
 # ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
-def envanter_guncelle(yemek_adi, user_email):
+
+# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
+# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
+def envanter_guncelle(yemek_adi, user_email, disaridan_malzemeler=None):
     try:
+        import re 
         tarifler = veriyi_yukle()
         envanter = kullanici_envanterini_getir(user_email)
 
-        secilen_tarif = next(
-            (t for t in tarifler if t["ad"].lower() == yemek_adi.lower()), None
-        )
-        if secilen_tarif:
-            for malzeme in secilen_tarif["malzemeler"]:
-                for stok in envanter:
-                    if veri_temizle(stok["ad"]) == veri_temizle(malzeme):
-                        stok["miktar"] = max(0, stok["miktar"] - 1)
-            kullanici_envanterini_kaydet(user_email, envanter)
-            print(f"✅ {yemek_adi} yapıldı, stoklar düşüldü.")
-        else:
-            print(f"⚠️ {yemek_adi} tarifi bulunamadı.")
-    except Exception as e:
-        print(f"❌ Veri güncelleme hatası: {e}")
+        def harf_duzelt(metin):
+            return str(metin).lower().replace("ı","i").replace("ş","s").replace("ğ","g").replace("ü","u").replace("ö","o").replace("ç","c").strip()
 
+        print(f"\n[{yemek_adi}] Pişirildi! Envanter kontrolü başlıyor...")
+        
+        malzemeler_listesi = []
+
+        if disaridan_malzemeler and isinstance(disaridan_malzemeler, list) and len(disaridan_malzemeler) > 0:
+            malzemeler_listesi = disaridan_malzemeler
+        else:
+            hedef_yemek = harf_duzelt(yemek_adi)
+            for t in tarifler:
+                if harf_duzelt(t.get("ad", "")) == hedef_yemek or harf_duzelt(t.get("title", "")) == hedef_yemek:
+                    malzemeler_listesi = t.get("malzemeler", []) or t.get("ingredients", [])
+                    break
+
+        if not malzemeler_listesi:
+            print("❌ HATA: Malzeme listesi boş!")
+            return
+
+        guncellenen = 0
+        for malzeme in malzemeler_listesi:
+            if isinstance(malzeme, dict):
+                malzeme_adi = malzeme.get("isim", "")
+                malzeme_birimi = str(malzeme.get("birim", "adet")).lower().strip()
+                try:
+                    gerekli_miktar = float(malzeme.get("miktar", 1))
+                except:
+                    gerekli_miktar = 1
+            else:
+                malzeme_str = str(malzeme).lower().strip()
+                match = re.search(r'^(\d+[\.,]?\d*)\s*([a-zA-Zçğıöşü]+)?\s*(.*)', malzeme_str)
+                if match:
+                    try:
+                        gerekli_miktar = float(match.group(1).replace(',', '.'))
+                    except:
+                        gerekli_miktar = 1
+                    malzeme_birimi = match.group(2) if match.group(2) else "adet"
+                    sadece_isim = match.group(3).strip()
+                    malzeme_adi = sadece_isim if sadece_isim else malzeme_str
+                else:
+                    gerekli_miktar = 1
+                    malzeme_birimi = "adet"
+                    malzeme_adi = malzeme_str
+
+            temiz_malzeme = harf_duzelt(malzeme_adi)
+
+            for stok in envanter:
+                temiz_stok = harf_duzelt(stok.get("ad", ""))
+                
+                if temiz_stok in temiz_malzeme or temiz_malzeme in temiz_stok:
+                    mevcut_miktar = int(stok.get("miktar", 0))
+                    adet_kabul_edilenler = ["adet", "dilim", "diş", "yaprak", "dal", "top", "baş", "demet"]
+                    
+                    if malzeme_birimi in adet_kabul_edilenler:
+                        dusulecek = int(gerekli_miktar)
+                    else:
+                        if mevcut_miktar > 10 and gerekli_miktar > 10:
+                            dusulecek = int(gerekli_miktar)
+                        else:
+                            dusulecek = 1
+                            
+                    yeni_miktar = max(0, mevcut_miktar - dusulecek)
+                    stok["miktar"] = yeni_miktar
+                    guncellenen += 1
+                    print(f"    📉 EŞLEŞTİ: {stok.get('ad')} (-{dusulecek} birim) -> Kalan: {yeni_miktar}")
+                    break
+                    
+        if guncellenen > 0:
+            kullanici_envanterini_kaydet(user_email, envanter)
+            print(f"🎉 İŞLEM BAŞARILI! Toplam {guncellenen} ürün dolaptan eksiltildi.\n")
+    except Exception as e:
+        print(f"❌ HATA: {e}\n")
 # ─── Envanter istatistikleri ─────────────────────────────────────────────────
 def envanter_istatistikleri(user_email):
     try:
@@ -359,7 +414,7 @@ def akilli_temizlik_yap(user_email):
     Bu, _kritik_yedek_al()'ın tetiklendiği nadir durumlardan biridir.
     """
     try:
-        _kritik_yedek_al("inventory.json")   # ← Otomatik, tek seferlik yedek
+        _kritik_yedek_al("inventory.json") 
 
         envanter   = kullanici_envanterini_getir(user_email)
         bugun      = datetime.now()
@@ -806,8 +861,6 @@ def sifir_ekstra_malzemeli_oneri(user_email=None):
         return []
 
 # ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
-# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
-# ─── Envantere özel AI tarif önerisi (remzi.html sağ kart) ──────────────────
 def envanter_icin_ai_tarif_oner(user_email=None):
     malzemeler_listesi = ai_icin_malzeme_listesi_hazirla(user_email)
 
@@ -853,16 +906,15 @@ Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
         tarifler = json.loads(response.text)
 
         result = []
-        base_id = int(time.time()) # ✅ ÇÖZÜM 1: HER TARİFE EŞSİZ KİMLİK!
+        base_id = int(time.time()) 
         
         for i, t in enumerate(tarifler):
             cat = t.get("category", "ana-menu")
             
-            # ✅ ÇÖZÜM 2: YAPAY ZEKA İSİM DEĞİŞTİRİRSE HEPSİNİ YAKALA
             adims = t.get("steps") or t.get("adimlar") or t.get("yapilisi") or t.get("hazirlanis") or ["1. Tüm malzemeleri hazırlayın.", "2. Afiyetle tüketin."]
             
             result.append({
-                "id":         -(base_id + i), # Asla çakışmayan ID
+                "id":         -(base_id + i), 
                 "title":      t.get("title", "Tarif"),
                 "image":      yemek_fotografi_bul(t.get("title", "")),
                 "time":       t.get("time", "30 dk"),
@@ -871,7 +923,7 @@ Yanıtı SADECE aşağıdaki JSON formatında ver, başka hiçbir metin yazma:
                 "tags":       [cat],
                 "tagLabels":  [KATEGORI_LABEL.get(cat, "🍽️ Öneri")],
                 "ingredients": t.get("ingredients") or t.get("malzemeler") or [],
-                "steps":      adims, # Garantiye alınmış adımlar
+                "steps":      adims, 
                 "desc":       f"Envanterinize göre AI önerisi"
             })
         return result

@@ -8,13 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* Header inject edilene kadar boş div'i gizle — layout shift önler */
     #app-header:empty { visibility: hidden; min-height: 64px; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER (JS tarafından inject edilir) -->
   <div id="app-header"></div>
 
   <!-- ===== HERO ===== -->
@@ -107,7 +105,7 @@
     </div>
   </footer>
 
-  <!-- CHATBOT (JS tarafından inject edilir) -->
+  <!-- CHATBOT  -->
   <div id="chatbot-root"></div>
 
   <script type="module">
@@ -127,7 +125,6 @@
     initDrawer();
 
     // ─── AI Menü Detay Paneli ────────────────────────────────────────────────────
-    // Pencere genelinde AI menü verilerini tutar (detay paneli için)
     window._aiMenuCards = [];
 
     function _ensureMenuDetailPanel() {
@@ -209,23 +206,13 @@
 
         let cleanedList = ingredients.map(ing => {
             let clean = (ing || '').toLocaleLowerCase('tr-TR');
-            
-            // Parantez içlerini sil (örn: "(üzeri için)")
-            clean = clean.replace(/\(.*?\)/g, ''); 
-            
-            // Rakamları ve noktalama işaretlerini sil (1/2, 1.5, 200 vb.)
+            clean = clean.replace(/\(.*?\)/g, '');
             clean = clean.replace(/[\d\/\.,]+/g, ''); 
-            
-            // Ölçü birimleri ve gereksiz kelimeleri kelime bazlı sil (Türkçe karaktere duyarlı)
             [...units, ...extras].forEach(word => {
                 const regex = new RegExp(`(^|\\s)${word}(?=\\s|$)`, 'g');
                 clean = clean.replace(regex, ' ');
             });
-
-            // Fazla boşlukları, tireleri temizle
             clean = clean.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
-            
-            // İlk harfini büyük yap
             if (!clean) return '';
             return clean.charAt(0).toLocaleUpperCase('tr-TR') + clean.slice(1);
         });
@@ -255,7 +242,7 @@
     let missing = [];
     let isMissingLoading = false;
 
-    // --- ÖNEMLİ KISIM: Kısa listeyi atlayıp direkt cache veya yükleniyor durumu ---
+    // --- Kısa listeyi atlayıp direkt cache veya yükleniyor durumu ---
     if (cachedTarif) {
         const d = JSON.parse(cachedTarif);
         if (d.kullanilan_malzemeler) missing = filterMissing(d.kullanilan_malzemeler);
@@ -396,7 +383,7 @@
             }
 
             const malzemelerHtml = (d.kullanilan_malzemeler || []).map(m => `<li style="padding:0.2rem 0;">${m}</li>`).join('');
-            const adimlarHtml = (d.hazirlanis || []).map((a, i) => `
+            const adimlarHtml = (d.adimlar || d.hazirlanis || []).map((a, i) => `
                 <div style="display:flex;gap:0.75rem;margin-bottom:0.85rem;">
                   <span style="width:24px;height:24px;border-radius:50%;background:var(--clr-accent);color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">${i+1}</span>
                   <span>${a.replace(/^\d+\.\s*/, '')}</span>
@@ -454,7 +441,7 @@
         }
     });
 
-    // --- ÖNEMLİ KISIM 2: Arkaplanda eksikleri çekme işlemi ---
+    // Arkaplanda eksikleri çekme işlemi ---
     if (isMissingLoading) {
         setTimeout(async () => {
             try {
@@ -679,7 +666,7 @@
       }
     }
 
-        // Her iki yerde kullanılabilmesi için dışarıda tanımla
+        
     const TEMEL_MALZEMELER_LISTESI = [
       'tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ',
       'şeker', 'salça', 'domates salçası', 'biber salçası',
@@ -718,7 +705,6 @@
         score: _menuScore(menu.id),
         tags: ['Tam Menü'],
         emoji: '✨',
-        // ✅ YENİ — kart nesnesine eklemeden önce filtrele:
         ingredients: _filterTemelMalzemeler(menu.eksik_malzemeler || []),
         _raw: menu
       }));
@@ -727,13 +713,8 @@
       renderMenuGrid('dailyCards', menuCards);
     }
 
-    // fetchDailyMenu'yu window scope'a al ki retry butonu erişebilsin
     window.fetchDailyMenu = fetchDailyMenu;
     fetchDailyMenu();
-    // ─── GÜNLÜK DEĞİŞEN TARİF SEÇİMİ FONKSİYONU ───
-    // MOCK_RECIPES henüz boş olabilir; bu yüzden 'smartrec:recipes-ready'
-    // event'ini dinleyerek tetikliyoruz. Event zaten geldiyse (sayfa geç yüklendiyse)
-    // MOCK_RECIPES.length kontrolü ile anında çalışır.
     function getDailyDiscovery(tag, count, cacheKey) {
       const today = new Date().toDateString();
       const cached = localStorage.getItem(cacheKey);
@@ -765,20 +746,13 @@
     }
 
     // ─── DİĞER TARİF KARTLARINI BAŞLAT ───
-    // Veriler hazır olunca çalışır; zaten yüklüyse anında.
     function renderDiscoveryCards() {
-      // recipes.js'de normalize edilmiş slug etiketleri kullanıyoruz
       const traditional = getDailyDiscovery('geleneksel', 8, 'smartrec_traditional_daily');
       const healthy     = getDailyDiscovery('saglikli',   8, 'smartrec_healthy_daily');
 
       renderRecipeGrid('traditionalCards', traditional, { showDetail: true });
       renderRecipeGrid('healthyCards',     healthy,     { showDetail: true });
     }
-
-    // ── Render tetikleyici: event'ten önce de sonra da güvenli çalışır ────────
-    // loadRecipes() modül yüklenince hemen başlar; import eden sayfa event'i
-    // kaçırabilir. Bu yüzden import sonrası her 50ms'de MOCK_RECIPES.length kontrol
-    // edilir (max 10 sn). Event gelirse interval temizlenir.
     let _discoveryRendered = false;
     function _renderOnce() {
       if (_discoveryRendered) return;
@@ -793,7 +767,6 @@
     } else {
       window.addEventListener('smartrec:recipes-ready', _renderOnce, { once: true });
       window.addEventListener('tarifler-hazir',         _renderOnce, { once: true });
-      // Fallback: event kaçırıldıysa polling ile yakala
       _discoveryPoll = setInterval(() => {
         if (MOCK_RECIPES.length > 0) _renderOnce();
       }, 50);

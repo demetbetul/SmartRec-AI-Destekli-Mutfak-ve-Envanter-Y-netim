@@ -115,6 +115,31 @@
         "skt": "2026-05-17"
       }
     ],
-    "esmanurmuslu68@gmail.com": []
+    "esmanurmuslu68@gmail.com": [
+      {
+        "ad": "patlıcan",
+        "miktar": 3,
+        "birim": "adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "domates",
+        "miktar": 0,
+        "birim": "adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "salatalık",
+        "miktar": 0,
+        "birim": "adet",
+        "skt": "2026-05-17"
+      },
+      {
+        "ad": "hamsi",
+        "miktar": 0,
+        "birim": "gr",
+        "skt": "2026-05-17"
+      }
+    ]
   }
 }

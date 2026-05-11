@@ -69,16 +69,13 @@ export function initRemzi() {
     });
   }
 
-  let isWaitingForResponse = false; // 1. İstek kilidi eklendi
+  let isWaitingForResponse = false;
 
   const sendMsg = async () => {
-    // Eğer Remzi hala düşünüyorsa yeni mesaja izin verme
     if (isWaitingForResponse) return; 
 
     const text = input?.value.trim();
     if (!text || !body) return;
-
-    // İstek başladı, kilidi kapat ve butonu devre dışı bırak
     isWaitingForResponse = true;
     if (sendBtn) sendBtn.disabled = true;
 
@@ -97,7 +94,6 @@ export function initRemzi() {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({
-          // Ön yüzden envanter göndermeyi kaldırdık, çünkü backend (Python) zaten ekliyor.
           mesaj    : text, 
           kullanici: user?.ad || 'Misafir',
           email    : user?.email || ''
@@ -106,13 +102,11 @@ export function initRemzi() {
     
       const data = await res.json();
       const el = document.getElementById(loadId);
-      // Remzi'nin satır atlamalarını düzgün göstermek için ufak bir regex eklendi
       if (el) el.querySelector('p').innerHTML = data.cevap.replace(/\n/g, '<br>') || 'Bir şeyler ters gitti.';
     } catch {
       const el = document.getElementById(loadId);
       if (el) el.querySelector('p').innerHTML = '<span style="color:#C0392B">⚠️ Sunucuya ulaşılamıyor.</span>';
     } finally {
-      // İstek bitti, kilidi aç, butonu aktifleştir ve odağı inputa geri ver
       isWaitingForResponse = false;
       if (sendBtn) sendBtn.disabled = false;
       body.scrollTop = body.scrollHeight;
@@ -140,7 +134,12 @@ export function initDrawer() {
 
   if (!drawer) return;
 
-  const openDrawer  = () => { drawer.classList.add('open'); overlay?.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); };
+  const openDrawer  = () => { 
+    drawer.classList.add('open'); 
+    overlay?.classList.add('open'); 
+    drawer.setAttribute('aria-hidden', 'false'); 
+    syncInventory(); // 🌟 Çekmece her açıldığında 0'ları temizler ve günceller
+  };
   const closeDrawer = () => { drawer.classList.remove('open'); overlay?.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); };
 
   document.getElementById('inventoryToggle')?.addEventListener('click', openDrawer);
@@ -165,20 +164,23 @@ export function initDrawer() {
   document.getElementById('addInventoryBtn')?.addEventListener('click', () => {
     const nameEl   = document.getElementById('invItemName');
     const qtyEl    = document.getElementById('invItemQty');
+    const unitEl   = document.getElementById('invItemUnit'); // Birim eklendi
     const expiryEl = document.getElementById('invItemExpiry');
+    
     const name = nameEl?.value.trim();
+    const unit = unitEl?.value || 'adet';
     if (!name) { nameEl?.focus(); return; }
 
     const user = Auth.getUser();
-    const newItem = { id: Date.now(), ad: name, miktar: Number(qtyEl?.value) || 1, skt: expiryEl?.value || '' };
+    const newItem = { id: Date.now(), ad: name, miktar: Number(qtyEl?.value) || 1, birim: unit, skt: expiryEl?.value || '' };
 
-    const items = getInventory();
+    // Sıfırları temizleyerek yeni öğeyi ekle
+    const items = getInventory().filter(i => Number(i.miktar) > 0);
     items.push(newItem);
     _saveInventory(items);
     _renderInventory();
     _dispatchInventoryChange();
 
-    // Sonra backend'e de gönder (oturum açıksa)
     if (user?.email) {
       fetch('http://localhost:5000/api/inventory/add', {
         method : 'POST',
@@ -187,9 +189,10 @@ export function initDrawer() {
           email          : user.email,
           ad             : name,
           miktar         : Number(qtyEl?.value) || 1,
-          tuketim_suresi : expiryEl?.value ? null : 7  // SKT seçildiyse backend hesaplar
+          birim          : unit, // Arka plana da gram/paket bilgisi gider
+          tuketim_suresi : expiryEl?.value ? null : 7
         })
-      }).catch(() => {}); // backend kapalıysa sessiz kal
+      }).then(() => syncInventory()).catch(() => {}); // Ekledikten sonra eşitle
     }
 
     if (nameEl)   nameEl.value   = '';
@@ -198,11 +201,11 @@ export function initDrawer() {
     nameEl?.focus();
   });
 
-  // Alışveriş: ekle
+
   document.getElementById('addShopBtn')?.addEventListener('click', _addShopItem);
   document.getElementById('shopItemName')?.addEventListener('keypress', e => { if (e.key === 'Enter') _addShopItem(); });
 
-  // İşaretlenenleri temizle
+
   document.getElementById('clearCheckedBtn')?.addEventListener('click', () => {
     _saveShopping(_getShopping().filter(i => !i.checked));
     _renderShopping();
@@ -226,7 +229,10 @@ function _dispatchInventoryChange() {
 function _renderInventory() {
   const list = document.getElementById('inventoryList');
   if (!list) return;
-  const items = getInventory();
+  
+  // 🌟 EKRANA ÇİZMEDEN ÖNCE 0 OLANLARI TEMİZLE
+  let items = getInventory().filter(item => Number(item.miktar) > 0);
+  _saveInventory(items);
 
   if (!items.length) {
     list.innerHTML = '<li class="drawer__empty">Henüz malzeme eklenmedi.</li>';
@@ -244,7 +250,7 @@ function _renderInventory() {
     return `
 <li class="drawer__item" data-id="${item.id}">
   <span class="drawer__item-name">${item.ad}${badge}</span>
-  <span class="drawer__item-meta">${item.miktar} adet${item.skt ? ' · ' + item.skt : ''}</span>
+  <span class="drawer__item-meta">${item.miktar} ${item.birim || 'adet'}${item.skt ? ' · ' + item.skt : ''}</span>
   <button class="drawer__item-del" data-id="${item.id}" aria-label="Sil">✕</button>
 </li>`;
   }).join('');
@@ -252,23 +258,20 @@ function _renderInventory() {
   list.querySelectorAll('.drawer__item-del').forEach(btn => {
     btn.addEventListener('click', () => {
       const all     = getInventory();
-      const item    = all.find(i => String(i.id) === btn.dataset.id); // sil öncesi bul
+      const item    = all.find(i => String(i.id) === btn.dataset.id); 
       const updated = all.filter(i => String(i.id) !== btn.dataset.id);
       _saveInventory(updated);
       _renderInventory();
       _dispatchInventoryChange();
-
-      // Backend'den de sil
       const user = Auth.getUser();
       if (user?.email && item) {
         fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
           method: 'DELETE'
-        }).catch(() => {});
+        }).then(() => syncInventory()).catch(() => {});
       }
     });
   });
 }
-
 // ─── Alışveriş CRUD ───────────────────────────────────────────────────────────
 function _getShopping() {
   try { return JSON.parse(localStorage.getItem(_shopKey()) || '[]'); }
@@ -323,7 +326,7 @@ function _renderShopping() {
     });
   }
 
-  // Migros butonu (tekrar eklenmeyi önle)
+  // Migros butonu 
   const clearBtn = document.getElementById('clearCheckedBtn');
   if (clearBtn && !document.getElementById('migrosSiparisBtn')) {
     const migrosBtn = document.createElement('button');
@@ -337,7 +340,6 @@ function _renderShopping() {
 }
 
 // ─── Eksikleri Alışveriş'e Ekle ──────────────────────────────────────────────
-// ─── Eksikleri Alışveriş'e Ekle ──────────────────────────────────────────────
 export function addMissingToShopping(recipeMaterials) {
   const inv  = getInventory().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
   const shop = _getShopping().map(i => i.ad.toLocaleLowerCase('tr-TR').trim());
@@ -345,8 +347,6 @@ export function addMissingToShopping(recipeMaterials) {
   // Gereksiz kelimeleri temizleme listeleri
   const units = ['su bardağı', 'çay bardağı', 'yemek kaşığı', 'tatlı kaşığı', 'çay kaşığı', 'kahve fincanı', 'gram', 'gr', 'kilogram', 'kg', 'ml', 'litre', 'lt', 'adet', 'dilim', 'tutam', 'paket', 'demet', 'diş', 'baş', 'kutu', 'kase', 'fincan', 'bardak', 'kaşık', 'yaprak', 'dal', 'küp', 'yarım', 'çeyrek', 'birkaç', 'tepeleme', 'silme', 'avuç', 'kilo', 'porsiyon'];
   const extras = ['rendelenmiş', 'haşlanmış', 'doğranmış', 'ezilmiş', 'kıyılmış', 'oda sıcaklığında', 'soğuk', 'sıcak', 'ılık', 'ince', 'kalın', 'iri', 'ufak', 'ayıklanmış', 'yıkanmış', 'kavrulmuş', 'eritilmiş', 'kırılmış', 'çırpılmış', 'dövülmüş', 'isteğe bağlı', 'üzeri için', 'süslemek için', 'içi için'];
-
-  // Temel malzemeleri zaten hiç eklemeyelim
   const TEMEL_MALZEMELER = ['tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ', 'şeker', 'salça', 'domates salçası', 'biber salçası', 'un', 'nişasta', 'sirke', 'limon suyu', 'sarımsak', 'soğan', 'tereyağı', 'tereyağ', 'margarin', 'toz şeker', 'pudra şekeri', 'vanilya', 'kabartma tozu', 'kırmızı pul biber', 'nane', 'kekik', 'pul biber'];
 
   let missing = [];
@@ -367,12 +367,10 @@ export function addMissingToShopping(recipeMaterials) {
       const isTemel = TEMEL_MALZEMELER.some(temel => clean === temel || clean.includes(temel) || temel.includes(clean));
       if (isTemel) return;
 
-      // Hem envanter (inv) hem de sepet (shop) kontrolünü daha esnek yapıyoruz (includes ile)
       const isInInventory = inv.some(invItem => invItem.length > 2 && (clean.includes(invItem) || invItem.includes(clean)));
       const isInShop = shop.some(shopItem => shopItem.length > 2 && (clean.includes(shopItem) || shopItem.includes(clean)));
 
       if (!isInInventory && !isInShop) {
-          // İlk harfini büyük yapıp listeye al
           const capitalized = clean.charAt(0).toLocaleUpperCase('tr-TR') + clean.slice(1);
           if (!missing.includes(capitalized)) {
               missing.push(capitalized);
@@ -401,5 +399,32 @@ export function addMissingToShopping(recipeMaterials) {
     );
     document.getElementById('tabInventory')?.classList.add('hidden');
     document.getElementById('tabShopping')?.classList.remove('hidden');
+  }
+}
+// ─── Backend ile Senkronizasyon ve Temizlik ──────────────────────────────────
+export async function syncInventory() {
+  const user = (typeof Auth !== 'undefined') ? Auth.getUser() : null;
+  if (!user || !user.email) return;
+  
+  try {
+    const res = await fetch(`http://localhost:5000/api/inventory?email=${encodeURIComponent(user.email)}`);
+    const data = await res.json();
+    const backendVerisi = data.envanter || data.inventory || data.data || data.items || [];
+    
+    // 🌟 Miktarı 0 ve altı olanları FİLTRELE (Çöpe at) ve formatla!
+    const temizVeri = backendVerisi
+      .filter(item => Number(item.miktar) > 0)
+      .map((item, index) => ({
+        id: item.id || Date.now() + index,
+        ad: item.ad || item.name || item.isim || 'Bilinmeyen Malzeme',
+        miktar: Number(item.miktar || item.quantity || 1),
+        birim: item.birim || item.unit || 'adet',
+        skt: item.skt || item.tuketim_suresi || ''
+      }));
+      
+    _saveInventory(temizVeri);
+    _renderInventory();
+  } catch (err) {
+    console.error("Senkronizasyon hatası:", err);
   }
 }
