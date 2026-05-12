@@ -7,8 +7,9 @@ function _userSuffix() {
   return '_' + user.email.replace('@', '_at_').replace(/\./g, '_');
 }
 
-function _invKey()  { return `smartrec_inventory${_userSuffix()}`; }
-function _shopKey() { return `smartrec_shopping${_userSuffix()}`; }
+// 🌟 DÜZELTME: Sidebar artık e-postalı özel kutuya değil, Panel ile AYNI düz kutuya bakacak!
+function _invKey()  { return `smartrec_inventory`; }
+function _shopKey() { return `smartrec_shopping`; }
 
 // ─── Toast yardımcısı ─────────────────────────────────────────────────────────
 function _srToast({ type = 'info', icon = 'ℹ️', title = '', sub = '' } = {}) {

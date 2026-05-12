@@ -123,12 +123,6 @@
         "skt": "2026-05-17"
       },
       {
-        "ad": "domates",
-        "miktar": 0,
-        "birim": "adet",
-        "skt": "2026-05-17"
-      },
-      {
         "ad": "salatalık",
         "miktar": 0,
         "birim": "adet",
@@ -139,6 +133,36 @@
         "miktar": 0,
         "birim": "gr",
         "skt": "2026-05-17"
+      },
+      {
+        "ad": "patates",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-16"
+      },
+      {
+        "ad": "süt",
+        "miktar": 1,
+        "birim": "lt",
+        "skt": "2026-05-20"
+      },
+      {
+        "ad": "ekmek",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-20"
+      },
+      {
+        "ad": "armut",
+        "miktar": 1,
+        "birim": "Adet",
+        "skt": "2026-05-20"
+      },
+      {
+        "ad": "muz",
+        "miktar": 1,
+        "birim": "adet",
+        "skt": "2026-05-20"
       }
     ]
   }

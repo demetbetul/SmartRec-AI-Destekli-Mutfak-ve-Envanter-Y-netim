@@ -14,6 +14,9 @@
     "source.fixAll": "explicit"
   },
   "liveServer.settings.ignoreFiles": [
-    "**/*.json"
+    ".vscode/**",
+    "**/*.json",
+    "**/data/**",
+    "**/backups/**"
   ]
 }

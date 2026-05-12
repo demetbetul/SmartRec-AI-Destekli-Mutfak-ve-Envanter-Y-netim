@@ -407,17 +407,18 @@ def envanter_istatistikleri(user_email):
         logging.error(f"SKT Analiz hatası: {e}")
 
 # ─── Akıllı temizlik (KRİTİK işlem — otomatik yedek alır) ───────────────────
+# ─── Akıllı temizlik (KRİTİK işlem — otomatik yedek alır) ───────────────────
+# ─── Akıllı temizlik (KRİTİK işlem — otomatik yedek alır) ───────────────────
+# ─── Akıllı temizlik (KRİTİK işlem — otomatik yedek alır) ───────────────────
 def akilli_temizlik_yap(user_email):
-    """
-    Süresi geçmiş ürünleri envanterden siler.
-    Silme geri alınamaz olduğundan işlem öncesinde otomatik kritik yedek alınır.
-    Bu, _kritik_yedek_al()'ın tetiklendiği nadir durumlardan biridir.
-    """
     try:
-        _kritik_yedek_al("inventory.json") 
+        # 🌟 LİVE SERVER'IN SAYFAYI YENİLEMESİNİ ENGELLEMEK İÇİN YEDEĞİ KAPATTIK
+        # _kritik_yedek_al("inventory.json") 
 
         envanter   = kullanici_envanterini_getir(user_email)
-        bugun      = datetime.now()
+        
+        # 🌟 TARİH KARIŞIKLIĞINI ÖNLEMEK İÇİN SAATİ SIFIRLADIK
+        bugun      = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         kalanlar   = []
         silinenler = []
 
@@ -436,7 +437,6 @@ def akilli_temizlik_yap(user_email):
     except Exception as e:
         logging.error(f"Temizlik hatası: {e}")
         return False, []
-
 # ─── Günlük kaloriyi getir ────────────────────────────────────────────────────
 def bugunku_kaloriyi_getir(user_email=None):
     tarih = datetime.now().strftime("%Y-%m-%d")
@@ -476,7 +476,7 @@ def get_recipes_from_gemini(malzemeler_metni):
     Sen profesyonel bir aşçısın. Elimdeki şu malzemeleri kullanarak bana BİRBİRİNDEN FARKLI 3 ADET MENÜ ALTERNATİFİ öner: {malzemeler_metni}.
 
     Her menü alternatifinde başlangıç, ana yemek ve tatlı KESİNLİKLE olmalıdır.
-    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt, bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle ve tüm menünün tahmini toplam hazırlanma süresini (Örn: "45 dk", "1 saat 15 dk") 'hazirlik_suresi' olarak belirt.
+    Ayrıca her menü için evde eksik olan tahmini 3-4 malzemeyi 'eksik_malzemeler' olarak belirt, bu menünün genel yapım zorluğunu (Kolay, Orta veya Zor) 'zorluk' olarak ekle ve tüm menünün tahmini toplam hazırlanma süresini (Örn: "45 dk", "75 dk" gibi SADECE DAKİKA cinsinden) 'hazirlik_suresi' olarak belirt.
 
     Yanıtı SADECE aşağıdaki JSON formatında ver, dışına hiçbir metin veya açıklama yazma:
     {{

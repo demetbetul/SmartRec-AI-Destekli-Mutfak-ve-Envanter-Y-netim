@@ -34,7 +34,7 @@
     <div class="dashboard__grid">
 
       <!-- ===== ENVANTER ===== -->
-      <section class="dash-card dash-card--inventory">
+      <section class="dash-card dash-card--inventory" style="overflow: visible;">
         <div class="dash-card__header">
           <h2 class="dash-card__title">🧊 Envanter</h2>
           <div style="display:flex;gap:0.5rem;">
@@ -55,22 +55,32 @@
             ⏳ SKT Sırala
           </button>
         </div>
-        <div class="skt-legend">
-          <span class="skt-dot skt-dot--green"></span> Taze
-          <span class="skt-dot skt-dot--orange"></span> Yakında Bozulacak
-          <span class="skt-dot skt-dot--red"></span> Bugün/Geçmiş
+        <div class="skt-legend" id="sktFilters" style="display:flex; gap:12px; cursor:pointer; user-select:none; margin-bottom:10px;">
+          <div data-status="all" style="font-size:0.82rem; font-weight:700; opacity:1; text-decoration:underline;">Tümü</div>
+          <div data-status="green" style="font-size:0.82rem; opacity:0.6; transition:0.2s;"><span class="skt-dot skt-dot--green"></span> Taze</div>
+          <div data-status="orange" style="font-size:0.82rem; opacity:0.6; transition:0.2s;"><span class="skt-dot skt-dot--orange"></span> Yakında Bozulacak</div>
+          <div data-status="red" style="font-size:0.82rem; opacity:0.6; transition:0.2s;"><span class="skt-dot skt-dot--red"></span> Bugün/Geçmiş</div>
         </div>
         <div class="inventory-list" id="inventoryList" style="max-height:320px;overflow-y:auto;padding-right:4px;"></div>
-        <div class="mini-form hidden" id="addInventoryForm">
-          <input type="text" class="input" id="newItemName" list="material-suggestions"
-                 placeholder="Malzeme adı (örn: Yumurta)" autocomplete="off" />
-          <datalist id="material-suggestions">
-            <option value="Süt"><option value="Yumurta"><option value="Un">
-            <option value="Domates"><option value="Peynir"><option value="Zeytinyağı">
-            <option value="Tavuk"><option value="Makarna"><option value="Soğan"><option value="Patates">
-          </datalist>
-          <input type="date" class="input" id="newItemExpiry" />
-          <input type="number" class="input" id="newItemQty" placeholder="Miktar" min="1" value="1" />
+        <div class="mini-form hidden" id="addInventoryForm" style="overflow: visible;">
+          <div style="position: relative; flex: 1; min-width: 150px;">
+            <input type="text" class="input" id="newItemName" placeholder="Malzeme adı (örn: Yumurta)" autocomplete="new-password" style="width: 100%;" />
+            <ul id="customSuggestions" style="display:none; position:absolute; top:100%; left:0; width:100%; background:#fff; border:1px solid #ccc; border-radius:6px; max-height:160px; overflow-y:auto; z-index:999999; list-style:none; padding:0; margin:2px 0 0 0; box-shadow:0 4px 12px rgba(0,0,0,0.15);"></ul>
+          </div> 
+          
+          <input type="date" class="input" id="newItemExpiry" style="max-width: 130px;" />
+          <input type="number" class="input" id="newItemQty" placeholder="Miktar" min="1" value="1" style="max-width: 70px;" />
+          
+          <select id="newItemUnit" class="input" style="max-width: 90px; cursor: pointer; padding: 0.4rem;">
+            <option value="adet">Adet</option>
+            <option value="gr">Gram</option>
+            <option value="kg">Kg</option>
+            <option value="ml">Mililitre</option>
+            <option value="lt">Litre</option>
+            <option value="paket">Paket</option>
+            <option value="demet">Demet</option>
+          </select>
+
           <div style="display:flex;gap:0.5rem;">
             <button class="btn btn--primary btn--sm" id="saveInventoryBtn">Kaydet</button>
             <button class="btn btn--ghost btn--sm" id="cancelInventoryBtn">İptal</button>
@@ -170,6 +180,9 @@
     initPage();
     initRemzi();
     initDrawer();
+    initDrawer();
+    
+    setTimeout(() => window.dispatchEvent(new CustomEvent('smartrec:inventory-change')), 300);
 
     if (!Auth.isLoggedIn()) {
       Auth.requireAuth('dashboard.html');
@@ -184,30 +197,39 @@
     const subtitleEl = document.getElementById('userNameDisplay');
     if (subtitleEl) subtitleEl.textContent = `Hoş geldin, ${displayName}! Mutfak envanterini yönet.`;
 
-    // ─── LOCAL STORAGE KEYS ───────────────────────────────
-    
+    // ─── LOKAL HAFIZA ANAHTARLARI ───
     function _userSuffix() {
       const u = Auth.getUser();
       return u?.email ? '_' + u.email.replace('@','_at_').replace(/\./g,'_') : '';
     }
-    const LS_INV   = () => `smartrec_inventory${_userSuffix()}`;
-    const LS_SHOP  = () => `smartrec_shopping${_userSuffix()}`;
+    const LS_INV   = () => `smartrec_inventory`;
+    const LS_SHOP  = () => `smartrec_shopping`;
     const LS_CAL   = `smartrec_calories_log${_userSuffix()}`;  
     const LS_GOAL  = 'smartrec_cal_goal';
-
-   function getInv() { 
-  try { 
-    let items = JSON.parse(localStorage.getItem(LS_INV()) || '[]'); 
-    // 🌟 SIFIR OLANLARI HER ZAMAN FİLTRELE
-    return items.filter(i => Number(i.miktar) > 0);
-  } catch { return []; } 
-}
-    function saveInv(d) { localStorage.setItem(LS_INV(),  JSON.stringify(d)); }
-    function getShop()  { try { return JSON.parse(localStorage.getItem(LS_SHOP()) || '[]'); } catch { return []; } }
+    // 🌟 EKSİKSİZ VERİ ÇEKME VE KAYDETME FONKSİYONLARI
+    
+    function getInv() { 
+      try { 
+        let items = JSON.parse(localStorage.getItem(LS_INV()) || '[]'); 
+        return items.filter(i => Number(i.miktar) > 0);
+      } catch { return []; } 
+    }
+    function saveInv(d) { 
+      localStorage.setItem(LS_INV(), JSON.stringify(d)); 
+      window.dispatchEvent(new CustomEvent('smartrec:inventory-change')); 
+    }
+    
+    function getShop()  { 
+      try { 
+        return JSON.parse(localStorage.getItem(LS_SHOP()) || '[]'); 
+      } catch { return []; } 
+    }
     function saveShop(d) {
       localStorage.setItem(LS_SHOP(), JSON.stringify(d));
-      window.dispatchEvent(new CustomEvent('smartrec:shopping-change'));
+      window.dispatchEvent(new CustomEvent('smartrec:shopping-change')); 
     }
+
+    // 🌟 YANLIŞLIKLA SİLDİRDİĞİM KALORİ FONKSİYONLARI (GERİ GELDİ!)
     function getGoal() { return parseInt(localStorage.getItem(LS_GOAL) || '2000'); }
     function saveGoal(g){ localStorage.setItem(LS_GOAL, g); }
 
@@ -229,7 +251,6 @@
       }
       return days;
     }
-
     // ─── ENVANTER ────────────────────────────────────────
     function renderInventory() {
       const container = document.getElementById('inventoryList');
@@ -269,7 +290,7 @@
               ${badgeHtml}
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-              <span style="font-size:0.8rem;color:#888;">${item.miktar} adet</span>
+              <span style="font-size:0.8rem;color:#888;">${item.miktar} ${item.birim || 'adet'}</span>
               <button class="qty-btn" data-action="minus" data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">−</button>
               <button class="qty-btn" data-action="plus"  data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">+</button>
               <button class="del-btn" data-id="${item.id}" style="width:24px;height:24px;border:none;border-radius:6px;background:#fef0f0;cursor:pointer;font-size:0.8rem;color:#e74c3c;">✕</button>
@@ -317,7 +338,7 @@
       _renderNotifications(items);
     }
 
-    // Envanter formu
+// Envanter formu
     const addInventoryBtn    = document.getElementById('addInventoryBtn');
     const addInventoryForm   = document.getElementById('addInventoryForm');
     const saveInventoryBtn   = document.getElementById('saveInventoryBtn');
@@ -325,36 +346,51 @@
     const inputAd            = document.getElementById('newItemName');
     const inputSKT           = document.getElementById('newItemExpiry');
     const inputMiktar        = document.getElementById('newItemQty');
+    const inputBirim         = document.getElementById('newItemUnit'); // 🌟 YENİ EKLENDİ
 
-    addInventoryBtn?.addEventListener('click', () => {
+    addInventoryBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
       addInventoryForm?.classList.toggle('hidden');
       inputAd?.focus();
     });
-    cancelInventoryBtn?.addEventListener('click', () => {
+    cancelInventoryBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
       addInventoryForm?.classList.add('hidden');
-      inputAd.value = ''; inputSKT.value = ''; inputMiktar.value = '1';
+      if(inputAd) inputAd.value = ''; 
+      if(inputSKT) inputSKT.value = ''; 
+      if(inputMiktar) inputMiktar.value = '1';
+      if(inputBirim) inputBirim.value = 'adet'; // 🌟 YENİ
     });
-    saveInventoryBtn?.addEventListener('click', () => {
+    
+    saveInventoryBtn?.addEventListener('click', (e) => {
+      e.preventDefault(); 
       const name = inputAd?.value.trim();
       if (!name) { inputAd?.focus(); return; }
+      
       const skt    = inputSKT?.value || '';
       const miktar = Number(inputMiktar?.value) || 1;
+      const birim  = inputBirim?.value || 'adet'; 
       const items  = getInv();
-      items.push({ id: Date.now(), ad: name, miktar, skt });
+      
+      items.push({ id: Date.now(), ad: name, miktar, birim, skt }); 
       saveInv(items);
+      
       cancelInventoryBtn.click();
-      renderInventory();
+      renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', _invSortBySKT);
+      
+      window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
+      
       _toast(`✅ "${name}" dolaba eklendi.`, 'success');
-      if (user?.email) {t
+      
+      if (user?.email) {
         let tuketim_suresi = 7;
         if (skt) {
-          const diff = Math.ceil((new Date(skt) - new Date()) / 86400000);
-          tuketim_suresi = Math.max(1, diff);
+          tuketim_suresi = Math.ceil((new Date(skt) - new Date()) / 86400000);
         }
         fetch('http://localhost:5000/api/inventory/add', {
           method : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body   : JSON.stringify({ email: user.email, ad: name, miktar, tuketim_suresi })
+          body   : JSON.stringify({ email: user.email, ad: name, miktar, birim, tuketim_suresi: String(tuketim_suresi) }) 
         }).catch(() => {});
       }
     });
@@ -363,6 +399,30 @@
       inp?.addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); i < arr.length-1 ? arr[i+1]?.focus() : saveInventoryBtn?.click(); }
       });
+    });
+
+    // Akıllı temizlik
+    document.getElementById('smartCleanBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const items   = getInv();
+      const today   = todayStr();
+      const expired = items.filter(i => i.skt && i.skt < today).map(i => i.ad);
+      const fresh   = items.filter(i => !i.skt || i.skt >= today);
+      
+      if (!expired.length) {
+        _toast('✨ Dolapta tarihi geçmiş ürün yok, her şey taze!', 'info');
+        return;
+      }
+      if (confirm(`Tarihi geçmiş ${expired.length} ürün temizlenecek:\n${expired.join(', ')}\n\nDevam edilsin mi?`)) {
+        saveInv(fresh);
+        renderInventory();
+        _toast(`🧹 ${expired.length} ürün temizlendi.`, 'success');
+        if (user?.email) {
+          fetch(`http://localhost:5000/api/inventory/smart-clean?email=${encodeURIComponent(user.email)}`, {
+            method: 'POST'
+          }).catch(() => {});
+        }
+      }
     });
 
     // Akıllı temizlik
@@ -497,51 +557,59 @@
       renderShopping();
     }
 
-    document.getElementById('addShopBtn')?.addEventListener('click', () => {
-      const inp = document.getElementById('shopItemInput');
-      _addShopItem(inp?.value);
-      if (inp) inp.value = '';
-      inp?.focus();
-    });
-    document.getElementById('shopItemInput')?.addEventListener('keypress', e => {
-      if (e.key === 'Enter') document.getElementById('addShopBtn').click();
-    });
-    document.getElementById('clearCheckedShopBtn')?.addEventListener('click', () => {
-      const all     = getShop();
-      const checked = all.filter(i => i.checked);
-      const rest    = all.filter(i => !i.checked);
+    document.getElementById('clearCheckedShopBtn')?.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      try {
+          const all = getShop() || [];
+          const checked = all.filter(i => i.checked);
+          const rest = all.filter(i => !i.checked);
+          
+          if (!checked.length) { _toast('İşaretli ürün yok.', 'warn'); return; }
+          
+          // 🌟 ÖNCE ALIŞVERİŞ LİSTESİNDEN SİL Kİ HEMEN KAYBOLSUN
+          saveShop(rest); 
+          if (typeof renderShopping === 'function') renderShopping();
 
-      if (!checked.length) { _toast('İşaretli ürün yok.', 'warn'); return; }
+          const inv = getInv() || [];
+          
+          // 🌟 Otomatik 7 gün sonrasını hesapla
+          const d = new Date();
+          d.setDate(d.getDate() + 7);
+          const autoSkt = d.toISOString().split('T')[0];
 
-      // İşaretlileri envantere ekle
-      const inv = getInv();
-      checked.forEach(shopItem => {
-        const ad = shopItem.ad.trim();
-        const existing = inv.find(i => i.ad.toLowerCase() === ad.toLowerCase());
-        if (existing) {
-          existing.miktar = (existing.miktar || 1) + 1; // zaten varsa miktarı artır
-        } else {
-          inv.push({ id: Date.now() + Math.random(), ad, miktar: 1, skt: '' });
-        }
-      });
-      saveInv(inv);
-      renderInventory();
-      window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
+          checked.forEach(shopItem => {
+            const ad = (shopItem.ad || '').trim();
+            if(!ad) return;
 
-      // Backend'e de yaz
-      if (user?.email) {
-        checked.forEach(shopItem => {
-          fetch('http://localhost:5000/api/inventory/add', {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ email: user.email, ad: shopItem.ad.trim(), miktar: 1, tuketim_suresi: 7 })
-          }).catch(() => {});
-        });
+            const existing = inv.find(i => (i.ad || '').toLowerCase() === ad.toLowerCase());
+            
+            if (existing) {
+              existing.miktar = Number(existing.miktar || 1) + 1; 
+            } else {
+              inv.push({ id: Date.now() + Math.random(), ad: ad, miktar: 1, birim: 'adet', skt: autoSkt });
+            }
+          });
+          
+          // 🌟 SONRA ENVANTERE KAYDET
+          saveInv(inv); 
+          if (typeof window.renderInventory === 'function') {
+              window.renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', typeof _invSortBySKT !== 'undefined' ? _invSortBySKT : false); 
+          }
+          
+          _toast(`✅ ${checked.length} ürün dolaba eklendi.`, 'success');
+          
+          if (typeof user !== 'undefined' && user?.email) { 
+            checked.forEach(shopItem => { 
+              fetch('http://localhost:5000/api/inventory/add', { 
+                method : 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body   : JSON.stringify({ email: user.email, ad: (shopItem.ad || '').trim(), miktar: 1, birim: 'adet', tuketim_suresi: 7 }) 
+              }).catch(() => {}); 
+            }); 
+          }
+      } catch (err) {
+          console.error("Temizleme hatası:", err);
       }
-
-      saveShop(rest);
-      renderShopping();
-      _toast(`✅ ${checked.length} ürün envantere eklendi.`, 'success');
     });
 
     // ── ALIŞVERİŞ LİSTESİ PNG İNDİR ─────────────────────────────────
@@ -796,29 +864,37 @@
     renderInventory();
     renderCalorie();
     renderShopping();
+    
     if (user?.email) {
-      fetch(`http://localhost:5000/api/inventory?email=${encodeURIComponent(user.email)}`)
+      // 🌟 SİLİNEN FETCH SATIRI VE ÖNBELLEK KORUMASI BURADA
+      fetch(`http://localhost:5000/api/inventory?email=${encodeURIComponent(user.email)}&_t=${Date.now()}`)
         .then(r => r.json())
         .then(data => {
           if (data.success && Array.isArray(data.envanter) && data.envanter.length > 0) {
-            // Backend verisini localStorage formatına dönüştür ve kaydet
-            // 🌟 BURADA DA 0 OLANLARI FİLTRELEYİP ÇÖPE ATIYORUZ
+            
             const backendItems = data.envanter
               .filter(item => Number(item.miktar) > 0)
               .map((item, i) => ({
-                id   : item.id || (Date.now() + i),
-                ad   : item.ad,
+                id    : item.id || (Date.now() + i),
+                ad    : item.ad,
                 miktar: item.miktar,
-                skt  : item.skt || ''
+                birim : item.birim || 'adet',
+                skt   : item.skt || ''
               }));
+              
             saveInv(backendItems);
-            renderInventory();
+            renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', _invSortBySKT);
+            
+            // 🌟 İŞTE BU SATIR SİDEBAR'I ANINDA DOLDURUR:
+            window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
           }
         })
         .catch(() => {}); 
     }
 
     let _invSortBySKT = false;
+    let _invFilterStatus = 'all'; // 🌟 YENİ: Hangi renk filtrenin seçildiğini tutar
+
     renderInventory = function renderInventoryExt(filter, sortSKT) {
       const container = document.getElementById('inventoryList');
       if (!container) return;
@@ -826,7 +902,20 @@
       const badge = document.getElementById('inventoryCount');
       if (badge) badge.textContent = items.length;
 
-      // Filtre
+      const today = new Date();
+
+      // 🌟 YENİ: KATEGORİ (RENK) FİLTRESİNİ UYGULA
+      if (_invFilterStatus !== 'all') {
+        items = items.filter(item => {
+          const diff = item.skt ? Math.ceil((new Date(item.skt) - today) / 86400000) : 999;
+          if (_invFilterStatus === 'red') return diff < 0;
+          if (_invFilterStatus === 'orange') return diff >= 0 && diff <= 3;
+          if (_invFilterStatus === 'green') return diff > 3;
+          return true;
+        });
+      }
+
+      // Metin Filtresi
       const q = (filter !== undefined ? filter : (document.getElementById('inventorySearch')?.value?.trim() || '')).toLowerCase();
       if (q) items = items.filter(i => i.ad.toLowerCase().includes(q));
 
@@ -841,14 +930,13 @@
       }
 
       if (!items.length) {
-        container.innerHTML = q
-          ? `<p style="text-align:center;color:#aaa;padding:1.5rem 0;font-size:0.9rem;">🔍 "<em>${q}</em>" için sonuç bulunamadı.</p>`
+        container.innerHTML = q || _invFilterStatus !== 'all'
+          ? `<p style="text-align:center;color:#aaa;padding:1.5rem 0;font-size:0.9rem;">🔍 Kriterlerinize uygun malzeme bulunamadı.</p>`
           : '<p style="text-align:center;color:#aaa;padding:1.5rem 0;font-size:0.9rem;">Henüz malzeme eklenmedi. ↑ Ekle butonunu kullanın.</p>';
-        if (!q) { document.getElementById('expiryCount').textContent = '0'; _renderNotifications([]); }
+        if (!q && _invFilterStatus === 'all') { document.getElementById('expiryCount').textContent = '0'; _renderNotifications([]); }
         return;
       }
 
-      const today = new Date();
       let warnCount = 0;
       container.innerHTML = items.map(item => {
         const diff      = item.skt ? Math.ceil((new Date(item.skt) - today) / 86400000) : 999;
@@ -858,11 +946,17 @@
           ? '<span style="font-size:.72rem;color:#C0392B;font-weight:600;">SKT geçmiş</span>'
           : diff <= 3 ? `<span style="font-size:.72rem;color:#D4720A;font-weight:600;">${diff}g kaldı</span>` : '';
         if (diff <= 3) warnCount++;
+
+        // 🌟 YENİ: TARİHLERİ LİSTEYE YAZDIRMA (Ters çevirerek, GG.AA.YYYY formatında)
+        const formatliTarih = item.skt ? item.skt.split('-').reverse().join('.') : 'Belirtilmedi';
+        const dateHtml = `<span style="font-size:0.75rem; color:#888; margin-left:6px; font-weight:500;">(SKT: ${formatliTarih})</span>`;
+
         return `
           <div class="inventory-item ${cls}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;margin-bottom:6px;border-radius:10px;border:1.5px solid #eee;background:#fafaf8;gap:8px;">
             <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
               <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
               <span style="font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.ad}</span>
+              ${dateHtml}
               ${badgeHtml}
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
@@ -874,7 +968,7 @@
           </div>`;
       }).join('');
 
-      if (!q) { document.getElementById('expiryCount').textContent = warnCount; _renderNotifications(getInv()); }
+      if (!q && _invFilterStatus === 'all') { document.getElementById('expiryCount').textContent = warnCount; _renderNotifications(getInv()); }
 
       container.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -882,12 +976,33 @@
           if (idx < 0) return;
           if (btn.dataset.action === 'plus')  all[idx].miktar = (all[idx].miktar || 1) + 1;
           if (btn.dataset.action === 'minus') all[idx].miktar = Math.max(0, (all[idx].miktar || 1) - 1);
+          const degisim = btn.dataset.action === 'plus' ? 1 : -1;
+          const itemAd  = all[idx]?.ad;
           if (all[idx].miktar === 0) all.splice(idx, 1);
-          saveInv(all); renderInventory();
+          saveInv(all);
+          renderInventory();
+          window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
+          if (user?.email && itemAd) {
+            fetch(`http://localhost:5000/api/inventory/qty/${encodeURIComponent(itemAd)}?email=${encodeURIComponent(user.email)}&degisim=${degisim}`, {
+              method: 'POST'
+            }).catch(() => {});
+          }
         });
       });
+
       container.querySelectorAll('.del-btn').forEach(btn => {
-        btn.addEventListener('click', () => { saveInv(getInv().filter(i => String(i.id) !== btn.dataset.id)); renderInventory(); });
+        btn.addEventListener('click', () => {
+          const all = getInv();
+          const item = all.find(i => String(i.id) === btn.dataset.id);
+          saveInv(all.filter(i => String(i.id) !== btn.dataset.id));
+          renderInventory();
+          window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
+          if (user?.email && item) {
+            fetch(`http://localhost:5000/api/inventory/remove/${encodeURIComponent(item.ad)}?email=${encodeURIComponent(user.email)}`, {
+              method: 'DELETE'
+            }).catch(() => {});
+          }
+        });
       });
     };
 
@@ -902,20 +1017,101 @@
       this.style.borderColor = _invSortBySKT ? 'var(--clr-accent)' : '';
       renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', _invSortBySKT);
     });
+    // 🌟 YENİ: FİLTRE BUTONLARI TIKLAMA İŞLEMLERİ
+    setTimeout(() => {
+      document.querySelectorAll('#sktFilters div[data-status]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          _invFilterStatus = e.currentTarget.dataset.status;
+          
+          // Tıklananı aktif, diğerlerini soluk yap
+          document.querySelectorAll('#sktFilters div[data-status]').forEach(div => {
+             const isAct = div.dataset.status === _invFilterStatus;
+             div.style.opacity = isAct ? '1' : '0.6';
+             div.style.fontWeight = isAct ? '700' : 'normal';
+             div.style.textDecoration = isAct ? 'underline' : 'none';
+          });
+          
+          renderInventory(document.getElementById('inventorySearch')?.value?.trim() || '', _invSortBySKT);
+        });
+      });
+    }, 500);
 
-    function _openMarket(baseUrl, label) {
+    // ─── MAĞAZA LİNKLERİ ───
+    function _openMarket(baseUrl, label) { 
+      const unchecked = getShop().filter(i => !i.checked); 
+      if (!unchecked.length) { _toast('🛒 Listede işaretlenmemiş ürün yok.', 'warn'); return; } 
+      
+      unchecked.forEach((it, idx) => {
+        setTimeout(() => window.open(baseUrl + encodeURIComponent(it.ad), '_blank'), idx * 350);
+      }); 
+      _toast(`🛒 ${label}'de ${unchecked.length} ürün aranıyor…`, 'info'); 
+    }
+    
+    document.getElementById('dashMigrosBtn')?.addEventListener('click', () => _openMarket('https://www.migros.com.tr/arama?q=', 'Migros'));
+    
+    // 🌟 YENİ: Getir direkt arama linklerini engellediği için ana sayfaya yönlendiriyoruz
+    document.getElementById('dashGetirBtn')?.addEventListener('click', () => {
       const unchecked = getShop().filter(i => !i.checked);
       if (!unchecked.length) { _toast('🛒 Listede işaretlenmemiş ürün yok.', 'warn'); return; }
-      unchecked.forEach((it, idx) =>
-        setTimeout(() => window.open(baseUrl + encodeURIComponent(it.ad), '_blank'), idx * 350)
-      );
-      _toast(`🛒 ${label}'de ${unchecked.length} ürün aranıyor…`, 'info');
-    }
-    document.getElementById('dashMigrosBtn')?.addEventListener('click', () =>
-      _openMarket('https://www.migros.com.tr/arama?q=', 'Migros')
-    );
-    document.getElementById('dashGetirBtn')?.addEventListener('click', () =>
-      _openMarket('https://getir.com/search?q=', 'Getir')
-    );
+      
+      window.open('https://getir.com/', '_blank');
+      _toast(`🛒 Getir sitesinden teslimat adresinizi seçmelisiniz.`, 'info');
+    });
+    // 🌟 YEPYENİ AKILLI ARAMA MENÜSÜ KODU
+    setTimeout(() => {
+      const inputAd = document.getElementById('newItemName');
+      const customSuggestions = document.getElementById('customSuggestions');
+      const inputSKT = document.getElementById('newItemExpiry');
+      const defaultMaterials = [
+        "Domates", "Salatalık", "Patates", "Soğan", "Sarımsak", "Havuç", "Kabak", "Patlıcan", 
+        "Yeşil Biber", "Kırmızı Biber", "Brokoli", "Ispanak", "Marul", "Karnabahar", "Bezelye", 
+        "Taze Fasulye", "Elma", "Armut", "Muz", "Portakal", "Mandalina", "Limon", "Üzüm", 
+        "Çilek", "Karpuz", "Kavun", "Şeftali", "Kayısı", "Kiraz", "Nar", "Tavuk Göğsü", 
+        "Tavuk But", "Dana Eti", "Kuzu Eti", "Kıyma", "Sucuk", "Salam", "Sosis", "Yumurta", 
+        "Levrek", "Hamsi", "Somon", "Kırmızı Mercimek", "Yeşil Mercimek", "Nohut", "Kuru Fasulye", 
+        "Barbunya", "Pirinç", "Bulgur", "Makarna", "Zeytinyağı", "Tereyağı", "Ayçiçek Yağı", 
+        "Mısır Yağı", "Tuz", "Karabiber", "Kırmızı Toz Biber", "Kimyon", "Kuru Nane", "Kekik",
+        "Süt", "Peynir", "Un", "Ejder Meyvesi"
+];
+
+      function showSuggestions() {
+        if (!inputAd || !customSuggestions) return;
+        const val = inputAd.value.trim().toLowerCase();
+        const invNames = typeof getInv === 'function' ? getInv().map(i => i.ad.trim()) : [];
+        const allMaterials = [...new Set([...defaultMaterials, ...invNames])];
+        
+        let filtered = allMaterials;
+        if (val) filtered = allMaterials.filter(m => m.toLowerCase().startsWith(val));
+
+        if (filtered.length > 0) {
+          customSuggestions.innerHTML = filtered.map(m =>
+            `<li style="padding:10px 14px; cursor:pointer; border-bottom:1px solid #f0f0f0; font-size:0.9rem; color:#333; transition:background 0.2s;"
+                 onmouseover="this.style.background='#f4f6f8'" onmouseout="this.style.background='#fff'">${m}</li>`
+          ).join('');
+          customSuggestions.style.display = 'block';
+
+          customSuggestions.querySelectorAll('li').forEach(li => {
+            li.addEventListener('click', function(e) {
+              e.stopPropagation();
+              inputAd.value = this.textContent.trim();
+              customSuggestions.style.display = 'none';
+              if(inputSKT) inputSKT.focus();
+            });
+          });
+        } else {
+          customSuggestions.style.display = 'none';
+        }
+      }
+
+      // 🌟 YENİ: Hem yazıldığında hem kutuya tıklandığında (focus) listeyi gösterir!
+      inputAd?.addEventListener('input', showSuggestions);
+      inputAd?.addEventListener('focus', showSuggestions);
+
+      document.addEventListener('click', function(e) {
+        if (e.target !== inputAd && e.target !== customSuggestions) {
+          if(customSuggestions) customSuggestions.style.display = 'none';
+        }
+      });
+    }, 500);
   </script>
 </body>

@@ -1,5 +1,14 @@
 import { Auth } from './auth.js';
 
+export function formatTime(timeStr) {
+  if (!timeStr) return "30 dk";
+  let str = String(timeStr).toLowerCase();
+  if (!str.includes('saat')) return str.replace('dakika', 'dk');
+  
+  let saat = str.match(/(\d+)\s*saat/) ? parseInt(str.match(/(\d+)\s*saat/)[1]) * 60 : 0;
+  let dk = str.match(/(\d+)\s*(dk|dakika)/) ? parseInt(str.match(/(\d+)\s*(dk|dakika)/)[1]) : 0;
+  return (saat + dk) + ' dk';
+}
 // ─── HAFIZA YÖNETİMİ (Pişirildi ve Eklendi Durumları İçin) ────────────────────
 function isCookedToday(id) {
   const today = new Date().toISOString().split('T')[0];
@@ -501,7 +510,7 @@ export function createRecipeCard(recipe, opts = {}) {
     <p class="recipe-card__desc">${recipe.desc}</p>
   </div>
   <div class="recipe-card__meta">
-    <span class="meta-item">⏱ <strong>${recipe.time}</strong></span>
+    <span class="meta-item">⏱ <strong>${formatTime(recipe.time)}</strong></span>
     <span class="meta-item">🔥 <strong>${recipe.calories}</strong> kcal</span>
     <span class="flavor-score">★ ${recipe.score}</span>
   </div>

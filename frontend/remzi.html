@@ -309,17 +309,27 @@
       });
     }
 
-    const createMenuCard = (recipe, categoryLabel) => `
+    const createMenuCard = (recipe, categoryLabel) => {
+      let sure = String(recipe.time || '30 dk').toLowerCase();
+      if (sure.includes('saat')) {
+        let s = sure.match(/(\d+)\s*saat/) ? parseInt(sure.match(/(\d+)\s*saat/)[1]) * 60 : 0;
+        let d = sure.match(/(\d+)\s*(dk|dakika)/) ? parseInt(sure.match(/(\d+)\s*(dk|dakika)/)[1]) : 0;
+        sure = (s + d) + ' dk';
+      } else {
+        sure = sure.replace('dakika', 'dk');
+      }
+      return `
       <div class="menu-card-h" data-id="${recipe.id}" style="cursor:pointer;">
         <img src="${recipe.image}" alt="${recipe.title}" class="menu-card-h__img"
              onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c'" loading="lazy">
         <div class="menu-card-h__body">
           <span class="menu-card-h__tag">${categoryLabel || recipe.tagLabels?.[0] || 'Öneri'}</span>
           <div class="menu-card-h__title">${recipe.title}</div>
-          <div class="menu-card-h__meta">⏱ ${recipe.time} · 🔥 ${recipe.calories} kcal</div>
+          <div class="menu-card-h__meta">⏱ ${sure} · 🔥 ${recipe.calories} kcal</div>
         </div>
         <div class="menu-card-h__arrow">›</div>
       </div>`;
+    };
 
     // ─── SOL KART: Sana Özel Menü (Günlük Sabit) ──────────────────────────────────
     const dailyEl = document.getElementById('remziDailyList');
