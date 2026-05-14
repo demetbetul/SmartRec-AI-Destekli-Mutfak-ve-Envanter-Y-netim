@@ -98,9 +98,9 @@
       },
       {
         "ad": "yumurta",
-        "miktar": 7,
+        "miktar": 8,
         "birim": "Adet",
-        "skt": "2026-05-17"
+        "skt": "2026-05-22"
       },
       {
         "ad": "sucuk",
@@ -113,6 +113,12 @@
         "miktar": 5,
         "birim": "Adet",
         "skt": "2026-05-17"
+      },
+      {
+        "ad": "orta boy patates",
+        "miktar": 1,
+        "birim": "adet",
+        "skt": "2026-05-22"
       }
     ],
     "esmanurmuslu68@gmail.com": [

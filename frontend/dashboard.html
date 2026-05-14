@@ -61,7 +61,7 @@
           <div data-status="orange" style="font-size:0.82rem; opacity:0.6; transition:0.2s;"><span class="skt-dot skt-dot--orange"></span> Yakında Bozulacak</div>
           <div data-status="red" style="font-size:0.82rem; opacity:0.6; transition:0.2s;"><span class="skt-dot skt-dot--red"></span> Bugün/Geçmiş</div>
         </div>
-        <div class="inventory-list" id="inventoryList" style="max-height:320px;overflow-y:auto;padding-right:4px;"></div>
+        <div class="inventory-list" id="dashInventoryList" style="max-height:320px;overflow-y:auto;padding-right:4px;"></div>
         <div class="mini-form hidden" id="addInventoryForm" style="overflow: visible;">
           <div style="position: relative; flex: 1; min-width: 150px;">
             <input type="text" class="input" id="newItemName" placeholder="Malzeme adı (örn: Yumurta)" autocomplete="new-password" style="width: 100%;" />
@@ -253,7 +253,7 @@
     }
     // ─── ENVANTER ────────────────────────────────────────
     function renderInventory() {
-      const container = document.getElementById('inventoryList');
+      const container = document.getElementById('dashInventoryList');
       if (!container) return;
       const items = getInv();
       const badge = document.getElementById('inventoryCount');
@@ -896,7 +896,7 @@
     let _invFilterStatus = 'all'; // 🌟 YENİ: Hangi renk filtrenin seçildiğini tutar
 
     renderInventory = function renderInventoryExt(filter, sortSKT) {
-      const container = document.getElementById('inventoryList');
+      const container = document.getElementById('dashInventoryList');
       if (!container) return;
       let items = getInv();
       const badge = document.getElementById('inventoryCount');
@@ -1113,5 +1113,20 @@
         }
       });
     }, 500);
+
+    import { syncInventory } from './js/remzi.js';
+
+  // Sayfa yüklendiğinde sidebar verilerini arka planda çek ve doldur
+    document.addEventListener('DOMContentLoaded', () => {
+     syncInventory();
+    });
+
+  // Profil menüsünden "Envanter"e tıklandığında sidebar'ı anlık tazele
+  // Not: header.js içinde envanter butonuna genellikle 'openInventoryBtn' ID'si verilir
+    document.addEventListener('click', (e) => {
+     if (e.target.closest('#openInventoryBtn') || e.target.textContent.includes('Envanter')) {
+      syncInventory();
+     }
+    });
   </script>
 </body>
