@@ -79,43 +79,13 @@
     "selen@gmail.com": [],
     "guldaliduygu123@gmail.com": [
       {
-        "ad": "domates",
-        "miktar": 13,
-        "birim": "Adet",
-        "skt": "2026-05-17"
-      },
-      {
-        "ad": "patates",
-        "miktar": 6,
-        "birim": "Adet",
-        "skt": "2026-05-17"
-      },
-      {
-        "ad": "soğan",
-        "miktar": 3,
-        "birim": "Adet",
-        "skt": "2026-05-17"
-      },
-      {
-        "ad": "yumurta",
-        "miktar": 8,
-        "birim": "Adet",
+        "ad": "barbunya",
+        "miktar": 0,
+        "birim": "kg",
         "skt": "2026-05-22"
       },
       {
-        "ad": "sucuk",
-        "miktar": 3,
-        "birim": "Adet",
-        "skt": "2026-05-17"
-      },
-      {
-        "ad": "yeşil soğan",
-        "miktar": 5,
-        "birim": "Adet",
-        "skt": "2026-05-17"
-      },
-      {
-        "ad": "orta boy patates",
+        "ad": "soğan",
         "miktar": 1,
         "birim": "adet",
         "skt": "2026-05-22"

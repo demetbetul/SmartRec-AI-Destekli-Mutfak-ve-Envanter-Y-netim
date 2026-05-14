@@ -350,8 +350,18 @@
 
     addInventoryBtn?.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation(); // ÖNEMLİ: Tıklamanın sayfa geneline yayılıp listeyi anında kapatmasını engeller
+      
+      const formGizliMi = addInventoryForm?.classList.contains('hidden');
       addInventoryForm?.classList.toggle('hidden');
-      inputAd?.focus();
+      
+      if (formGizliMi) {
+        // Form yeni açılıyorsa, HTML'in görünür olmasını bir anlık bekleyip listeyi zorla tetikleriz
+        setTimeout(() => {
+          inputAd?.focus();
+          inputAd?.dispatchEvent(new Event('focus')); 
+        }, 50);
+      }
     });
     cancelInventoryBtn?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -960,7 +970,7 @@
               ${badgeHtml}
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-              <span style="font-size:0.8rem;color:#888;">${item.miktar} adet</span>
+              <span style="font-size:0.8rem;color:#888;">${item.miktar} ${item.birim || 'adet'}</span>
               <button class="qty-btn" data-action="minus" data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">−</button>
               <button class="qty-btn" data-action="plus"  data-id="${item.id}" style="width:24px;height:24px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">+</button>
               <button class="del-btn" data-id="${item.id}" style="width:24px;height:24px;border:none;border-radius:6px;background:#fef0f0;cursor:pointer;font-size:0.8rem;color:#e74c3c;">✕</button>

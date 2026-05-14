@@ -170,7 +170,7 @@ def kullanici_logunu_kaydet(user_email: str, kayitlar: list) -> bool:
 def veri_dogrula(veri, tip):
     if tip == "envanter":
         for item in veri.get("envanter", []):
-            if not all(k in item for k in ("ad", "miktar", "skt")):
+            if not all(k in item for k in ("ad", "miktar", "skt", "birim")):
                 return False, f"Eksik alan bulundu: {item.get('ad', 'Bilinmeyen')}"
     if tip == "tarif":
         for tarif in veri.get("tarifler", []):
@@ -205,7 +205,7 @@ def veriyi_yukle(dosya_adi='recipes.json', user_email=None):
         return [] if "recipes" in dosya_adi else {}
 
 # ─── Envanter ekleme ──────────────────────────────────────────────────────────
-def envanter_malzeme_ekle(user_email, ad, miktar, birim="Adet",
+def envanter_malzeme_ekle(user_email, ad, miktar, birim,
                           kategori=None, tuketim_suresi=7):
     try:
         raf_omru_gun = int(tuketim_suresi) if tuketim_suresi else 7
