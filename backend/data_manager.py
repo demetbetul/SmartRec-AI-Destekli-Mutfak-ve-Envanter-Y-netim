@@ -301,9 +301,6 @@ def yemeği_gunluge_kaydet(yemek_adi, toplam_kalori, user_email=None):
         print(f"❌ Günlük kaydı hatası: {e}")
 
 # ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
-
-# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
-# ─── Envanter güncelleme (yemek yapıldığında) ────────────────────────────────
 def envanter_guncelle(yemek_adi, user_email, disaridan_malzemeler=None):
     try:
         import re 
@@ -376,9 +373,12 @@ def envanter_guncelle(yemek_adi, user_email, disaridan_malzemeler=None):
                     stok["miktar"] = yeni_miktar
                     guncellenen += 1
                     print(f"    📉 EŞLEŞTİ: {stok.get('ad')} (-{dusulecek} birim) -> Kalan: {yeni_miktar}")
+                    if yeni_miktar == 0:
+                        print(f"    🗑️ SİLİNDİ: {stok.get('ad')} tamamen bitti!")
                     break
                     
         if guncellenen > 0:
+            envanter = [stok for stok in envanter if int(stok.get("miktar", 0)) > 0]
             kullanici_envanterini_kaydet(user_email, envanter)
             print(f"🎉 İŞLEM BAŞARILI! Toplam {guncellenen} ürün dolaptan eksiltildi.\n")
     except Exception as e:

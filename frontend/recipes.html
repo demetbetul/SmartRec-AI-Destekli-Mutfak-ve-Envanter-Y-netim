@@ -657,10 +657,34 @@
         recipes = recipes.filter(r => Array.isArray(r.tags) && r.tags.includes(activeFilters.diet));
       }
 
-      if (activeSort === 'calories-asc')   recipes.sort((a, b) => a.calories - b.calories);
-      else if (activeSort === 'calories-desc') recipes.sort((a, b) => b.calories - a.calories);
-      else if (activeSort === 'time-asc')  recipes.sort((a, b) => parseInt(a.time) - parseInt(b.time));
-      else if (activeSort === 'score-desc') recipes.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+      // 🌟 YENİ: Süreyi (saat ve dk) hesaplayıp toplam dakikaya çeviren yardımcı fonksiyon
+      const getMinutes = (timeStr) => {
+        if (!timeStr) return 0;
+        let s = String(timeStr).toLowerCase();
+        let saat = s.match(/(\d+)\s*saat/) ? parseInt(s.match(/(\d+)\s*saat/)[1]) * 60 : 0;
+        let dk = s.match(/(\d+)\s*(dk|dakika)/) ? parseInt(s.match(/(\d+)\s*(dk|dakika)/)[1]) : 0;
+        if (saat === 0 && dk === 0) return parseInt(s) || 0; 
+        return saat + dk;
+      };
+
+      // 🌟 YENİ: Tüm sıralama mantıkları
+      if (activeSort === 'newest') {
+        // En yeni: ID'si en büyük olan (en son eklenen) en üstte çıkar
+        recipes.sort((a, b) => Number(b.id) - Number(a.id));
+      } 
+      else if (activeSort === 'calories-asc') {
+        recipes.sort((a, b) => Number(a.calories) - Number(b.calories));
+      } 
+      else if (activeSort === 'calories-desc') {
+        recipes.sort((a, b) => Number(b.calories) - Number(a.calories));
+      } 
+      else if (activeSort === 'time-asc') {
+        // Süre: 1 saat 30 dk gibi metinleri dakikaya çevirip doğru kıyaslar
+        recipes.sort((a, b) => getMinutes(a.time) - getMinutes(b.time));
+      } 
+      else if (activeSort === 'score-desc') {
+        recipes.sort((a, b) => parseFloat(b.score || 0) - parseFloat(a.score || 0));
+      }
 
       grid.innerHTML = recipes.length
         ? recipes.map(r => createRecipeCard(r, { showDetail: true, showMissing: true, showCooked: true })).join('')

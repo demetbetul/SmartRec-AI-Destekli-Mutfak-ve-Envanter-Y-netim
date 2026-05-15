@@ -277,9 +277,16 @@
         chatBody.appendChild(typingEl);
         chatBody.scrollTop = chatBody.scrollHeight;
         try {
-          const invList = getInventory().map(i => i.ad).join(', ');
-          const envanterBilgisi = invList.trim() === "" ? "Şu an envanterin bomboş." : `Kullanıcının envanterindeki güncel malzemeler şunlar: ${invList}`;
-          const temizMesaj = `[SİSTEM NOTU: ${envanterBilgisi}]\n\n${chatContext}`;
+          const invList = getInventory()
+           .filter(item => Number(item.miktar) > 0) // Sadece bitmemiş olanları al
+           .map(i => i.ad)
+           .join(', ');
+          const kaloriHedefi = localStorage.getItem('smartrec_cal_goal') || '2000';
+          const envanterNotu = invList.trim() === "" 
+            ? "[SİSTEM NOTU: Kullanıcının dijital envanteri ŞU AN BOŞ. Kendi kendine malzeme uydurma. ANCAK kullanıcı mesajında açıkça 'elimde şunlar var', 'şu malzemeyle' gibi ifadelerle malzeme belirtiyorsa, SADECE onun belirttiği malzemelerle tarif verebilirsin. Eğer malzeme belirtmiyorsa nazikçe dolaba malzeme eklemesini iste.]" 
+            : `[SİSTEM NOTU: Kullanıcının dijital envanterindeki malzemeler: ${invList}. Kullanıcının günlük kalori hedefi: ${kaloriHedefi} kcal.]`;
+            
+          const temizMesaj = `${envanterNotu}\n\n${chatContext}`;
           const res = await fetch('http://localhost:5000/api/ai/chat', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ mesaj: temizMesaj, userId: user?.id, email: user?.email || '', envanter: getInventory().map(i => i.ad).join(',') })

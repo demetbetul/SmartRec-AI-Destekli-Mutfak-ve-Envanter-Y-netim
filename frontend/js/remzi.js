@@ -90,14 +90,26 @@ export function initRemzi() {
 
     try {
       const user = Auth.getUser();
+      const invData = getInventory(); // Mevcut envanteri al
+      const invList = invData
+       .filter(item => Number(item.miktar) > 0) // Sıfır olanları Remzi'ye söyleme
+       .map(i => i.ad)
+       .join(', ');
+      const kaloriHedefi = localStorage.getItem('smartrec_cal_goal') || '2000';
+      const envanterNotu = invList.trim() === "" 
+        ? "[SİSTEM NOTU: Kullanıcının dijital envanteri ŞU AN BOŞ. Kendi kendine malzeme uydurma. ANCAK kullanıcı mesajında açıkça 'elimde şunlar var', 'şu malzemeyle' gibi ifadelerle malzeme belirtiyorsa, SADECE onun belirttiği malzemelerle tarif verebilirsin. Eğer malzeme belirtmiyorsa nazikçe dolaba malzeme eklemesini iste.]" 
+        : `[SİSTEM NOTU: Kullanıcının dijital envanterindeki güncel malzemeler: ${invList}. Kullanıcının günlük kalori hedefi: ${kaloriHedefi} kcal.]`;
+        
+      const tamMesaj = `${envanterNotu}\n\nKullanıcı Mesajı: ${text}`;
 
       const res  = await fetch('http://localhost:5000/api/ai/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({
-          mesaj    : text, 
+          mesaj    : tamMesaj, 
           kullanici: user?.ad || 'Misafir',
-          email    : user?.email || ''
+          email    : user?.email || '',
+          envanter : invList
         })
       });
     
@@ -139,15 +151,34 @@ export function initDrawer() {
     drawer.classList.add('open'); 
     overlay?.classList.add('open'); 
     drawer.setAttribute('aria-hidden', 'false'); 
-    syncInventory(); // 🌟 Çekmece her açıldığında 0'ları temizler ve günceller
+    syncInventory(); // 🌟 Çekmece her açıldığında verileri tazeler
   };
-  const closeDrawer = () => { drawer.classList.remove('open'); overlay?.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); };
+  const closeDrawer = () => { 
+    drawer.classList.remove('open'); 
+    overlay?.classList.remove('open'); 
+    drawer.setAttribute('aria-hidden', 'true'); 
+  };
+  window.addEventListener('smartrec:inventory-change', () => {
+    _renderInventory();
+    _renderShopping();
+  });
+  syncInventory();
 
   document.getElementById('inventoryToggle')?.addEventListener('click', openDrawer);
   closeBtn?.addEventListener('click', closeDrawer);
   overlay?.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
+  // 🌟 YENİ EKLENEN KISIM: Header dinamik yüklendiği için sayfa genelinde butonu dinliyoruz
+  document.addEventListener('click', (e) => {
+    // Tıklanan öğe #openInventoryBtn ise veya içinde "Envanter" yazan bir navbar linkiyse
+    if (e.target.closest('#openInventoryBtn') || (e.target.classList && e.target.classList.contains('nav__link') && e.target.textContent.includes('Envanter'))) {
+      e.preventDefault();
+      openDrawer();
+    }
+  });
+
+  // Tab Menü Geçişleri
   drawer.querySelectorAll('.drawer__tab').forEach(tab => {
     tab.addEventListener('click', () => {
       drawer.querySelectorAll('.drawer__tab').forEach(t => t.classList.remove('drawer__tab--active'));
@@ -161,11 +192,11 @@ export function initDrawer() {
   _renderInventory();
   _renderShopping();
 
-  // Envanter: ekle
+  // Envanter: Ekle
   document.getElementById('addInventoryBtn')?.addEventListener('click', () => {
     const nameEl   = document.getElementById('invItemName');
     const qtyEl    = document.getElementById('invItemQty');
-    const unitEl   = document.getElementById('invItemUnit'); // Birim eklendi
+    const unitEl   = document.getElementById('invItemUnit');
     const expiryEl = document.getElementById('invItemExpiry');
     
     const name = nameEl?.value.trim();
@@ -180,7 +211,7 @@ export function initDrawer() {
     items.push(newItem);
     _saveInventory(items);
     _renderInventory();
-    _dispatchInventoryChange();
+    window.dispatchEvent(new CustomEvent('smartrec:inventory-change'));
 
     if (user?.email) {
       fetch('http://localhost:5000/api/inventory/add', {
@@ -190,10 +221,10 @@ export function initDrawer() {
           email          : user.email,
           ad             : name,
           miktar         : Number(qtyEl?.value) || 1,
-          birim          : unit, // Arka plana da gram/paket bilgisi gider
+          birim          : unit, 
           tuketim_suresi : expiryEl?.value ? null : 7
         })
-      }).then(() => syncInventory()).catch(() => {}); // Ekledikten sonra eşitle
+      }).then(() => syncInventory()).catch(() => {});
     }
 
     if (nameEl)   nameEl.value   = '';
@@ -202,17 +233,15 @@ export function initDrawer() {
     nameEl?.focus();
   });
 
-
+  // Alışveriş: Ekle ve Temizle
   document.getElementById('addShopBtn')?.addEventListener('click', _addShopItem);
   document.getElementById('shopItemName')?.addEventListener('keypress', e => { if (e.key === 'Enter') _addShopItem(); });
-
 
   document.getElementById('clearCheckedBtn')?.addEventListener('click', () => {
     _saveShopping(_getShopping().filter(i => !i.checked));
     _renderShopping();
   });
 }
-
 // ─── Envanter CRUD ────────────────────────────────────────────────────────────
 export function getInventory() {
   try { return JSON.parse(localStorage.getItem(_invKey()) || '[]'); }
@@ -347,8 +376,9 @@ export function addMissingToShopping(recipeMaterials) {
   
   // Gereksiz kelimeleri temizleme listeleri
   const units = ['su bardağı', 'çay bardağı', 'yemek kaşığı', 'tatlı kaşığı', 'çay kaşığı', 'kahve fincanı', 'gram', 'gr', 'kilogram', 'kg', 'ml', 'litre', 'lt', 'adet', 'dilim', 'tutam', 'paket', 'demet', 'diş', 'baş', 'kutu', 'kase', 'fincan', 'bardak', 'kaşık', 'yaprak', 'dal', 'küp', 'yarım', 'çeyrek', 'birkaç', 'tepeleme', 'silme', 'avuç', 'kilo', 'porsiyon'];
-  const extras = ['rendelenmiş', 'haşlanmış', 'doğranmış', 'ezilmiş', 'kıyılmış', 'oda sıcaklığında', 'soğuk', 'sıcak', 'ılık', 'ince', 'kalın', 'iri', 'ufak', 'ayıklanmış', 'yıkanmış', 'kavrulmuş', 'eritilmiş', 'kırılmış', 'çırpılmış', 'dövülmüş', 'isteğe bağlı', 'üzeri için', 'süslemek için', 'içi için'];
-  const TEMEL_MALZEMELER = ['tuz', 'karabiber', 'su', 'sıvıyağ', 'zeytinyağı', 'zeytinyağ', 'şeker', 'salça', 'domates salçası', 'biber salçası', 'un', 'nişasta', 'sirke', 'limon suyu', 'sarımsak', 'soğan', 'tereyağı', 'tereyağ', 'margarin', 'toz şeker', 'pudra şekeri', 'vanilya', 'kabartma tozu', 'kırmızı pul biber', 'nane', 'kekik', 'pul biber'];
+  const extras = ['dilimlenmiş','rendelenmiş', 'haşlanmış', 'doğranmış', 'ezilmiş', 'kıyılmış', 'oda sıcaklığında', 'soğuk', 'sıcak', 'ılık', 'ince', 'kalın', 'iri', 'ufak', 'ayıklanmış', 'yıkanmış', 'kavrulmuş', 'eritilmiş', 'kırılmış', 'çırpılmış', 'dövülmüş', 'isteğe bağlı','İsteğe bağlı', 'üzeri için', 'süslemek için', 'içi için','bayat', 'taze', 'kuru', 'bütün', 'yarım', 'çiğ', 'pişmiş', 'konserve', 'fermente', 'organik', 'glutensiz', 'vegan', 'vegetaryen', 'az yağlı', 'yağsız', 'şekerli', 'şekersiz', 'tuzlu', 'tuzsuz', 'orta boy', 'küçük boy', 'büyük boy', 'biraz', 'bir miktar', 'yeterince', 'damak tadına göre', 'garnitürlük', 'servislik', 'marinelenmiş', 'soslu', 'baharatlı', 'tatlı', 'acı', 'ekşi', 'tuzlu', 'sarısı', 'renkli', 'rendesi', 'rende'];
+  const TEMEL_MALZEMELER = ['tuz', 'karabiber', 'su', 'sıvıyağ','sıvı yağ', 'Sıvı yağ','ekmek','kırmızı biber', 'Sıvıyağ', 'zeytinyağı', 'zeytinyağ', 'şeker', 'salça', 'salçası', 'salça', 'un', 'sirke', 'limon suyu', 'sarımsak', 'tereyağı', 'tereyağ', 'margarin', 'toz şeker', 'kırmızı pul biber', 'nane', 'kekik', 'pul biber','kimyon', 'isot', 
+    'sumak', 'tarçın', 'karbonat', 'susam', 'çörek otu'];
 
   let missing = [];
 

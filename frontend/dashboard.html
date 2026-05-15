@@ -1125,18 +1125,5 @@
     }, 500);
 
     import { syncInventory } from './js/remzi.js';
-
-  // Sayfa yüklendiğinde sidebar verilerini arka planda çek ve doldur
-    document.addEventListener('DOMContentLoaded', () => {
-     syncInventory();
-    });
-
-  // Profil menüsünden "Envanter"e tıklandığında sidebar'ı anlık tazele
-  // Not: header.js içinde envanter butonuna genellikle 'openInventoryBtn' ID'si verilir
-    document.addEventListener('click', (e) => {
-     if (e.target.closest('#openInventoryBtn') || e.target.textContent.includes('Envanter')) {
-      syncInventory();
-     }
-    });
   </script>
 </body>

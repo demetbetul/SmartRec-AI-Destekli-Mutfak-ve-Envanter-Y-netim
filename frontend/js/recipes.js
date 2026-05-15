@@ -38,12 +38,33 @@ function _favKey() {
 
 // ─── Temel Malzeme Filtresi (Tuz, Su vb. Listeye Eklenmesin Diye) ───────────
 function filtreleTemelMalzemeler(malzemelerListesi) {
-  if (!malzemelerListesi) return [];
-  const atilacaklar = ['tuz', 'su', 'karabiber', 'zeytinyağı', 'sıvı yağ', 'sıvıyağ', 'ayçiçek yağı', 'yağ', 'şeker'];
-  return malzemelerListesi.filter(malzeme => {
-    const kucuk = malzeme.toLowerCase().trim();
-    return !atilacaklar.some(t => kucuk === t || kucuk.endsWith(' ' + t));
-  });
+
+  const TEMEL_MALZEMELER = ['tuz', 'karabiber', 'su', 'sıvıyağ','sıvı yağ', 'Sıvı yağ', 'Sıvıyağ', 'zeytinyağı', 'zeytinyağ', 'şeker', 'salça', 'domates salçası', 'biber salçası', 'un', 'sirke', 'limon suyu', 'sarımsak', 'tereyağı', 'tereyağ', 'margarin', 'toz şeker', 'kırmızı pul biber', 'nane', 'kekik', 'pul biber','kimyon', 'isot', 
+    'sumak', 'tarçın', 'karbonat', 'susam', 'çörek otu'];
+  const extras = ['dilimlenmiş','rendelenmiş', 'haşlanmış', 'doğranmış', 'ezilmiş', 'kıyılmış', 'oda sıcaklığında', 'soğuk', 'sıcak', 'ılık', 'ince', 'kalın', 'iri', 'ufak', 'ayıklanmış', 'yıkanmış', 'kavrulmuş', 'eritilmiş', 'kırılmış', 'çırpılmış', 'dövülmüş', 'isteğe bağlı', 'üzeri için', 'süslemek için', 'içi için','taze', 'kuru', 'bütün', 'yarım', 'çiğ', 'pişmiş', 'konserve', 'fermente', 'organik', 'glutensiz', 'vegan', 'vegetaryen', 'az yağlı', 'yağsız', 'şekerli', 'şekersiz', 'tuzlu', 'tuzsuz', 'orta boy', 'küçük boy', 'büyük boy', 'biraz', 'bir miktar', 'yeterince', 'damak tadına göre', 'garnitürlük', 'servislik', 'marinelenmiş', 'soslu', 'baharatlı', 'tatlı', 'acı', 'ekşi', 'tuzlu', 'karışık', 'renkli'];
+  return malzemelerListesi
+    .map(malzeme => {
+      let temiz = malzeme.toLowerCase().trim();
+      
+      // Önce "dilimlenmiş kaşar peyniri" içindeki "dilimlenmiş" kelimesini bulup siler
+      extras.forEach(sifat => {
+        // Kelimenin tam eşleşmesini siler (örn: taze soğan -> soğan)
+        temiz = temiz.replace(new RegExp(`\\b${sifat}\\b`, 'gi'), '').trim();
+      });
+      
+      // Fazladan kalan boşlukları temizle
+      return temiz.replace(/\s+/g, ' ');
+    })
+    .filter(temizMalzeme => {
+      if (!temizMalzeme) return false; // Eğer geriye bir şey kalmadıysa at
+      
+      // Temizlenen kelime temel malzemelerden biriyse (örn: sadece "kimyon" ise) listeye ekleme
+      return !TEMEL_MALZEMELER.some(t => temizMalzeme === t || temizMalzeme.endsWith(' ' + t));
+    })
+    .map(malzeme => {
+      // Listedeki malzemenin ilk harfini büyük yaparak şık bir görünüm sağlar
+      return malzeme.charAt(0).toUpperCase() + malzeme.slice(1);
+    });
 }
 
 // ─── Favori Yönetimi ──────────────────────────────────────────────────────────

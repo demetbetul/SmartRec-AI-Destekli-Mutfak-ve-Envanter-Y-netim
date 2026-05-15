@@ -32,12 +32,7 @@
         />
         <button class="btn btn--primary search-bar__btn" id="searchBtn">Ara</button>
       </div>
-      <div class="hero__tags">
-        <button class="tag" data-filter="kolay">⚡ Hızlı & Kolay</button>
-        <button class="tag" data-filter="saglikli">🥗 Sağlıklı</button>
-        <button class="tag" data-filter="geleneksel">🫕 Geleneksel</button>
-        <button class="tag" data-filter="vejetaryen">🌿 Vejetaryen</button>
-      </div>
+
     </div>
   </section>
 
@@ -251,6 +246,7 @@
     }
 
     const renderMissing = (items, isLoading = false) => {
+        if (!isLoggedIn) return '';
         if (isLoading) {
             return `
               <div style="margin-top:1.25rem;">
@@ -307,8 +303,8 @@
           <div id="menuDetailMissingArea">${renderMissing(missing, isMissingLoading)}</div>
           
           <div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-top:1rem;border-top:1.5px solid var(--clr-border);margin-top:0.5rem;">
-            ${isLoggedIn ? `<button id="menuDetailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;" ${!missing.length && !isMissingLoading ? 'disabled' : ''}>🛒 Eksikleri Ekle</button>` : `<button class="btn btn--outline btn--sm" style="flex:1;opacity:.7;" onclick="_showMenuAuthToast()">🛒 Eksikleri Ekle</button>`}
-            <button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${tumMenuAdi}">👨‍🍳 Tüm Menünün Tarifi</button>
+           ${isLoggedIn ? `<button id="menuDetailMissingBtn" class="btn btn--outline btn--sm" style="flex:1;" ${!missing.length && !isMissingLoading ? 'disabled' : ''}>🛒 Eksikleri Ekle</button>` : ''}
+           <button id="menuDetailRecipeBtn" class="btn btn--primary btn--sm" style="flex:1;" data-yemek="${tumMenuAdi}">👨‍🍳 Tüm Menünün Tarifi</button>
           </div>
           <div id="menuDetailRecipeSteps" style="display:none;margin-top:1.25rem;">
             <h3 style="font-family:var(--font-display);font-size:1rem;margin-bottom:0.85rem;padding-bottom:0.4rem;border-bottom:2px solid var(--clr-accent-light);">👨‍🍳 Adım Adım Tarif</h3>
